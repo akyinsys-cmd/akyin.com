@@ -1,5 +1,7 @@
 import { ArrowUpRight } from 'lucide-react';
 import { OFFICIAL_CONTACT } from '../data/akyinData';
+import { useSiteConfig } from '../context/SiteConfigContext';
+import { sanitizeHref } from '../utils/security';
 
 interface SocialLinksProps {
   variant?: 'compact' | 'card' | 'inline';
@@ -39,24 +41,41 @@ function PlatformIcon({ id }: { id: 'instagram' | 'facebook' | 'x' | 'youtube' }
 }
 
 export function SocialLinks({ variant = 'compact', className = '' }: SocialLinksProps) {
+  const { settings } = useSiteConfig();
+
+  const resolvedSocials = OFFICIAL_CONTACT.marketingSocials.map((s) => {
+    const dynamicUrl =
+      s.id === 'instagram'
+        ? settings.instagramUrl
+        : s.id === 'facebook'
+          ? settings.facebookUrl
+          : s.id === 'x'
+            ? settings.xUrl
+            : settings.youtubeUrl;
+    return {
+      ...s,
+      url: sanitizeHref(dynamicUrl || s.url, s.url),
+    };
+  });
+
   if (variant === 'card') {
     return (
       <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 ${className}`}>
-        {OFFICIAL_CONTACT.marketingSocials.map((social) => (
+        {resolvedSocials.map((social) => (
           <a
             key={social.id}
             href={social.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-[#FFFFFF] border border-[#D9CCB9] hover:border-[#B66A50] text-[#292722] transition-colors group"
+            className="liquid-glass-card flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl hover:border-white text-[#1D1D1F] transition-all duration-200 hover:-translate-y-0.5 group"
           >
             <span className="flex items-center gap-2.5 text-sm font-semibold">
-              <span className="text-[#B66A50]">
+              <span className="text-[#1D1D1F]">
                 <PlatformIcon id={social.id} />
               </span>
               <span>{social.name}</span>
             </span>
-            <span className="inline-flex items-center gap-1 text-xs text-[#77736C] group-hover:text-[#B66A50]">
+            <span className="inline-flex items-center gap-1 text-xs text-[#6E6E73] group-hover:text-[#1D1D1F]">
               <span>{social.handle}</span>
               <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
             </span>
@@ -69,14 +88,14 @@ export function SocialLinks({ variant = 'compact', className = '' }: SocialLinks
   if (variant === 'inline') {
     return (
       <div className={`flex flex-wrap items-center gap-2.5 ${className}`}>
-        {OFFICIAL_CONTACT.marketingSocials.map((social) => (
+        {resolvedSocials.map((social) => (
           <a
             key={social.id}
             href={social.url}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${social.name} (${social.handle})`}
-            className="group inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#FFFFFF] border border-[#D9CCB9] hover:border-[#B66A50] text-xs font-semibold text-[#292722] hover:text-[#B66A50] transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
+            className="liquid-glass-cta group inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold text-[#1D1D1F] hover:bg-white/95 transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
           >
             <span className="transition-transform duration-200 group-hover:scale-110">
               <PlatformIcon id={social.id} />
@@ -90,21 +109,21 @@ export function SocialLinks({ variant = 'compact', className = '' }: SocialLinks
 
   return (
     <ul className={`space-y-2.5 text-sm ${className}`}>
-      {OFFICIAL_CONTACT.marketingSocials.map((social) => (
+      {resolvedSocials.map((social) => (
         <li key={social.id}>
           <a
             href={social.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2.5 text-[#292722] hover:text-[#B66A50] transition-colors"
+            className="group inline-flex items-center gap-2.5 text-[#1D1D1F] hover:text-black transition-colors"
           >
-            <span className="text-[#77736C] group-hover:text-[#B66A50] transition-all duration-200 group-hover:scale-110">
+            <span className="text-[#6E6E73] group-hover:text-[#1D1D1F] transition-all duration-200 group-hover:scale-110">
               <PlatformIcon id={social.id} />
             </span>
             <span>{social.name}</span>
-            <span className="text-xs text-[#77736C]">({social.handle})</span>
+            <span className="text-xs text-[#6E6E73]">({social.handle})</span>
             <ArrowUpRight
-              className="w-3.5 h-3.5 text-[#A99C8B] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              className="w-3.5 h-3.5 text-[#A1A1A6] group-hover:text-[#1D1D1F] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
               aria-hidden="true"
             />
           </a>

@@ -1,4 +1,11 @@
-import { OFFICIAL_CONTACT } from '../data/akyinData';
+import { z } from 'zod';
+import {
+  BUSINESS_VERTICAL_OPTIONS,
+  ENQUIRY_CATEGORIES,
+  ENQUIRY_TYPE_OPTIONS,
+  OFFICIAL_CONTACT,
+} from '../data/akyinData';
+import { sanitizeHref, sanitizeTextInput } from './security';
 
 export interface EnquiryPayload {
   category: string;
@@ -13,23 +20,198 @@ export interface EnquiryPayload {
   message: string;
 }
 
+export const FIELD_LIMITS = {
+  name: 100,
+  company: 120,
+  email: 160,
+  phone: 24,
+  country: 80,
+  city: 80,
+  message: 1500,
+} as const;
+
+const nameSchema = z
+  .string()
+  .transform((val) => sanitizeTextInput(val, FIELD_LIMITS.name, false))
+  .pipe(
+    z
+      .string()
+      .min(2, 'Please enter your full name (minimum 2 characters).')
+      .max(FIELD_LIMITS.name, `Full name must be ${FIELD_LIMITS.name} characters or fewer.`)
+      .refine((val) => !/[<>]/.test(val), 'Name cannot contain < or > characters.')
+  );
+
+const companySchema = z
+  .string()
+  .transform((val) => sanitizeTextInput(val, FIELD_LIMITS.company, false))
+  .pipe(
+    z
+      .string()
+      .max(
+        FIELD_LIMITS.company,
+        `Company name must be ${FIELD_LIMITS.company} characters or fewer.`
+      )
+      .refine((val) => !/[<>]/.test(val), 'Company name cannot contain < or > characters.')
+  );
+
+const emailSchema = z
+  .string()
+  .transform((val) => sanitizeTextInput(val, FIELD_LIMITS.email, false))
+  .pipe(
+    z
+      .string()
+      .min(1, 'Please enter your email address.')
+      .max(FIELD_LIMITS.email, `Email must be ${FIELD_LIMITS.email} characters or fewer.`)
+      .email('Please enter a valid email address.')
+  );
+
+const phoneSchema = z
+  .string()
+  .transform((val) => sanitizeTextInput(val, FIELD_LIMITS.phone, false))
+  .pipe(
+    z
+      .string()
+      .min(1, 'Please enter your phone number.')
+      .refine(
+        (val) => /^\+?[0-9]{8,15}$/.test(val.replace(/[\s\-()]/g, '')),
+        'Please enter a valid phone number (8 to 15 digits).'
+      )
+  );
+
+const countrySchema = z
+  .string()
+  .transform((val) => sanitizeTextInput(val, FIELD_LIMITS.country, false))
+  .pipe(
+    z
+      .string()
+      .min(2, 'Please enter your country (minimum 2 characters).')
+      .max(FIELD_LIMITS.country, `Country must be ${FIELD_LIMITS.country} characters or fewer.`)
+      .refine((val) => !/[<>]/.test(val), 'Country cannot contain < or > characters.')
+  );
+
+const citySchema = z
+  .string()
+  .transform((val) => sanitizeTextInput(val, FIELD_LIMITS.city, false))
+  .pipe(
+    z
+      .string()
+      .min(2, 'Please enter your city (minimum 2 characters).')
+      .max(FIELD_LIMITS.city, `City must be ${FIELD_LIMITS.city} characters or fewer.`)
+      .refine((val) => !/[<>]/.test(val), 'City cannot contain < or > characters.')
+  );
+
+const messageSchema = z
+  .string()
+  .refine(
+    (val) => val.trim().length <= FIELD_LIMITS.message,
+    `Message must be ${FIELD_LIMITS.message} characters or fewer.`
+  )
+  .transform((val) => sanitizeTextInput(val, FIELD_LIMITS.message, true));
+
+const categorySchema = z
+  .string()
+  .refine(
+    (val) => (ENQUIRY_CATEGORIES as readonly string[]).includes(val),
+    'Please select a valid enquiry category.'
+  );
+
+const verticalSchema = z
+  .string()
+  .refine(
+    (val) => (BUSINESS_VERTICAL_OPTIONS as readonly string[]).includes(val),
+    'Please select a valid business vertical.'
+  );
+
+const enquiryTypeSchema = z
+  .string()
+  .refine(
+    (val) => ENQUIRY_TYPE_OPTIONS.includes(val),
+    'Please select a valid enquiry type.'
+  );
+
+export const enquirySchema = z.object({
+  category: categorySchema,
+  vertical: verticalSchema,
+  enquiryType: enquiryTypeSchema,
+  name: nameSchema,
+  company: companySchema,
+  email: emailSchema,
+  phone: phoneSchema,
+  country: countrySchema,
+  city: citySchema,
+  message: messageSchema,
+});
+
+const FIELD_SCHEMA_MAP: Record<keyof EnquiryPayload, z.ZodType<string>> = {
+  category: categorySchema,
+  vertical: verticalSchema,
+  enquiryType: enquiryTypeSchema,
+  name: nameSchema,
+  company: companySchema,
+  email: emailSchema,
+  phone: phoneSchema,
+  country: countrySchema,
+  city: citySchema,
+  message: messageSchema,
+};
+
+export function validateEnquiryField(
+  field: keyof EnquiryPayload,
+  value: string
+): string | undefined {
+  const schema = FIELD_SCHEMA_MAP[field];
+  const result = schema.safeParse(value);
+  if (result.success) {
+    return undefined;
+  }
+  return result.error.issues[0]?.message || 'Please check this field.';
+}
+
+export function normalizeEnquiryPayload(payload: EnquiryPayload): EnquiryPayload {
+  const safeCategory = (ENQUIRY_CATEGORIES as readonly string[]).includes(payload.category)
+    ? payload.category
+    : ENQUIRY_CATEGORIES[0];
+
+  const safeVertical = (BUSINESS_VERTICAL_OPTIONS as readonly string[]).includes(payload.vertical)
+    ? payload.vertical
+    : BUSINESS_VERTICAL_OPTIONS[0];
+
+  const safeEnquiryType = ENQUIRY_TYPE_OPTIONS.includes(payload.enquiryType)
+    ? payload.enquiryType
+    : ENQUIRY_TYPE_OPTIONS[0];
+
+  return {
+    category: safeCategory,
+    vertical: safeVertical,
+    enquiryType: safeEnquiryType,
+    name: sanitizeTextInput(payload.name, FIELD_LIMITS.name, false),
+    company: sanitizeTextInput(payload.company, FIELD_LIMITS.company, false),
+    email: sanitizeTextInput(payload.email, FIELD_LIMITS.email, false),
+    phone: sanitizeTextInput(payload.phone, FIELD_LIMITS.phone, false),
+    country: sanitizeTextInput(payload.country, FIELD_LIMITS.country, false),
+    city: sanitizeTextInput(payload.city, FIELD_LIMITS.city, false),
+    message: sanitizeTextInput(payload.message, FIELD_LIMITS.message, true),
+  };
+}
+
 export function buildFormattedEnquiryText(payload: EnquiryPayload): string {
+  const safe = normalizeEnquiryPayload(payload);
   const lines = [
     `Hello AKYIN Ventures Team,`,
     ``,
-    `Enquiry Category: ${payload.category}`,
-    `Business Vertical: ${payload.vertical}`,
-    `Enquiry Type: ${payload.enquiryType}`,
-    `Full Name: ${payload.name.trim()}`,
-    `Business / Company Name: ${payload.company.trim() || 'Not specified'}`,
-    `Email Address: ${payload.email.trim()}`,
-    `Phone Number: ${payload.phone.trim()}`,
-    `Country: ${payload.country.trim()}`,
-    `City: ${payload.city.trim()}`,
+    `Enquiry Category: ${safe.category}`,
+    `Business Vertical: ${safe.vertical}`,
+    `Enquiry Type: ${safe.enquiryType}`,
+    `Full Name: ${safe.name}`,
+    `Business / Company Name: ${safe.company || 'Not specified'}`,
+    `Email Address: ${safe.email}`,
+    `Phone Number: ${safe.phone}`,
+    `Country: ${safe.country}`,
+    `City: ${safe.city}`,
   ];
 
-  if (payload.message.trim()) {
-    lines.push(`Message: ${payload.message.trim()}`);
+  if (safe.message) {
+    lines.push(`Message: ${safe.message}`);
   }
 
   lines.push(``, `Prepared via AKYIN.com`);
@@ -38,35 +220,31 @@ export function buildFormattedEnquiryText(payload: EnquiryPayload): string {
 
 export function buildWhatsAppDispatchUrl(payload: EnquiryPayload): string {
   const text = buildFormattedEnquiryText(payload);
-  return `https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=${encodeURIComponent(text)}`;
+  const candidate = `https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=${encodeURIComponent(text)}`;
+  return sanitizeHref(candidate, OFFICIAL_CONTACT.whatsappUrl, false);
 }
 
 export function buildEmailDispatchUrl(payload: EnquiryPayload): string {
-  const subject = `[${payload.category}] ${payload.vertical} — ${payload.company.trim() || payload.name.trim()}`;
-  const body = buildFormattedEnquiryText(payload);
-  return `mailto:${OFFICIAL_CONTACT.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const safe = normalizeEnquiryPayload(payload);
+  const rawSubject = `[${safe.category}] ${safe.vertical} — ${safe.company || safe.name || 'Enquiry'}`;
+  const cleanSubject = sanitizeTextInput(rawSubject, 180, false);
+  const body = buildFormattedEnquiryText(safe);
+  const candidate = `mailto:${OFFICIAL_CONTACT.email}?subject=${encodeURIComponent(cleanSubject)}&body=${encodeURIComponent(body)}`;
+  return sanitizeHref(candidate, `mailto:${OFFICIAL_CONTACT.email}`, true);
 }
 
 export function validateEnquiryPayload(payload: EnquiryPayload): Record<string, string> {
+  const result = enquirySchema.safeParse(payload);
+  if (result.success) {
+    return {};
+  }
+
   const errors: Record<string, string> = {};
-
-  if (!payload.name.trim() || payload.name.trim().length < 2) {
-    errors.name = 'Please enter your full name.';
+  for (const issue of result.error.issues) {
+    const key = String(issue.path[0] ?? 'form');
+    if (!errors[key]) {
+      errors[key] = issue.message;
+    }
   }
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!payload.email.trim() || !emailRegex.test(payload.email.trim())) {
-    errors.email = 'Please enter a valid email address.';
-  }
-  const cleanPhone = payload.phone.replace(/[\s\-()]/g, '');
-  if (!cleanPhone || cleanPhone.length < 8) {
-    errors.phone = 'Please enter a valid phone number.';
-  }
-  if (!payload.country.trim()) {
-    errors.country = 'Please enter your country.';
-  }
-  if (!payload.city.trim()) {
-    errors.city = 'Please enter your city.';
-  }
-
   return errors;
 }

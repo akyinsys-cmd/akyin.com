@@ -4,14 +4,17 @@ export type AppRoute =
   | '/ventures'
   | '/ventures/publishing'
   | '/ventures/marketing'
+  | '/marketing/automotive'
   | '/ventures/store'
   | '/ventures/aicalc'
   | '/ventures/kartigo'
   | '/ventures/biznxt'
   | '/ventures/budget-bazaar'
+  | '/advisory'
   | '/insights'
   | '/contact'
-  | '/sitemap';
+  | '/sitemap'
+  | '/admin';
 
 export interface VentureOverview {
   id: string;
@@ -127,20 +130,23 @@ export const EXTERNAL_VERTICAL_URLS = {
 } as const;
 
 export const IMAGES = {
-  warmCorporateHero: '/src/assets/images/akyin_warm_corporate_hero_1795332556147.jpg',
-  warmEditorialStudio: '/src/assets/images/akyin_ventures_editorial_1795332556079.jpg',
-  aicalcWorkspace: '/src/assets/images/aicalc_bright_workspace_1795332556304.jpg',
-  publishingHero: '/src/assets/images/publishing_editorial_hero_1795331975752.jpg',
-  disciplineCodeBook: '/src/assets/images/discipline_code_book_1795331975194.jpg',
-  heroShowroom: '/src/assets/images/hero_automotive_showroom_1795330448365.jpg',
-  salesTraining: '/src/assets/images/showroom_sales_training_1795330450860.jpg',
-  automotiveHeritage: '/src/assets/images/automotive_heritage_timeline_1795330450722.jpg',
-  thriftHero: '/src/assets/images/thrift_fashion_hero_1795331975049.jpg',
-  thriftFlatlay: '/src/assets/images/thrift_apparel_flatlay_1795331975547.jpg',
-  kartigoWarehouse: '/src/assets/images/kartigo_warehouse_b2b_1795331975536.jpg',
-  biznxtConsulting: '/src/assets/images/biznxt_consulting_workspace_1795333858437.jpg',
-  biznxtStrategy: '/src/assets/images/biznxt_strategy_table_1795333858580.jpg',
-  budgetBazaarRetail: '/src/assets/images/budget_bazaar_retail_1795333859087.jpg',
+  liquidGlassHero: '/src/assets/images/apple_hero_glass_monolith_1795345424385.jpg',
+  liquidGlassVentures: '/src/assets/images/apple_ventures_stack_1795345421049.jpg',
+  liquidGlassAdvisory: '/src/assets/images/apple_advisory_console_1795345421545.jpg',
+  warmCorporateHero: '/src/assets/images/apple_hero_glass_monolith_1795345424385.jpg',
+  warmEditorialStudio: '/src/assets/images/apple_ventures_stack_1795345421049.jpg',
+  aicalcWorkspace: '/src/assets/images/apple_aicalc_hardware_1795345421860.jpg',
+  publishingHero: '/src/assets/images/apple_publishing_edition_1795345421531.jpg',
+  disciplineCodeBook: '/src/assets/images/apple_discipline_book_1795345421096.jpg',
+  heroShowroom: '/src/assets/images/apple_sales_coaching_1795345420916.jpg',
+  salesTraining: '/src/assets/images/apple_marketing_agency_1795345421802.jpg',
+  automotiveHeritage: '/src/assets/images/apple_agency_heritage_1795345553029.jpg',
+  thriftHero: '/src/assets/images/apple_store_thrift_hanger_1795345421581.jpg',
+  thriftFlatlay: '/src/assets/images/apple_store_thrift_stack_1795345421794.jpg',
+  kartigoWarehouse: '/src/assets/images/apple_kartigo_cubes_1795345421779.jpg',
+  biznxtConsulting: '/src/assets/images/apple_biznxt_compass_1795345424719.jpg',
+  biznxtStrategy: '/src/assets/images/apple_biznxt_playbook_1795345421019.jpg',
+  budgetBazaarRetail: '/src/assets/images/apple_budget_bazaar_goods_1795345421332.jpg',
 } as const;
 
 export const VENTURES_PORTFOLIO: VentureOverview[] = [
@@ -157,7 +163,7 @@ export const VENTURES_PORTFOLIO: VentureOverview[] = [
     externalUrl: PUBLISHING_LINKS.amazonAuthorStore,
     externalLabel: 'Amazon Author Store',
     image: IMAGES.publishingHero,
-    imageAlt: 'Hardcover editions and brass lamp in an editorial study',
+    imageAlt: 'Isolated matte hardcover edition and glass e-reader stamped with AKYIN emblem',
   },
   {
     id: 'marketing',
@@ -165,12 +171,12 @@ export const VENTURES_PORTFOLIO: VentureOverview[] = [
     name: 'AKYIN Marketing',
     shortName: 'Akyin Marketing',
     route: '/ventures/marketing',
-    sector: 'Automotive Marketing & Sales Training',
-    positioning: 'Drive More Enquiries. Build Stronger Dealerships.',
+    sector: 'Full-Service Marketing Agency & Growth Strategy',
+    positioning: 'Build Brand Demand. Convert Better Enquiries.',
     description:
-      'Specialized automotive marketing division helping dealerships attract buyers, qualify existing enquiries via managed AI-assisted calling, and train showroom sales teams—backed by 16 years of automobile industry experience.',
+      'Full-service performance marketing agency helping retail, service businesses, commercial brands, and automotive dealers acquire buyers, qualify existing enquiries, and strengthen sales execution.',
     image: IMAGES.salesTraining,
-    imageAlt: 'Automobile dealership consultants conducting a showroom vehicle walkaround',
+    imageAlt: 'Isolated brushed aluminum analytics slate, glass prism, and AKYIN emblem block',
   },
   {
     id: 'store',
@@ -183,7 +189,7 @@ export const VENTURES_PORTFOLIO: VentureOverview[] = [
     description:
       'Consumer clothing retail brand featuring fashion sub-brand AKYIN THRIFT, focused on offering carefully selected men’s and women’s apparel at exceptional discounted prices.',
     image: IMAGES.thriftHero,
-    imageAlt: 'Curated clothing racks in a warm sunlit boutique showroom',
+    imageAlt: 'Tailored monochrome jacket on brushed titanium hanger with AKYIN metal tag',
   },
   {
     id: 'aicalc',
@@ -198,7 +204,7 @@ export const VENTURES_PORTFOLIO: VentureOverview[] = [
     externalUrl: EXTERNAL_VERTICAL_URLS.aicalc,
     externalLabel: 'aicalc.in',
     image: IMAGES.aicalcWorkspace,
-    imageAlt: 'Bright minimalist desk with laptop and tablet for AICalc technology',
+    imageAlt: 'Frosted liquid-glass smart calculator hardware tablet with AKYIN engraved emblem',
   },
   {
     id: 'kartigo',
@@ -213,7 +219,7 @@ export const VENTURES_PORTFOLIO: VentureOverview[] = [
     externalUrl: EXTERNAL_VERTICAL_URLS.kartigo,
     externalLabel: 'kartigo.online',
     image: IMAGES.kartigoWarehouse,
-    imageAlt: 'Organized commercial warehouse and wholesale stock shelving',
+    imageAlt: 'Modular frosted-glass and brushed titanium supply cubes stamped with AKYIN emblem',
   },
   {
     id: 'biznxt',
@@ -228,7 +234,7 @@ export const VENTURES_PORTFOLIO: VentureOverview[] = [
     externalUrl: EXTERNAL_VERTICAL_URLS.biznxt,
     externalLabel: 'biznxt.online',
     image: IMAGES.biznxtConsulting,
-    imageAlt: 'Sunlit oak conference workspace for BizNXT business consulting',
+    imageAlt: 'Crystal compass, matte black chess rook, and brushed aluminum tablet with AKYIN emblem',
   },
   {
     id: 'budget-bazaar',
@@ -243,7 +249,7 @@ export const VENTURES_PORTFOLIO: VentureOverview[] = [
     externalUrl: EXTERNAL_VERTICAL_URLS.budgetBazaar,
     externalLabel: 'budgetbazaar.org',
     image: IMAGES.budgetBazaarRetail,
-    imageAlt: 'Bright contemporary Budget Bazaar retail store shelves with everyday household items',
+    imageAlt: 'Isolated pearl-grey canvas tote, frosted canisters, and aluminum bottle with AKYIN tag',
   },
 ];
 
@@ -280,7 +286,7 @@ export const ECOSYSTEM_VENTURES_TICKER: EcosystemBrandEntry[] = [
   {
     id: 'eco-marketing',
     name: 'AKYIN Marketing',
-    relationshipLabel: 'AKYIN Venture',
+    relationshipLabel: 'Marketing Agency',
     category: 'venture',
     internalRoute: '/ventures/marketing',
     wordmarkStyle: 'sans',
@@ -407,24 +413,24 @@ export const FULL_ECOSYSTEM_TICKER: EcosystemBrandEntry[] = [
 export const ABOUT_PILLARS = [
   {
     number: '01',
-    title: 'Automotive Industry Experience',
-    meta: '16 Years · Maruti Suzuki to Audi',
+    title: 'Multi-Sector Performance Marketing',
+    meta: 'Lead Generation · Creative Strategy',
     description:
-      'Sixteen years of direct, practical automobile industry exposure across volume showrooms and luxury automotive brands—understanding how buyers compare variants, negotiate, and take delivery.',
+      'Structured Meta lead campaigns, launch creatives, creator collaborations, and local SEO engineered for retail, service enterprises, consumer brands, and automotive dealers.',
   },
   {
     number: '02',
-    title: 'Digital Marketing',
-    meta: 'Enquiry Generation · Local Reach',
+    title: 'Managed Lead Qualification & CRM',
+    meta: 'AI-Assisted Calling · Zero Leakage',
     description:
-      'Structured Meta lead campaigns, vehicle launch creatives, and hyper-local search visibility designed specifically to generate dealership enquiries.',
+      'Disciplined qualification of existing inbound enquiries through structured AI-assisted outbound calling, buyer readiness classification, and daily Excel pipeline reports.',
   },
   {
     number: '03',
-    title: 'Sales Team Development',
-    meta: 'Showroom Discipline · Closing Craft',
+    title: '16 Years Commercial & Sales Coaching',
+    meta: 'Maruti Suzuki to Audi Pedigree · Team Training',
     description:
-      'Practical personality development, grooming, walkaround presentation, test-drive execution, and follow-up coaching for automobile sales executives.',
+      'Grounded in sixteen years of direct commercial and automotive retail leadership—equipping sales executives with practical presentation, communication, and closing craft.',
   },
 ];
 
@@ -433,7 +439,7 @@ export const SERVICE_CATEGORIES: { id: ServiceCategory; label: string }[] = [
   { id: 'lead-crm', label: 'Lead Gen, Filtering & CRM' },
   { id: 'creative-media', label: 'Creative, Video & Social' },
   { id: 'campaigns-local', label: 'Campaigns & Local Growth' },
-  { id: 'sales-training', label: 'Sales Training & Development' },
+  { id: 'sales-training', label: 'Sales Training & Coaching' },
 ];
 
 export const MARKETING_SERVICES: MarketingService[] = [
@@ -442,14 +448,14 @@ export const MARKETING_SERVICES: MarketingService[] = [
     number: '01',
     title: 'Lead Generation',
     category: 'lead-crm',
-    categoryLabel: 'New Buyer Acquisition',
-    scopeNote: 'Focused strictly on generating new dealership enquiries',
+    categoryLabel: 'New Customer Acquisition',
+    scopeNote: 'Focused strictly on generating new high-intent buyer enquiries',
     summary:
-      'Meta Ads, vehicle promotions, instant lead forms, conversion landing pages, retargeting, and lead source reporting engineered to attract active buyers.',
+      'Meta Ads, targeted brand and product promotions, instant lead forms, conversion landing pages, retargeting, and attribution reporting for growth-focused businesses.',
     deliverables: [
       'Meta Ads setup & ongoing campaign management',
-      'Vehicle-specific promotions & offer creatives',
-      'Lead forms & dedicated landing pages',
+      'Product, service & seasonal offer creatives',
+      'Instant lead forms & dedicated conversion landing pages',
       'Audience retargeting & lead source reporting',
     ],
     rateCardMatch: 'Meta lead generation management',
@@ -460,14 +466,14 @@ export const MARKETING_SERVICES: MarketingService[] = [
     title: 'Lead Filtering & Qualification',
     category: 'lead-crm',
     categoryLabel: 'Existing Enquiry Qualification',
-    scopeNote: 'Qualifies existing dealership enquiries — does NOT generate new leads',
+    scopeNote: 'Qualifies existing inbound enquiries — does NOT generate new leads',
     summary:
-      'Managed AI-assisted calling of existing dealership enquiries to capture buyer readiness before showroom follow-up.',
+      'Managed AI-assisted calling of existing business enquiries to verify buyer readiness, budget, and timeline before sales team follow-up.',
     deliverables: [
-      'Identifies model/variant, budget, purchase timeline, exchange, finance & test-drive interest',
-      'Captures preferred callback timing',
+      'Captures product/service interest, budget, purchase timeline & booking intent',
+      'Logs preferred callback timing for sales teams',
       'Classifies leads: Hot, Warm, Future Follow-up, Unreachable & Not Interested',
-      'Delivers Daily Excel reports, call summaries, classification & monthly report',
+      'Delivers Daily Excel reports, call summaries, classification & monthly review',
     ],
     rateCardMatch: 'Lead filtering and qualification',
   },
@@ -476,14 +482,14 @@ export const MARKETING_SERVICES: MarketingService[] = [
     number: '03',
     title: 'AI-Assisted Calling',
     category: 'lead-crm',
-    categoryLabel: 'Managed Operations',
+    categoryLabel: 'Managed Agency Operations',
     scopeNote: 'Operated internally by AKYIN — not sold as standalone software',
     summary:
-      'Structured AI-assisted outbound enquiry calling workflows operated directly by the AKYIN MARKETINGS team to maintain fast response discipline.',
+      'Structured AI-assisted outbound enquiry calling workflows operated directly by the AKYIN Marketing Agency team to maintain rapid response discipline.',
     deliverables: [
-      'Calling script & dealership workflow alignment',
+      'Custom calling script & commercial workflow alignment',
       'Up to 1,000 mins/month included in retainer packages (subject to vendor plan)',
-      'Structured call outcome logging & escalation',
+      'Structured call outcome logging & priority escalation',
       'Zero client-side software management overhead',
     ],
     rateCardMatch: 'AI calling workflow management',
@@ -493,14 +499,14 @@ export const MARKETING_SERVICES: MarketingService[] = [
     number: '04',
     title: 'CRM & Lead Pipeline Management',
     category: 'lead-crm',
-    categoryLabel: 'Enquiry Hygiene',
-    scopeNote: 'AKYIN manages pipeline tracking internally — we do NOT sell proprietary CRM software',
+    categoryLabel: 'Pipeline Hygiene',
+    scopeNote: 'AKYIN manages pipeline tracking internally — we do NOT sell CRM software',
     summary:
-      'Disciplined enquiry tracking, stage updates, and daily Excel / pipeline summaries so showroom managers see every open prospect clearly.',
+      'Disciplined enquiry tracking, stage updates, and daily Excel / pipeline summaries so business leaders see every open prospect clearly.',
     deliverables: [
       'Enquiry stage hygiene & duplicate cleanup',
-      'Priority routing for Hot & Test-Drive callbacks',
-      'Daily Excel reporting sheets for dealership BDC',
+      'Priority routing for Hot & scheduled demo/visit callbacks',
+      'Daily Excel reporting sheets for sales desks',
       'Monthly qualification & stage breakdown summary',
     ],
     rateCardMatch: 'CRM and lead pipeline management',
@@ -512,12 +518,12 @@ export const MARKETING_SERVICES: MarketingService[] = [
     category: 'creative-media',
     categoryLabel: 'Brand Presence',
     summary:
-      'Consistent dealership social presence across Instagram and Facebook showcasing vehicle highlights, delivery stories, and showroom credibility.',
+      'Consistent brand social presence across Instagram and Facebook showcasing products, customer stories, operational highlights, and market credibility.',
     deliverables: [
-      'Monthly dealership content calendar & posting',
-      'Model highlights & showroom updates',
-      'Consistent dealership visual standards',
-      'Monthly content & reach overview',
+      'Monthly brand content calendar & scheduled posting',
+      'Product spotlights & company milestones',
+      'Unified visual art direction & tone standards',
+      'Monthly content & engagement overview',
     ],
     rateCardMatch: 'Social media management',
   },
@@ -528,12 +534,12 @@ export const MARKETING_SERVICES: MarketingService[] = [
     category: 'creative-media',
     categoryLabel: 'Creator Collaborations',
     summary:
-      'Coordinating regional automotive and lifestyle creators for authentic showroom walkarounds, test-drive features, and model spotlights.',
+      'Coordinating regional and niche creators for authentic product walkthroughs, brand reviews, lifestyle reels, and audience reach.',
     deliverables: [
       'Creator shortlisting & campaign briefing',
-      'Showroom shoot scheduling & coordination',
-      'Influencer video & upload workflow',
-      'Dealership enquiry link & CTA alignment',
+      'Shoot scheduling & on-brand production coordination',
+      'Influencer video editing & upload workflow',
+      'Enquiry link & conversion CTA alignment',
     ],
     rateCardMatch: 'Influencer campaign coordination',
   },
@@ -544,78 +550,78 @@ export const MARKETING_SERVICES: MarketingService[] = [
     category: 'creative-media',
     categoryLabel: 'Visual Assets',
     summary:
-      'Automotive reels and static graphic creatives designed for Meta feeds, stories, and regional vehicle promotions.',
+      'High-retention vertical reels and crisp static graphic creatives designed for Meta feeds, stories, and regional digital campaigns.',
     deliverables: [
       '8 promotional reels packages',
       '10 graphic creatives packages',
-      'Offer, EMI & model feature visual layouts',
+      'Offer, pricing & product feature visual layouts',
       'Multi-placement aspect ratio formatting',
     ],
     rateCardMatch: '8 promotional reels',
   },
   {
-    id: 'vehicle-product-presentations',
+    id: 'product-brand-presentations',
     number: '08',
-    title: 'Vehicle Product Presentations',
+    title: 'Product & Brand Pitch Presentations',
     category: 'creative-media',
     categoryLabel: 'Sales Enablement',
     summary:
-      'Structured vehicle presentation PPT decks equipping sales consultants to communicate variant differences and key features clearly.',
+      'Structured commercial presentation PPT decks equipping sales teams to communicate product tiers, key advantages, and brand value clearly.',
     deliverables: [
-      'Model & trim comparison presentation PPTs',
-      'Key safety, powertrain & comfort callouts',
-      'Clean showroom tablet & digital share format',
-      'Corporate & fleet pitch adaptation',
+      'Product, service & package comparison PPT decks',
+      'Key value, capability & ROI callout slides',
+      'Clean tablet, desktop & digital share format',
+      'B2B, retail & specialty dealership pitch adaptation',
     ],
-    rateCardMatch: 'Vehicle presentation PPT',
+    rateCardMatch: 'Product & pitch presentation PPT',
   },
   {
-    id: 'vehicle-launch-campaigns',
+    id: 'product-launch-campaigns',
     number: '09',
-    title: 'Vehicle Launch Campaigns',
+    title: 'Product & Model Launch Campaigns',
     category: 'campaigns-local',
-    categoryLabel: 'New Model Rollouts',
+    categoryLabel: 'Go-To-Market Rollouts',
     summary:
-      'Focused digital promotion and early-booking enquiry funnels built around new vehicle launches, facelifts, and showroom unveilings.',
+      'Focused digital promotion and early-booking enquiry funnels built around new product launches, flagship rollouts, and store unveilings.',
     deliverables: [
-      'Pre-launch teaser & booking enquiry campaign',
+      'Pre-launch teaser & early enquiry campaign',
       'Launch event promotional creatives',
-      'Showroom unveiling invite assets',
-      'Priority lead capture for early bookings',
+      'VIP preview & store unveiling invite assets',
+      'Priority lead capture for launch-week buyers',
     ],
-    rateCardMatch: 'Vehicle launch campaign',
+    rateCardMatch: 'Product / model launch campaign',
   },
   {
-    id: 'test-drive-campaigns',
+    id: 'appointment-visit-campaigns',
     number: '10',
-    title: 'Test Drive Campaigns',
+    title: 'Store Visit & Demo Booking Campaigns',
     category: 'campaigns-local',
-    categoryLabel: 'Showroom Footfall',
+    categoryLabel: 'Customer Footfall',
     summary:
-      'Hyper-local conversion campaigns structured to move interested buyers from online enquiry into scheduled showroom or doorstep test drives.',
+      'Hyper-local conversion campaigns structured to move interested prospects from digital ads into scheduled showroom visits, consultations, or product demos.',
     deliverables: [
-      'Model-specific test-drive booking ads',
-      'Dealership catchment radius targeting',
+      'Local visit, demo & test-drive booking ads',
+      'City catchment radius audience targeting',
       'Preferred date & time slot capture',
-      'BDC handover for test-drive confirmation',
+      'Team handover for confirmed appointment scheduling',
     ],
-    rateCardMatch: 'Test-drive campaign',
+    rateCardMatch: 'Demo / visit booking campaign',
   },
   {
-    id: 'exchange-mela-campaigns',
+    id: 'upgrade-exchange-campaigns',
     number: '11',
-    title: 'Exchange Mela Campaigns',
+    title: 'Upgrade & Trade-In Event Campaigns',
     category: 'campaigns-local',
-    categoryLabel: 'Trade-In Events',
+    categoryLabel: 'Promotional Camps',
     summary:
-      'Event-driven lead generation campaigns promoting dealership Exchange Melas, old-car valuation camps, and upgrade bonus offers.',
+      'Event-driven lead generation campaigns promoting weekend pop-ups, customer exchange camps, and limited-time upgrade bonus offers.',
     deliverables: [
-      'Exchange bonus & valuation offer creatives',
-      'Event-week local awareness & lead forms',
-      'Current vehicle details capture on enquiry',
-      'Weekend showroom footfall support',
+      'Upgrade bonus & trade-in offer creatives',
+      'Event-week local awareness & instant lead forms',
+      'Buyer qualification details captured on entry',
+      'Weekend footfall & callout support',
     ],
-    rateCardMatch: 'Exchange mela campaign',
+    rateCardMatch: 'Upgrade / exchange event campaign',
   },
   {
     id: 'festive-campaigns',
@@ -624,12 +630,12 @@ export const MARKETING_SERVICES: MarketingService[] = [
     category: 'campaigns-local',
     categoryLabel: 'Seasonal Peaks',
     summary:
-      'High-intent seasonal campaigns aligned with Navratri, Diwali, Dussehra, and year-end booking windows when buyer demand accelerates.',
+      'High-intent seasonal campaigns aligned with major festive buying calendars and year-end retail peaks when consumer demand accelerates.',
     deliverables: [
       'Festive offer creative suite',
       'Time-bound seasonal lead capture',
-      'Retargeting of active showroom enquiries',
-      'Delivery-slot & booking urgency messaging',
+      'Retargeting of active pipeline enquiries',
+      'Limited-window booking urgency messaging',
     ],
     rateCardMatch: 'Festive campaign',
   },
@@ -640,77 +646,77 @@ export const MARKETING_SERVICES: MarketingService[] = [
     category: 'campaigns-local',
     categoryLabel: 'Local Discovery',
     summary:
-      'Optimizing dealership discovery across Google Search and Maps so nearby buyers find accurate showroom details, directions, and phone links.',
+      'Optimizing brand discovery across Google Search and Maps so nearby customers find accurate locations, hours, services, and click-to-call links.',
     deliverables: [
       'Google Business Profile management & hygiene',
-      'Local SEO management for catchment searches',
-      'Showroom visual & model update posts',
-      'Call & direction intent visibility',
+      'Local SEO management for city catchment searches',
+      'Visual showcase & seasonal offer updates',
+      'Call & direction intent tracking',
     ],
     rateCardMatch: 'Google Business Profile management',
   },
   {
-    id: 'pre-owned-vehicle-marketing',
+    id: 'specialty-inventory-campaigns',
     number: '14',
-    title: 'Pre-Owned Vehicle Marketing',
+    title: 'Catalog & Specialty Stock Campaigns',
     category: 'campaigns-local',
-    categoryLabel: 'Used Car Division',
+    categoryLabel: 'Inventory Rotation',
     summary:
-      'Dedicated inventory campaigns for certified pre-owned dealerships to showcase available stock and attract value-focused buyers.',
+      'Dedicated catalog advertising for retail collections, certified pre-owned divisions, and high-margin stock lines to accelerate monthly inventory movement.',
     deliverables: [
-      'Pre-owned inventory showcase creatives',
-      'Budget & segment-targeted buyer ads',
-      'Trade-in & upgrade enquiry capture',
-      'Consistent monthly stock rotation support',
+      'Catalog & stock highlight creatives',
+      'Budget & buyer-segment targeted ads',
+      'Direct inventory enquiry capture',
+      'Consistent monthly catalog rotation support',
     ],
-    rateCardMatch: 'Pre-owned vehicle marketing',
+    rateCardMatch: 'Catalog & stock rotation marketing',
   },
   {
     id: 'customer-retention-campaigns',
     number: '15',
     title: 'Customer Retention Campaigns',
     category: 'campaigns-local',
-    categoryLabel: 'After-Sales Growth',
+    categoryLabel: 'Repeat Business',
     summary:
-      'Service centre and existing-owner outreach campaigns designed to drive periodic maintenance bookings, check-up camps, and repeat visits.',
+      'Existing-customer outreach campaigns designed to drive repeat purchases, service centre visits, maintenance bookings, and loyalty engagement.',
     deliverables: [
-      'Service centre retention campaign creatives',
-      'Seasonal inspection & workshop promotions',
-      'Extended warranty & accessory awareness',
-      'Structured owner re-engagement cadence',
+      'Retention & repeat-visit campaign creatives',
+      'Seasonal check-up & VIP customer promotions',
+      'Add-on, subscription & accessory awareness',
+      'Structured customer re-engagement cadence',
     ],
-    rateCardMatch: 'Service centre retention campaign',
+    rateCardMatch: 'Customer retention campaign',
   },
   {
-    id: 'corporate-fleet-marketing',
+    id: 'corporate-b2b-marketing',
     number: '16',
-    title: 'Corporate & Fleet Marketing',
+    title: 'Corporate & B2B Institutional Marketing',
     category: 'campaigns-local',
-    categoryLabel: 'B2B Institutional',
+    categoryLabel: 'B2B & Enterprise',
     summary:
-      'Targeted B2B outreach and campaign support focused on corporate buyers, institutional accounts, and commercial fleet enquiries.',
+      'Targeted B2B outreach and campaign support focused on corporate procurement, institutional buyers, and commercial fleet or bulk accounts.',
     deliverables: [
-      'Corporate & fleet buyer campaign outreach',
-      'Institutional value & ownership framing',
+      'Corporate & B2B buyer campaign outreach',
+      'Institutional ROI & commercial value framing',
       'Bulk enquiry capture & qualification',
-      'Dedicated presentation alignment',
+      'Dedicated pitch deck & sales alignment',
     ],
-    rateCardMatch: 'Corporate/fleet campaign',
+    rateCardMatch: 'Corporate / B2B campaign',
   },
   {
-    id: 'automotive-sales-training',
+    id: 'commercial-sales-training',
     number: '17',
-    title: 'Automotive Sales Training',
+    title: 'Sales Team & Showroom Training',
     category: 'sales-training',
-    categoryLabel: '16 Years Industry Experience',
+    categoryLabel: '16 Years Commercial Pedigree',
     scopeNote: '₹25,000 per session · Scope, duration & location agreed before booking',
     summary:
-      'Practical dealership showroom sales training backed by 16 years of automotive experience spanning Maruti Suzuki to Audi.',
+      'Practical frontline sales and retail coaching backed by 16 years of high-trust selling experience from Maruti Suzuki to Audi.',
     deliverables: [
-      'Showroom etiquette & customer greeting standards',
-      'Structured vehicle walkaround & test-drive presentation',
-      'Objection handling & value-based negotiation',
-      'Follow-up discipline & booking closing craft',
+      'Customer greeting & hospitality etiquette standards',
+      'Structured product discovery & demonstration walkarounds',
+      'Calm objection handling & value-based negotiation',
+      'Follow-up discipline & deal closing craft',
     ],
     rateCardMatch: 'Sales training',
   },
@@ -720,14 +726,14 @@ export const MARKETING_SERVICES: MarketingService[] = [
     title: 'Personality Development',
     category: 'sales-training',
     categoryLabel: 'Executive Readiness',
-    scopeNote: '₹25,000 per session · Tailored for dealership frontline teams',
+    scopeNote: '₹25,000 per session · Tailored for customer-facing teams',
     summary:
-      'Dedicated grooming, communication clarity, body language, and executive presence workshops for automobile sales consultants.',
+      'Dedicated grooming, communication clarity, body language, and executive presence workshops for client-facing sales and advisory staff.',
     deliverables: [
-      'Professional showroom grooming & posture',
-      'Verbal clarity, listening & consultative tone',
-      'Confidence building for premium buyer conversations',
-      'Consistent team-wide customer experience standards',
+      'Professional grooming & poised body language',
+      'Verbal clarity, active listening & consultative tone',
+      'Confidence building for high-value client conversations',
+      'Consistent team-wide brand representation standards',
     ],
     rateCardMatch: 'Personality development training',
   },
@@ -736,57 +742,57 @@ export const MARKETING_SERVICES: MarketingService[] = [
 export const EXPERIENCE_MILESTONES: ExperienceMilestone[] = [
   {
     number: '01',
-    title: 'Dealership Operations',
-    spectrum: 'Mass-Market Volume to Luxury Flagships',
+    title: 'Cross-Industry Agency Execution',
+    spectrum: 'Retail, D2C, B2B & Dealerships',
     description:
-      'Understanding showroom floor cadence, daily BDC coordination, stock-to-enquiry alignment, and how marketing fits into real dealership targets.',
+      'Uniting paid acquisition, short-form video, social media, and search visibility into measurable lead pipelines tailored to each sector.',
   },
   {
     number: '02',
-    title: 'Showroom Customer Behaviour',
-    spectrum: 'Maruti Suzuki to Audi Buyer Psychology',
+    title: 'High-Trust Buyer Psychology',
+    spectrum: 'Mass-Market to Luxury Segment Insights',
     description:
-      'Practical insight into how first-time hatchback families, SUV upgraders, and luxury sedan buyers research, shortlist, and evaluate trust.',
+      'Sixteen years of frontline commercial exposure (from Maruti Suzuki to Audi) reveals how everyday consumers and premium buyers compare options and decide trust.',
   },
   {
     number: '03',
-    title: 'Vehicle Delivery & Presentation',
-    spectrum: 'First Impression to Handover Ceremony',
+    title: 'Product Story & Presentation',
+    spectrum: 'First Impression to Customer Handover',
     description:
-      'Structuring memorable walkarounds, feature storytelling, and delivery-day experiences that generate organic referrals.',
+      'Structuring memorable demonstrations, clear benefit storytelling, and customer experiences that convert first-time enquiries into referrals.',
   },
   {
     number: '04',
     title: 'CRM & Enquiry Discipline',
     spectrum: 'Zero-Leakage Pipeline Hygiene',
     description:
-      'Eliminating missed callbacks through clean lead classification (Hot, Warm, Future Follow-up), structured notes, and daily accountability.',
+      'Eliminating missed callbacks through clean lead classification (Hot, Warm, Future Follow-up), structured notes, and daily reporting accountability.',
   },
   {
     number: '05',
-    title: 'Showroom Sales Processes',
-    spectrum: 'Enquiry → Test Drive → Negotiation → Delivery',
+    title: 'Full-Funnel Sales Alignment',
+    spectrum: 'Ad Click → Qualification → Visit → Close',
     description:
-      'Bridging the gap between digital ad clicks and physical showroom test drives so marketing investment translates into actual bookings.',
+      'Bridging digital ad impressions and frontline sales desks so marketing investment translates directly into qualified meetings and closed revenue.',
   },
   {
     number: '06',
-    title: 'Sales Executive Development',
+    title: 'Executive Team Development',
     spectrum: 'Grooming, Etiquette & Closing Confidence',
     description:
-      'Hands-on coaching for frontline consultants on communication clarity, body language, objection handling, and disciplined follow-up.',
+      'Hands-on coaching for frontline consultants and sales executives on communication clarity, body language, objection handling, and disciplined follow-up.',
   },
 ];
 
 export const TRAINING_CURRICULUM = [
   'Personality development & executive mindset',
-  'Professional grooming & showroom readiness',
+  'Professional grooming & frontline readiness',
   'Structured verbal & non-verbal communication',
-  'Showroom floor etiquette & greeting standards',
-  '6-point vehicle walkaround presentation',
-  'Purposeful test-drive presentation & route framing',
+  'Client hospitality etiquette & greeting standards',
+  '6-point product walkthrough & presentation',
+  'Purposeful live demonstration & value framing',
   'Calm, factual objection handling',
-  'Value-anchored price & exchange negotiation',
+  'Value-anchored commercial negotiation',
   'Daily CRM & multi-touch follow-up discipline',
   'Confident booking & closing techniques',
 ];
@@ -795,47 +801,47 @@ export const PRICING_PACKAGES: PricingPackage[] = [
   {
     id: 'package-a',
     code: 'PACKAGE A',
-    name: 'Full Dealership Marketing & Lead Management',
+    name: 'Full-Service Growth Marketing & Lead Management',
     subtitle:
-      'Complete end-to-end digital buyer acquisition paired with managed AI-assisted calling and enquiry qualification.',
+      'Complete end-to-end digital customer acquisition paired with managed AI-assisted calling and enquiry qualification.',
     setupFee: '₹39,999',
     monthlyFee: '₹49,999',
     featured: true,
     includes: [
       'Meta ads management & campaign optimization',
-      'Lead generation forms & vehicle promotion creatives',
+      'Lead generation forms & conversion creatives',
       'AI-assisted calling up to 1,000 mins/month (subject to vendor plan)',
       'Structured lead filtering & buyer intent capture',
       'Hot / Warm / Future Follow-up / Unreachable / Not Interested classification',
       'Daily Excel enquiry reports & monthly performance review',
     ],
     excludes: [
-      'Meta ad spend (paid directly to Meta by dealership)',
+      'Meta ad spend (paid directly to Meta by client)',
       'Extra AI calling minutes beyond 1,000 mins/month',
       'Influencer / creator fees',
       'Special on-location video shoots & third-party production',
     ],
-    enquiryServiceValue: 'Package A — Full Dealership Marketing & Lead Management',
+    enquiryServiceValue: 'Package A — Full-Service Growth Marketing & Lead Management',
   },
   {
     id: 'package-b',
     code: 'PACKAGE B',
     name: 'Lead Filtering & Qualification Only',
     subtitle:
-      'Dedicated managed calling and classification for dealerships that already have incoming enquiries and need disciplined qualification.',
+      'Dedicated managed calling and classification for businesses that already receive incoming enquiries and need disciplined qualification.',
     setupFee: '₹14,999',
     monthlyFee: '₹19,999',
     featured: false,
     includes: [
-      'AI-assisted calling of existing dealership enquiries (up to 1,000 mins/month)',
-      'Model/variant, budget, timeline, exchange, finance & test-drive capture',
+      'AI-assisted calling of existing inbound enquiries (up to 1,000 mins/month)',
+      'Requirement, budget, timeline & appointment intent capture',
       'Hot / Warm / Future Follow-up / Unreachable / Not Interested classification',
       'Daily Excel qualification sheets & call summaries',
       'Monthly qualification & conversion insight report',
     ],
     excludes: [
       'Meta advertising & paid campaign management',
-      'New lead generation (qualifies existing dealership enquiries only)',
+      'New lead generation (qualifies existing enquiries only)',
       'Extra AI calling minutes beyond 1,000 mins/month',
     ],
     enquiryServiceValue: 'Package B — Lead Filtering & Qualification Only',
@@ -881,7 +887,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     category: 'Creative & Social',
     fee: '₹8,000',
     unit: '/month',
-    notes: 'Scheduled dealership content & page hygiene',
+    notes: 'Scheduled brand content & page hygiene',
   },
   {
     id: 'rc-6',
@@ -889,7 +895,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     category: 'Creative & Social',
     fee: '₹10,000',
     unit: '/month',
-    notes: 'Edited vertical reels from dealership or stock footage',
+    notes: 'Edited vertical reels from client or curated footage',
   },
   {
     id: 'rc-7',
@@ -897,7 +903,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     category: 'Creative & Social',
     fee: '₹4,000',
     unit: '/month',
-    notes: 'Static offer, model highlight & festive templates',
+    notes: 'Static offer, product highlight & festive templates',
   },
   {
     id: 'rc-8',
@@ -917,27 +923,27 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
   },
   {
     id: 'rc-10',
-    service: 'Vehicle launch campaign',
+    service: 'Product / model launch campaign',
     category: 'Campaigns',
     fee: '₹10,000',
     unit: '/campaign',
-    notes: 'Dedicated new model unveiling & booking promotion',
+    notes: 'Dedicated new product/model unveiling & booking promotion',
   },
   {
     id: 'rc-11',
-    service: 'Test-drive campaign',
+    service: 'Demo / visit booking campaign',
     category: 'Campaigns',
     fee: '₹7,500',
     unit: '/campaign',
-    notes: 'Targeted local test-drive booking drive',
+    notes: 'Targeted local appointment, demo or test-drive booking drive',
   },
   {
     id: 'rc-12',
-    service: 'Exchange mela campaign',
+    service: 'Upgrade / exchange event campaign',
     category: 'Campaigns',
     fee: '₹10,000',
     unit: '/campaign',
-    notes: 'Trade-in & weekend valuation event push',
+    notes: 'Promotional weekend event & upgrade valuation push',
   },
   {
     id: 'rc-13',
@@ -945,15 +951,15 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     category: 'Campaigns',
     fee: '₹10,000',
     unit: '/campaign',
-    notes: 'Seasonal offer rollout & showroom footfall drive',
+    notes: 'Seasonal offer rollout & customer footfall drive',
   },
   {
     id: 'rc-14',
-    service: 'Pre-owned vehicle marketing',
+    service: 'Catalog & stock rotation marketing',
     category: 'Campaigns',
     fee: '₹8,000',
     unit: '/month',
-    notes: 'Certified used-car stock promotion',
+    notes: 'Specialty inventory & pre-owned stock promotion',
   },
   {
     id: 'rc-15',
@@ -961,7 +967,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     category: 'Local Search',
     fee: '₹3,000',
     unit: '/month',
-    notes: 'Listing hygiene, updates & local showroom discovery',
+    notes: 'Listing hygiene, updates & local Maps discovery',
   },
   {
     id: 'rc-16',
@@ -969,31 +975,31 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     category: 'Local Search',
     fee: '₹6,000',
     unit: '/month',
-    notes: 'Catchment keyword & local search visibility',
+    notes: 'Catchment keyword & regional search visibility',
   },
   {
     id: 'rc-17',
-    service: 'Service centre retention campaign',
-    category: 'After-Sales',
+    service: 'Customer retention campaign',
+    category: 'Retention',
     fee: '₹8,000',
     unit: '/month',
-    notes: 'Periodic service & workshop booking outreach',
+    notes: 'Repeat customer & service centre booking outreach',
   },
   {
     id: 'rc-18',
-    service: 'Corporate/fleet campaign',
-    category: 'B2B / Fleet',
+    service: 'Corporate / B2B campaign',
+    category: 'B2B / Institutional',
     fee: '₹10,000',
     unit: '/campaign',
-    notes: 'Institutional & fleet buyer acquisition drive',
+    notes: 'Institutional, corporate & commercial buyer acquisition',
   },
   {
     id: 'rc-19',
-    service: 'Vehicle presentation PPT',
+    service: 'Product & pitch presentation PPT',
     category: 'Sales Enablement',
     fee: '₹3,000',
     unit: '/presentation',
-    notes: 'Structured model & variant sales deck',
+    notes: 'Structured offering, product & pricing sales deck',
   },
   {
     id: 'rc-20',
@@ -1001,7 +1007,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     category: 'Training',
     fee: '₹25,000',
     unit: '/session',
-    notes: 'Showroom walkaround, test-drive, objection & closing',
+    notes: 'Product presentation, objection handling & deal closing',
   },
   {
     id: 'rc-21',
@@ -1009,7 +1015,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     category: 'Training',
     fee: '₹25,000',
     unit: '/session',
-    notes: 'Grooming, communication & executive showroom etiquette',
+    notes: 'Grooming, communication & executive frontline etiquette',
   },
 ];
 
@@ -1038,7 +1044,7 @@ export const BUSINESS_VERTICAL_OPTIONS = [
 
 export const ENQUIRY_TYPE_OPTIONS: string[] = [
   'General Consultation / Proposal',
-  'Package A — Full Dealership Marketing & Lead Management',
+  'Package A — Full-Service Growth Marketing & Lead Management',
   'Package B — Lead Filtering & Qualification Only',
   ...RATE_CARD_ITEMS.map((item) => item.service),
   'Book Distribution / Publishing Rights',

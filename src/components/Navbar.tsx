@@ -2,6 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Menu, X } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { AppRoute, VENTURES_PORTFOLIO } from '../data/akyinData';
+import { useSiteConfig } from '../context/SiteConfigContext';
+import { isSafeImageSrc } from '../utils/security';
+import { AkyinLogo } from './AkyinLogo';
+import {
+  GlassButton,
+  GlassDropdown,
+  GlassNavigation,
+  LiquidGlassHeader,
+} from './liquid-glass';
 import { SocialLinks } from './SocialLinks';
 
 interface NavbarProps {
@@ -15,6 +24,7 @@ export function Navbar({
   onNavigate,
   onNavigateEcosystem,
 }: NavbarProps) {
+  const { settings } = useSiteConfig();
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -62,67 +72,66 @@ export function Navbar({
     onNavigateEcosystem();
   };
 
-  const navBarStyle = scrolled ? 'glass-nav-white' : 'glass-nav-warm';
   const isVentureActive =
     currentRoute === '/ventures' || currentRoute.startsWith('/ventures/');
 
   const linkClass = (isActive: boolean) =>
-    `group relative py-1 text-[13px] font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-      isActive ? 'text-[#B66A50]' : 'text-[#292722] hover:text-[#B66A50]'
-    }`;
-
-  const underlineClass = (isActive: boolean) =>
-    `pointer-events-none absolute left-0 right-0 -bottom-0.5 h-[2px] rounded-full bg-[#B66A50] origin-left transition-transform duration-200 ease-out ${
-      isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+    `relative px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F]/35 ${
+      isActive
+        ? 'frosted-glass-pill text-[#1D1D1F] font-semibold shadow-[0_2px_10px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,1)] border border-white/95'
+        : 'text-[#1D1D1F] hover:text-[#1D1D1F] hover:bg-white/60'
     }`;
 
   return (
-    <header
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-200 text-[#292722] ${navBarStyle}`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 lg:h-16 flex items-center justify-between gap-8">
-        {/* Zone 1: Single Brand Wordmark */}
+    <LiquidGlassHeader scrolled={scrolled}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 lg:h-16 flex items-center justify-between gap-4">
+        {/* Zone 1: Custom AKYIN Mark & Wordmark */}
         <a
           href="/"
           onClick={(e) => {
             e.preventDefault();
             navigateTo('/');
           }}
-          className="font-display text-lg font-extrabold tracking-tight text-[#292722] hover:text-[#B66A50] transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B66A50] rounded px-1"
+          className="inline-flex items-center whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F]/35 rounded-xl px-1 py-0.5 transition-opacity hover:opacity-85"
         >
-          AKYIN
+          {settings.logoUrl && isSafeImageSrc(settings.logoUrl) ? (
+            <img
+              src={settings.logoUrl}
+              alt={settings.brandWordmark || 'AKYIN'}
+              className="h-7 w-auto object-contain"
+            />
+          ) : (
+            <AkyinLogo wordmark={settings.brandWordmark || 'AKYIN'} size="sm" />
+          )}
         </a>
 
-        {/* Zone 2: Refined 6-Item Single-Line Navigation */}
-        <nav
-          aria-label="Primary navigation"
-          className="hidden lg:flex items-center gap-6"
-        >
+        {/* Zone 2: Floating Glass Navigation Pill */}
+        <GlassNavigation ariaLabel="Primary navigation">
           <a
             href="/"
+            aria-current={currentRoute === '/' ? 'page' : undefined}
             onClick={(e) => {
               e.preventDefault();
               navigateTo('/');
             }}
             className={linkClass(currentRoute === '/')}
           >
-            <span>Home</span>
-            <span className={underlineClass(currentRoute === '/')} aria-hidden="true" />
+            Home
           </a>
 
           <a
             href="/about"
+            aria-current={currentRoute === '/about' ? 'page' : undefined}
             onClick={(e) => {
               e.preventDefault();
               navigateTo('/about');
             }}
             className={linkClass(currentRoute === '/about')}
           >
-            <span>About</span>
-            <span className={underlineClass(currentRoute === '/about')} aria-hidden="true" />
+            About
           </a>
 
-          {/* Our Ventures Dropdown */}
+          {/* Ventures Dropdown */}
           <div
             ref={dropdownRef}
             className="relative"
@@ -136,71 +145,67 @@ export function Navbar({
               onClick={() => setDropdownOpen((prev) => !prev)}
               className={`inline-flex items-center gap-1 ${linkClass(isVentureActive)}`}
             >
-              <span>Our Ventures</span>
+              <span>Ventures</span>
               <ChevronDown
                 className={`w-3.5 h-3.5 transition-transform duration-200 ${
                   dropdownOpen ? 'rotate-180' : ''
                 }`}
                 aria-hidden="true"
               />
-              <span className={underlineClass(isVentureActive)} aria-hidden="true" />
             </button>
 
-            <AnimatePresence>
-              {dropdownOpen && (
-                <motion.div
-                  role="menu"
-                  initial={shouldReduceMotion ? false : { opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={shouldReduceMotion ? undefined : { opacity: 0, y: 4 }}
-                  transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                  className="absolute left-0 top-full pt-2.5 w-80 z-50"
-                >
-                  <div className="glass-dropdown-warm rounded-xl p-2 space-y-0.5 text-[#292722]">
-                    {VENTURES_PORTFOLIO.map((venture) => (
-                      <a
-                        key={venture.id}
-                        role="menuitem"
-                        href={venture.route}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          navigateTo(venture.route);
-                        }}
-                        className={`block px-3.5 py-2 rounded-lg transition-colors ${
-                          currentRoute === venture.route
-                            ? 'bg-[#EFE9DE] text-[#B66A50]'
-                            : 'hover:bg-[#F7F5F0] text-[#292722]'
+            <GlassDropdown open={dropdownOpen} className="w-80">
+              <div className="space-y-0.5">
+                {VENTURES_PORTFOLIO.map((venture) => (
+                  <a
+                    key={venture.id}
+                    role="menuitem"
+                    href={venture.route}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateTo(venture.route);
+                    }}
+                    className={`block px-3.5 py-2.5 rounded-xl transition-all ${
+                      currentRoute === venture.route
+                        ? 'frosted-glass text-[#1D1D1F] font-semibold shadow-xs'
+                        : 'hover:bg-white/80 text-[#1D1D1F]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-semibold">{venture.shortName}</span>
+                      <span
+                        className={`font-mono-num text-[11px] ${
+                          currentRoute === venture.route ? 'text-[#1D1D1F]/70 font-bold' : 'text-[#6E6E73]'
                         }`}
                       >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs font-bold">{venture.shortName}</span>
-                          <span className="font-mono-num text-[11px] text-[#77736C]">
-                            {venture.code}
-                          </span>
-                        </div>
-                        <p className="text-[11px] mt-0.5 truncate text-[#77736C]">
-                          {venture.sector}
-                        </p>
-                      </a>
-                    ))}
-
-                    <div className="pt-1.5 mt-1.5 border-t border-[#EFE9DE]">
-                      <a
-                        href="/ventures"
-                        role="menuitem"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          navigateTo('/ventures');
-                        }}
-                        className="block px-3.5 py-2 rounded-lg text-xs font-bold text-[#B66A50] hover:bg-[#F7F5F0] transition-colors"
-                      >
-                        View All 7 Ventures Directory
-                      </a>
+                        {venture.code}
+                      </span>
                     </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    <p
+                      className={`text-[11px] mt-0.5 truncate ${
+                        currentRoute === venture.route ? 'text-[#1D1D1F]/80 font-medium' : 'text-[#6E6E73]'
+                      }`}
+                    >
+                      {venture.sector}
+                    </p>
+                  </a>
+                ))}
+
+                <div className="pt-1.5 mt-1.5 border-t border-[#1D1D1F]/8">
+                  <a
+                    href="/ventures"
+                    role="menuitem"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateTo('/ventures');
+                    }}
+                    className="block px-3.5 py-2 rounded-xl text-xs font-semibold text-[#1D1D1F] hover:bg-white/90 transition-colors"
+                  >
+                    View All 7 Ventures Directory
+                  </a>
+                </div>
+              </div>
+            </GlassDropdown>
           </div>
 
           <a
@@ -211,61 +216,74 @@ export function Navbar({
             }}
             className={linkClass(false)}
           >
-            <span>Our Ecosystem</span>
-            <span className={underlineClass(false)} aria-hidden="true" />
+            Ecosystem
+          </a>
+
+          <a
+            href="/advisory"
+            aria-current={currentRoute === '/advisory' ? 'page' : undefined}
+            onClick={(e) => {
+              e.preventDefault();
+              navigateTo('/advisory');
+            }}
+            className={linkClass(currentRoute === '/advisory')}
+          >
+            Advisory
           </a>
 
           <a
             href="/insights"
+            aria-current={currentRoute === '/insights' ? 'page' : undefined}
             onClick={(e) => {
               e.preventDefault();
               navigateTo('/insights');
             }}
             className={linkClass(currentRoute === '/insights')}
           >
-            <span>Insights</span>
-            <span className={underlineClass(currentRoute === '/insights')} aria-hidden="true" />
+            Insights
           </a>
 
           <a
             href="/contact"
+            aria-current={currentRoute === '/contact' ? 'page' : undefined}
             onClick={(e) => {
               e.preventDefault();
               navigateTo('/contact');
             }}
             className={linkClass(currentRoute === '/contact')}
           >
-            <span>Contact</span>
-            <span className={underlineClass(currentRoute === '/contact')} aria-hidden="true" />
+            Contact
           </a>
-        </nav>
+        </GlassNavigation>
 
         {/* Zone 3: Single Primary Action */}
-        <div className="flex items-center gap-3 shrink-0">
-          <a
+        <div className="flex items-center gap-2.5 shrink-0">
+          <GlassButton
+            variant="primary"
+            size="sm"
             href="/contact"
             onClick={(e) => {
               e.preventDefault();
               navigateTo('/contact');
             }}
-            className="hidden sm:inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-white bg-[#B66A50] hover:bg-[#9E5740] rounded-lg transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap shrink-0"
+            className="hidden sm:inline-flex"
           >
-            Connect With Us
-          </a>
+            Let&apos;s Connect
+          </GlassButton>
 
           <button
             type="button"
             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={mobileMenuOpen}
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg text-[#292722] hover:bg-[#EFE9DE] transition-colors cursor-pointer"
+            className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-full liquid-glass-cta text-[#1D1D1F] transition-colors cursor-pointer"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
-      {/* Responsive Mobile Navigation Drawer */}
+      {/* Responsive Mobile Liquid Glass Drawer */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -273,35 +291,37 @@ export function Navbar({
             animate={{ opacity: 1, y: 0 }}
             exit={shouldReduceMotion ? undefined : { opacity: 0, y: -6 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:hidden bg-[#F7F5F0] border-t border-[#D9CCB9] px-4 py-5 space-y-1.5 text-[#292722] max-h-[84vh] overflow-y-auto shadow-lg"
+            className="lg:hidden liquid-glass-dropdown border-t border-white/80 px-4 py-5 space-y-1 text-[#1D1D1F] max-h-[84vh] overflow-y-auto"
           >
             <a
               href="/"
+              aria-current={currentRoute === '/' ? 'page' : undefined}
               onClick={(e) => {
                 e.preventDefault();
                 navigateTo('/');
               }}
-              className="block px-3 py-2.5 text-sm font-semibold rounded-lg hover:bg-[#EFE9DE]"
+              className="block px-3.5 py-2.5 text-sm font-semibold rounded-xl hover:bg-white/80"
             >
               Home
             </a>
             <a
               href="/about"
+              aria-current={currentRoute === '/about' ? 'page' : undefined}
               onClick={(e) => {
                 e.preventDefault();
                 navigateTo('/about');
               }}
-              className="block px-3 py-2.5 text-sm font-semibold rounded-lg hover:bg-[#EFE9DE]"
+              className="block px-3.5 py-2.5 text-sm font-semibold rounded-xl hover:bg-white/80"
             >
               About
             </a>
 
-            <div className="pt-2 pb-1 px-3">
-              <p className="text-[11px] font-semibold tracking-wide text-[#77736C]">
+            <div className="pt-2 pb-1 px-3.5">
+              <p className="text-[11px] font-semibold tracking-wide text-[#6E6E73]">
                 Our Ventures
               </p>
             </div>
-            <div className="pl-3 space-y-1">
+            <div className="pl-3 space-y-0.5">
               {VENTURES_PORTFOLIO.map((venture) => (
                 <a
                   key={venture.id}
@@ -310,7 +330,7 @@ export function Navbar({
                     e.preventDefault();
                     navigateTo(venture.route);
                   }}
-                  className="block px-3 py-2 text-sm text-[#292722] rounded-lg hover:bg-[#EFE9DE]"
+                  className="block px-3.5 py-2 text-sm text-[#1D1D1F] rounded-xl hover:bg-white/80"
                 >
                   {venture.shortName}
                 </a>
@@ -318,58 +338,75 @@ export function Navbar({
             </div>
 
             <a
+              href="/advisory"
+              aria-current={currentRoute === '/advisory' ? 'page' : undefined}
+              onClick={(e) => {
+                e.preventDefault();
+                navigateTo('/advisory');
+              }}
+              className="block px-3.5 py-2.5 text-sm font-semibold rounded-xl hover:bg-white/80"
+            >
+              Advisory
+            </a>
+            <a
               href="/#our-ecosystem"
               onClick={(e) => {
                 e.preventDefault();
                 handleEcosystemClick();
               }}
-              className="block px-3 py-2.5 text-sm font-semibold rounded-lg hover:bg-[#EFE9DE]"
+              className="block px-3.5 py-2.5 text-sm font-semibold rounded-xl hover:bg-white/80"
             >
-              Our Ecosystem
+              Ecosystem
             </a>
             <a
               href="/insights"
+              aria-current={currentRoute === '/insights' ? 'page' : undefined}
               onClick={(e) => {
                 e.preventDefault();
                 navigateTo('/insights');
               }}
-              className="block px-3 py-2.5 text-sm font-semibold rounded-lg hover:bg-[#EFE9DE]"
+              className="block px-3.5 py-2.5 text-sm font-semibold rounded-xl hover:bg-white/80"
             >
               Insights
             </a>
             <a
               href="/contact"
+              aria-current={currentRoute === '/contact' ? 'page' : undefined}
               onClick={(e) => {
                 e.preventDefault();
                 navigateTo('/contact');
               }}
-              className="block px-3 py-2.5 text-sm font-semibold rounded-lg hover:bg-[#EFE9DE]"
+              className="block px-3.5 py-2.5 text-sm font-semibold rounded-xl hover:bg-white/80"
             >
               Contact
             </a>
 
-            <div className="pt-3 border-t border-[#D9CCB9]">
-              <p className="px-3 text-[11px] font-semibold text-[#77736C] mb-2">
+            <div className="pt-3 border-t border-[#1D1D1F]/10">
+              <p className="px-3.5 text-[11px] font-semibold text-[#6E6E73] mb-2">
                 Follow @akyinmarketing
               </p>
-              <div className="px-3">
+              <div className="px-3.5">
                 <SocialLinks variant="inline" />
               </div>
             </div>
 
-            <a
-              href="/contact"
-              onClick={(e) => {
-                e.preventDefault();
-                navigateTo('/contact');
-              }}
-              className="block w-full text-center mt-3 px-4 py-3 text-sm font-semibold text-white bg-[#B66A50] hover:bg-[#9E5740] rounded-lg"
-            >
-              Connect With Us
-            </a>
+            <div className="pt-3">
+              <GlassButton
+                variant="primary"
+                size="lg"
+                href="/contact"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateTo('/contact');
+                }}
+                className="w-full"
+              >
+                Let&apos;s Connect
+              </GlassButton>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </LiquidGlassHeader>
   );
 }

@@ -1,8 +1,15 @@
 import { useState } from 'react';
 import { ArrowUpRight, Calculator, Cpu, Layers, Sparkles } from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
 import { EXTERNAL_VERTICAL_URLS, IMAGES } from '../data/akyinData';
 import { ContactDispatcher } from '../components/ContactDispatcher';
 import { EditorialReveal } from '../components/EditorialReveal';
+import {
+  GlassButton,
+  GlassCard,
+  GlassImageFrame,
+  GlassPanel,
+} from '../components/liquid-glass';
 import { ResilientImage } from '../components/ResilientImage';
 
 const SAMPLE_PROMPTS = [
@@ -24,65 +31,77 @@ const SAMPLE_PROMPTS = [
 ];
 
 export function AICalcPage() {
+  const shouldReduceMotion = useReducedMotion();
   const [activePromptIdx, setActivePromptIdx] = useState(0);
 
   return (
     <div>
-      {/* 1. Clean White & Warm Ivory Technology Hero */}
-      <section className="bg-[#FFFFFF] text-[#292722] pt-24 pb-16 lg:pt-32 lg:pb-24 border-b border-[#D9CCB9]">
+      {/* 1. Pure Apple-Inspired Tech Hero */}
+      <section className="surface-silver-gradient text-[#1D1D1F] pt-12 pb-16 lg:pt-16 lg:pb-24 border-b border-[#E8E8ED]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-6 space-y-6">
-            <p className="text-xs font-semibold tracking-wide text-[#B66A50]">
+          <motion.div
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-6 space-y-6"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
               AKYIN AI CALCULATOR · aicalc.in
             </p>
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight leading-[1.07] text-balance">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-[54px] font-bold tracking-[-0.025em] leading-[1.06] text-[#1D1D1F] text-balance">
               Smart Calculations. Powered by AI.
             </h1>
-            <p className="text-base sm:text-lg text-[#77736C] leading-relaxed">
+            <p className="text-base sm:text-lg text-[#6E6E73] leading-relaxed">
               AICalc is an AI-powered calculator platform that allows users to solve mathematical and practical calculation problems using natural-language text queries alongside traditional calculator functions.
             </p>
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              <a
+            <div className="flex flex-wrap items-center gap-3.5 pt-2">
+              <GlassButton
                 href={EXTERNAL_VERTICAL_URLS.aicalc}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-[#B66A50] hover:bg-[#9E5740] text-white text-sm font-semibold transition-colors whitespace-nowrap"
+                variant="primary"
+                size="lg"
               >
-                Visit AICalc.in
+                <span>Visit AICalc.in</span>
                 <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
-              </a>
-              <a
-                href="#aicalc-capabilities"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-[#F7F5F0] hover:bg-[#EFE9DE] text-[#292722] border border-[#D9CCB9] text-sm font-semibold transition-colors whitespace-nowrap"
-              >
+              </GlassButton>
+              <GlassButton href="#aicalc-capabilities" variant="glass" size="lg">
                 Explore Capabilities
-              </a>
+              </GlassButton>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Bright Tech Workspace Visual + Interactive Preview */}
-          <div className="lg:col-span-6 space-y-5">
-            <div className="rounded-2xl overflow-hidden border border-[#D9CCB9] aspect-[16/10] bg-[#F7F5F0]">
-              <ResilientImage
-                src={IMAGES.aicalcWorkspace}
-                alt="Minimalist white and pale oak desk setup for AICalc.in"
-                loading="eager"
-                fallbackTitle="AICalc.in Platform"
-                className="w-full h-full object-cover"
-              />
-            </div>
+          {/* Tech Workspace Visual + Liquid Glass Interactive Preview */}
+          <motion.div
+            initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.985 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.55, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-6 space-y-5"
+          >
+            <GlassImageFrame>
+              <div className="aspect-[16/9] bg-[#FFFFFF] overflow-hidden">
+                <ResilientImage
+                  src={IMAGES.aicalcWorkspace}
+                  alt="Apple-style isolated precision anodized silver AICalc calculator device on pure white studio ground"
+                  loading="eager"
+                  fallbackTitle="AICalc.in Platform"
+                  className="w-full h-full bg-[#FFFFFF]"
+                  imageClassName="object-contain p-3"
+                />
+              </div>
+            </GlassImageFrame>
 
-            <div className="rounded-2xl bg-[#F7F5F0] border border-[#D9CCB9] p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-[#D9CCB9] pb-3">
+            <GlassPanel className="p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-[#1D1D1F]/8 pb-3">
                 <div>
-                  <p className="text-xs font-medium text-[#77736C]">Product Interface Preview</p>
-                  <p className="font-mono-num text-sm font-bold text-[#292722]">https://aicalc.in</p>
+                  <p className="text-xs font-medium text-[#6E6E73]">Product Interface Preview</p>
+                  <p className="font-mono-num text-sm font-bold text-[#1D1D1F]">https://aicalc.in</p>
                 </div>
                 <a
                   href={EXTERNAL_VERTICAL_URLS.aicalc}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#B66A50] hover:underline"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline"
                 >
                   Open Live App
                   <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -95,10 +114,10 @@ export function AICalcPage() {
                     key={item.mode}
                     type="button"
                     onClick={() => setActivePromptIdx(index)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                       activePromptIdx === index
-                        ? 'bg-[#B66A50] text-white'
-                        : 'bg-[#FFFFFF] text-[#292722] border border-[#D9CCB9] hover:bg-[#EFE9DE]'
+                        ? 'bg-[#1D1D1F] text-white shadow-xs'
+                        : 'liquid-glass-cta text-[#1D1D1F]'
                     }`}
                   >
                     {item.mode}
@@ -106,85 +125,85 @@ export function AICalcPage() {
                 ))}
               </div>
 
-              <div className="rounded-xl bg-[#FFFFFF] border border-[#D9CCB9] p-4 space-y-2.5">
+              <div className="rounded-2xl bg-[#FFFFFF] border border-[#E8E8ED] p-4 space-y-2.5">
                 <div>
-                  <p className="text-[11px] font-medium text-[#77736C]">Natural-Language Input</p>
-                  <p className="text-sm font-medium text-[#292722] mt-0.5">
+                  <p className="text-[11px] font-medium text-[#6E6E73]">Natural-Language Input</p>
+                  <p className="text-sm font-medium text-[#1D1D1F] mt-0.5">
                     &ldquo;{SAMPLE_PROMPTS[activePromptIdx].query}&rdquo;
                   </p>
                 </div>
-                <div className="h-px bg-[#EFE9DE]" />
+                <div className="h-px bg-[#E8E8ED]" />
                 <div>
-                  <p className="text-[11px] font-medium text-[#77736C]">Structured Output</p>
-                  <p className="font-mono-num text-base font-bold text-[#B66A50] mt-0.5">
+                  <p className="text-[11px] font-medium text-[#6E6E73]">Structured Output</p>
+                  <p className="font-mono-num text-base font-bold text-[#1D1D1F] mt-0.5">
                     {SAMPLE_PROMPTS[activePromptIdx].result}
                   </p>
                 </div>
               </div>
-            </div>
-          </div>
+            </GlassPanel>
+          </motion.div>
         </div>
       </section>
 
       {/* 2. AI Calculator Capabilities & 3. Manual Calculator Capabilities */}
-      <section id="aicalc-capabilities" className="py-20 lg:py-24 bg-[#F7F5F0]">
+      <section id="aicalc-capabilities" className="py-20 lg:py-24 bg-[#F5F5F7]">
         <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="max-w-2xl space-y-3">
-            <p className="text-xs font-semibold tracking-wide text-[#B66A50]">
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
               Dual-Mode Calculation Architecture
             </p>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-[#292722] text-balance">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F] text-balance">
               Natural-Language AI Prompts Paired With Classic Keypad Precision.
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="rounded-2xl bg-[#FFFFFF] border border-[#D9CCB9] p-8 space-y-4">
-              <div className="w-10 h-10 rounded-lg bg-[#EFE9DE] text-[#B66A50] flex items-center justify-center">
+            <GlassCard interactive className="p-8 space-y-4">
+              <div className="w-10 h-10 rounded-xl bg-[#FFFFFF] border border-[#E8E8ED] text-[#1D1D1F] flex items-center justify-center shadow-xs">
                 <Sparkles className="w-5 h-5" aria-hidden="true" />
               </div>
-              <h3 className="font-display text-2xl font-bold text-[#292722]">
+              <h3 className="font-display text-2xl font-bold text-[#1D1D1F]">
                 AI Calculator Capabilities
               </h3>
-              <p className="text-sm text-[#77736C] leading-relaxed">
+              <p className="text-sm text-[#6E6E73] leading-relaxed">
                 Type everyday word problems, multi-step financial expressions, percentage markups, or unit conversions in plain language without translating them into nested formulas.
               </p>
-              <ul className="space-y-2 text-xs sm:text-sm text-[#292722]/85 pt-2">
+              <ul className="space-y-2 text-xs sm:text-sm text-[#1D1D1F]/85 pt-2">
                 <li>· Plain-text question parsing for everyday math</li>
                 <li>· Multi-step commercial and finance problem solving</li>
                 <li>· Clear, readable expression interpretation</li>
               </ul>
-            </div>
+            </GlassCard>
 
-            <div className="rounded-2xl bg-[#FFFFFF] border border-[#D9CCB9] p-8 space-y-4">
-              <div className="w-10 h-10 rounded-lg bg-[#EFE9DE] text-[#83866A] flex items-center justify-center">
+            <GlassCard interactive className="p-8 space-y-4">
+              <div className="w-10 h-10 rounded-xl bg-[#FFFFFF] border border-[#E8E8ED] text-[#1D1D1F] flex items-center justify-center shadow-xs">
                 <Calculator className="w-5 h-5" aria-hidden="true" />
               </div>
-              <h3 className="font-display text-2xl font-bold text-[#292722]">
+              <h3 className="font-display text-2xl font-bold text-[#1D1D1F]">
                 Manual Calculator Capabilities
               </h3>
-              <p className="text-sm text-[#77736C] leading-relaxed">
+              <p className="text-sm text-[#6E6E73] leading-relaxed">
                 When direct numeric entry is faster than typing a sentence, switch seamlessly to traditional calculator controls built for reliable arithmetic.
               </p>
-              <ul className="space-y-2 text-xs sm:text-sm text-[#292722]/85 pt-2">
+              <ul className="space-y-2 text-xs sm:text-sm text-[#1D1D1F]/85 pt-2">
                 <li>· Responsive standard arithmetic &amp; percentage keypad</li>
                 <li>· Clean keyboard and touch input ergonomics</li>
                 <li>· Zero-clutter display for rapid daily checks</li>
               </ul>
-            </div>
+            </GlassCard>
           </div>
         </EditorialReveal>
       </section>
 
-      {/* 4. Supported Calculation Categories & 7. Visit CTA */}
-      <section className="py-20 lg:py-24 bg-[#FFFFFF] border-t border-[#D9CCB9]">
+      {/* 4. Supported Calculation Categories & Visit CTA */}
+      <section className="py-20 lg:py-24 bg-[#FFFFFF] border-t border-[#E8E8ED]">
         <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             <div className="lg:col-span-5 space-y-3">
-              <p className="text-xs font-semibold tracking-wide text-[#B66A50]">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
                 Supported Calculation Categories
               </p>
-              <h2 className="font-display text-3xl font-bold text-[#292722] text-balance">
+              <h2 className="font-display text-3xl font-bold tracking-[-0.02em] text-[#1D1D1F] text-balance">
                 Practical Utility Across Personal, Academic &amp; Business Math.
               </h2>
             </div>
@@ -216,38 +235,39 @@ export function AICalcPage() {
                 return (
                   <div
                     key={cat.title}
-                    className="bg-[#F7F5F0] rounded-xl border border-[#D9CCB9] p-5 space-y-2"
+                    className="liquid-glass-card rounded-2xl p-5 space-y-2"
                   >
-                    <Icon className="w-4 h-4 text-[#B66A50]" aria-hidden="true" />
-                    <h3 className="font-display text-base font-bold text-[#292722]">
+                    <Icon className="w-4 h-4 text-[#1D1D1F]" aria-hidden="true" />
+                    <h3 className="font-display text-base font-bold text-[#1D1D1F]">
                       {cat.title}
                     </h3>
-                    <p className="text-xs text-[#77736C] leading-relaxed">{cat.desc}</p>
+                    <p className="text-xs text-[#6E6E73] leading-relaxed">{cat.desc}</p>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          <div className="rounded-2xl bg-[#EFE9DE] border border-[#D9CCB9] p-8 sm:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <GlassPanel className="p-8 sm:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-2 max-w-xl">
-              <h3 className="font-display text-2xl font-bold text-[#292722]">
+              <h3 className="font-display text-2xl font-bold text-[#1D1D1F]">
                 Use the Full Platform on AICalc.in
               </h3>
-              <p className="text-sm text-[#77736C]">
+              <p className="text-sm text-[#6E6E73]">
                 AICalc runs on its own dedicated web application so you can calculate directly in your browser.
               </p>
             </div>
-            <a
+            <GlassButton
               href={EXTERNAL_VERTICAL_URLS.aicalc}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-[#B66A50] hover:bg-[#9E5740] text-white text-sm font-semibold transition-colors whitespace-nowrap shrink-0"
+              variant="primary"
+              size="lg"
             >
-              Visit AICalc.in
+              <span>Visit AICalc.in</span>
               <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
-            </a>
-          </div>
+            </GlassButton>
+          </GlassPanel>
         </EditorialReveal>
       </section>
 

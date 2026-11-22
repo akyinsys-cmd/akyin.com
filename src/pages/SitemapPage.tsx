@@ -7,6 +7,7 @@ import {
   VENTURES_PORTFOLIO,
 } from '../data/akyinData';
 import { EditorialReveal } from '../components/EditorialReveal';
+import { GlassButton } from '../components/liquid-glass';
 import { SocialLinks } from '../components/SocialLinks';
 
 interface SitemapPageProps {
@@ -36,14 +37,15 @@ const CORPORATE_ROUTES: CorporateRouteItem[] = [
     route: '/',
     title: 'Home — AKYIN Ventures Group Portal',
     description:
-      'Parent corporate overview introducing AKYIN Ventures, equal-weight portfolio showcase across five operating verticals, and group enquiry gateway.',
+      'Parent corporate overview introducing AKYIN Ventures, equal-weight portfolio showcase across seven operating verticals, and group enquiry gateway.',
     sections: [
-      'Hero Introduction (Building Ideas Into Businesses)',
+      'Liquid Glass Hero Introduction (Building Ideas Into Businesses)',
       'About AKYIN Ventures',
-      'Our Business Portfolio (All 5 Verticals)',
+      'Our Business Portfolio (All 7 Verticals)',
       'Explore Our Ventures',
       'Our Approach to Business',
       'Featured Products & Direct Gateways',
+      'Customer & Client Endorsements (Verified Reviews & Feedback)',
       'Official Channels (@akyinmarketing) & Contact Desk',
     ],
   },
@@ -55,7 +57,9 @@ const CORPORATE_ROUTES: CorporateRouteItem[] = [
     sections: [
       'Corporate Profile Header',
       'Group Orientation & Diversified Initiatives',
+      'Interactive Growth Milestones Timeline',
       'Venture Architecture & Vertical Purpose',
+      'Security & Integrity Standards',
       'Business FAQs Accordion',
     ],
   },
@@ -63,10 +67,10 @@ const CORPORATE_ROUTES: CorporateRouteItem[] = [
     route: '/ventures',
     title: 'Our Businesses — Venture Portfolio Directory',
     description:
-      'Structured directory comparing all five operating divisions with direct links to dedicated vertical pages, live external domains, and vertical enquiries.',
+      'Structured directory comparing all seven operating divisions with direct links to dedicated vertical pages, live external domains, and vertical enquiries.',
     sections: [
       'Portfolio Directory Overview',
-      '5-Vertical Comparison Grid',
+      '7-Vertical Comparison Grid',
       'Direct Vertical Enquiry Triggers',
     ],
   },
@@ -80,13 +84,26 @@ const CORPORATE_ROUTES: CorporateRouteItem[] = [
       '02 · Measuring Lead Generation & Qualification Separately',
       '03 · Accessible Fashion Through Curated Merchandising',
       '04 · Purpose-Built Platforms vs. Generic Portals',
+      '05 · Clarity in Advisory & Everyday Value Retail',
+      'Automotive Marketing Trends & Benchmark Intelligence',
+    ],
+  },
+  {
+    route: '/advisory',
+    title: 'Business Advisory — Consultation Booking',
+    description:
+      'Dedicated consultation request desk with live Asia/Kolkata (IST) slot selection and fee transparency.',
+    sections: [
+      'Your Business. Your Vision. A Clearer Direction.',
+      'Advisory Focus Areas & Session Schedule',
+      'Live IST Time Slot Picker & Booking Form',
     ],
   },
   {
     route: '/contact',
     title: 'Contact — Central Enquiry Desk',
     description:
-      'Zero-backend structured enquiry dispatcher routing publishing, dealership marketing, retail, AICalc, Kartigo, and strategic partnership requests via WhatsApp or Email.',
+      'Structured enquiry dispatcher logging requests and preparing WhatsApp or Email drafts across publishing, marketing agency services, retail, AICalc, Kartigo, BizNXT, Budget Bazaar, and partnerships.',
     sections: [
       'Enquiry Categories Overview',
       'Official Social Media Channels (@akyinmarketing)',
@@ -100,7 +117,7 @@ const CORPORATE_ROUTES: CorporateRouteItem[] = [
       'Full architectural map of all corporate pages, vertical landing pages, key page sections, external platforms, and verified social destinations.',
     sections: [
       'Corporate Parent Group Pages',
-      'Five Operating Verticals & Key Sections',
+      'Seven Operating Verticals & Key Sections',
       'External Platforms & Direct Channels',
     ],
   },
@@ -128,13 +145,13 @@ const VERTICAL_SECTION_INDEX: VerticalSectionItem[] = [
     code: '02',
     name: 'AKYIN MARKETINGS',
     route: '/ventures/marketing',
-    sector: 'Automotive Dealership Marketing & Sales Training',
+    sector: 'Full-Service Marketing Agency & Growth Solutions',
     keySections: [
-      'Automotive Dealership Growth Hero',
+      'Full-Service Marketing Agency Hero',
       'About AKYIN MARKETINGS (3 Core Pillars)',
-      'Complete 18-Service Filterable Catalogue',
-      '16 Years of Automotive Industry Experience (Maruti Suzuki to Audi)',
-      'Dealership Showroom Sales Training (₹25,000 per session)',
+      'Complete 18-Service Filterable Agency Catalogue',
+      '16 Years of Multi-Industry & Automotive Commercial Experience',
+      'Commercial & Dealership Sales Training (₹25,000 per session)',
       'Retainer Packages (Package A & Package B) & Searchable 21-Item Rate Card',
       'Official @akyinmarketing Social Channels & Proposal Dispatcher',
     ],
@@ -220,26 +237,25 @@ const VERTICAL_SECTION_INDEX: VerticalSectionItem[] = [
 export function SitemapPage({ onNavigate }: SitemapPageProps) {
   return (
     <div>
-      {/* Editorial Sitemap Header */}
-      <section className="bg-[#EFE9DE] text-[#292722] pt-28 pb-16 lg:pt-36 lg:pb-20 border-b border-[#D9CCB9]">
+      <section className="surface-silver-gradient text-[#1D1D1F] pt-12 pb-16 lg:pt-16 lg:pb-20 border-b border-[#E8E8ED]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
-          <p className="text-xs font-semibold tracking-wide text-[#B66A50]">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
             AKYIN Ventures · Website Directory &amp; Sitemap
           </p>
-          <h1 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.08] text-balance max-w-4xl">
+          <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-[-0.025em] leading-[1.08] text-balance max-w-4xl">
             Complete Site Map &amp; Business Directory.
           </h1>
-          <p className="text-base sm:text-lg text-[#77736C] max-w-3xl leading-relaxed">
+          <p className="text-base sm:text-lg text-[#6E6E73] max-w-3xl leading-relaxed">
             A structured overview of all AKYIN Ventures corporate pages, dedicated vertical destinations, key content sections, and verified external platforms.
           </p>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-2 text-xs font-medium text-[#77736C]">
-            <span className="font-mono-num font-bold text-[#292722]">6 Corporate Pages</span>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-2 text-xs font-medium text-[#6E6E73]">
+            <span className="font-mono-num font-bold text-[#1D1D1F]">7 Corporate Pages</span>
             <span aria-hidden="true">·</span>
-            <span className="font-mono-num font-bold text-[#292722]">
+            <span className="font-mono-num font-bold text-[#1D1D1F]">
               {VENTURES_PORTFOLIO.length} Operating Verticals
             </span>
             <span aria-hidden="true">·</span>
-            <span className="font-mono-num font-bold text-[#292722]">
+            <span className="font-mono-num font-bold text-[#1D1D1F]">
               6 External Storefronts &amp; Platforms
             </span>
           </div>
@@ -247,20 +263,20 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
       </section>
 
       {/* Section 1: Corporate Parent Group Pages */}
-      <section className="py-20 bg-[#F7F5F0]">
+      <section className="py-20 bg-[#F5F5F7]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <EditorialReveal>
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide text-[#B66A50]">
-                  <Compass className="w-4 h-4" aria-hidden="true" />
+                <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
+                  <Compass className="w-4 h-4 text-[#1D1D1F]" aria-hidden="true" />
                   <span>Parent Portal Routes</span>
                 </div>
-                <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-[#292722]">
+                <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F]">
                   Corporate Group Pages.
                 </h2>
               </div>
-              <p className="text-sm text-[#77736C] max-w-md">
+              <p className="text-sm text-[#6E6E73] max-w-md">
                 Core informational routes across akyin.com introducing the parent business group, leadership orientation, and central enquiry desk.
               </p>
             </div>
@@ -271,26 +287,26 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
               {CORPORATE_ROUTES.map((item) => (
                 <article
                   key={item.route}
-                  className="bg-[#FFFFFF] rounded-2xl border border-[#D9CCB9] p-6 sm:p-7 flex flex-col justify-between space-y-6"
+                  className="liquid-glass-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between space-y-6"
                 >
                   <div className="space-y-3">
-                    <p className="font-mono-num text-xs font-bold text-[#B66A50]">
+                    <p className="font-mono-num text-xs font-bold text-[#1D1D1F]">
                       {item.route}
                     </p>
-                    <h3 className="font-display text-xl font-bold text-[#292722] text-balance">
+                    <h3 className="font-display text-xl font-bold text-[#1D1D1F] text-balance">
                       {item.title}
                     </h3>
-                    <p className="text-sm text-[#77736C] leading-relaxed">
+                    <p className="text-sm text-[#6E6E73] leading-relaxed">
                       {item.description}
                     </p>
-                    <div className="pt-2 border-t border-[#EFE9DE] space-y-1.5">
-                      <p className="text-[11px] font-semibold tracking-wide text-[#83866A]">
+                    <div className="pt-3 border-t border-[#1D1D1F]/8 space-y-1.5">
+                      <p className="text-[11px] font-semibold tracking-wide text-[#6E6E73]">
                         Key Sections
                       </p>
-                      <ul className="space-y-1 text-xs text-[#292722]/85">
+                      <ul className="space-y-1 text-xs text-[#1D1D1F]/85">
                         {item.sections.map((section) => (
                           <li key={section} className="flex items-start gap-2">
-                            <span className="text-[#B66A50] font-bold" aria-hidden="true">
+                            <span className="text-[#1D1D1F] font-bold" aria-hidden="true">
                               ·
                             </span>
                             <span>{section}</span>
@@ -300,11 +316,11 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-[#EFE9DE]">
+                  <div className="pt-3 border-t border-[#1D1D1F]/8">
                     <button
                       type="button"
                       onClick={() => onNavigate(item.route)}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#B66A50] hover:text-[#9E5740] transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1D1D1F] hover:underline transition-colors cursor-pointer"
                     >
                       Open {item.route}
                       <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -317,60 +333,60 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
         </div>
       </section>
 
-      {/* Section 2: Five Operating Verticals & Detailed Sections */}
-      <section className="py-20 bg-[#FFFFFF] border-t border-[#D9CCB9]">
+      {/* Section 2: Seven Operating Verticals & Detailed Sections */}
+      <section className="py-20 bg-[#FFFFFF] border-t border-[#E8E8ED]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <EditorialReveal>
             <div className="max-w-2xl space-y-2">
-              <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide text-[#B66A50]">
-                <Layers className="w-4 h-4" aria-hidden="true" />
+              <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
+                <Layers className="w-4 h-4 text-[#1D1D1F]" aria-hidden="true" />
                 <span>Operating Divisions</span>
               </div>
-              <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-[#292722]">
+              <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F]">
                 Vertical Landing Pages &amp; Section Index.
               </h2>
-              <p className="text-sm sm:text-base text-[#77736C] leading-relaxed">
-                Dedicated landing routes for each of the five AKYIN Ventures operating businesses, detailing every section available on each page.
+              <p className="text-sm sm:text-base text-[#6E6E73] leading-relaxed">
+                Dedicated landing routes for each of the seven AKYIN Ventures operating businesses, detailing every section available on each page.
               </p>
             </div>
           </EditorialReveal>
 
           <EditorialReveal delay={0.05}>
-            <div className="divide-y divide-[#D9CCB9] border border-[#D9CCB9] rounded-2xl bg-[#F7F5F0]/55 overflow-hidden">
+            <div className="divide-y divide-[#E8E8ED] border border-[#E8E8ED] rounded-3xl bg-[#F5F5F7]/50 overflow-hidden">
               {VERTICAL_SECTION_INDEX.map((vertical) => (
                 <article
                   key={vertical.id}
                   className="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start hover:bg-[#FFFFFF] transition-colors"
                 >
                   <div className="lg:col-span-5 space-y-2.5">
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-[#77736C]">
-                      <span className="font-mono-num font-bold text-[#B66A50]">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-[#6E6E73]">
+                      <span className="font-mono-num font-bold text-[#1D1D1F]">
                         {vertical.code}
                       </span>
                       <span aria-hidden="true">·</span>
                       <span>{vertical.sector}</span>
                     </div>
-                    <h3 className="font-display text-2xl font-bold text-[#292722]">
+                    <h3 className="font-display text-2xl font-bold text-[#1D1D1F]">
                       {vertical.name}
                     </h3>
-                    <p className="font-mono-num text-xs text-[#77736C]">{vertical.route}</p>
+                    <p className="font-mono-num text-xs text-[#6E6E73]">{vertical.route}</p>
 
                     <div className="flex flex-wrap items-center gap-4 pt-2">
-                      <button
-                        type="button"
+                      <GlassButton
+                        variant="primary"
+                        size="sm"
                         onClick={() => onNavigate(vertical.route)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#B66A50] hover:bg-[#9E5740] text-white text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer"
                       >
-                        Visit Page
+                        <span>Visit Page</span>
                         <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                      </button>
+                      </GlassButton>
 
                       {vertical.externalUrl && (
                         <a
                           href={vertical.externalUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#292722] hover:text-[#B66A50] transition-colors whitespace-nowrap"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:text-[#6E6E73] transition-colors whitespace-nowrap"
                         >
                           {vertical.externalLabel}
                           <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -379,14 +395,14 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
                     </div>
                   </div>
 
-                  <div className="lg:col-span-7 bg-[#FFFFFF] rounded-xl border border-[#D9CCB9] p-5 sm:p-6 space-y-3">
-                    <p className="text-xs font-semibold tracking-wide text-[#83866A]">
+                  <div className="lg:col-span-7 bg-[#FFFFFF] rounded-2xl border border-[#E8E8ED] p-5 sm:p-6 space-y-3">
+                    <p className="text-xs font-semibold tracking-wide text-[#6E6E73]">
                       Page Sections &amp; Content Index
                     </p>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs sm:text-sm text-[#292722]/90">
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs sm:text-sm text-[#1D1D1F]/90">
                       {vertical.keySections.map((sec) => (
                         <li key={sec} className="flex items-start gap-2">
-                          <span className="text-[#B66A50] font-bold" aria-hidden="true">
+                          <span className="text-[#1D1D1F] font-bold" aria-hidden="true">
                             ·
                           </span>
                           <span>{sec}</span>
@@ -402,29 +418,29 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
       </section>
 
       {/* Section 3: External Platforms, Direct Contact & Official Socials */}
-      <section className="py-20 bg-[#EFE9DE] border-t border-[#D9CCB9]">
+      <section className="py-20 surface-silver-gradient border-t border-[#E8E8ED]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <EditorialReveal>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              <div className="lg:col-span-6 bg-[#FFFFFF] rounded-2xl border border-[#D9CCB9] p-7 sm:p-8 space-y-5">
-                <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#B66A50]">
-                  <Globe className="w-4 h-4" aria-hidden="true" />
+              <div className="lg:col-span-6 liquid-glass-panel rounded-3xl p-7 sm:p-8 space-y-5">
+                <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-[#6E6E73]">
+                  <Globe className="w-4 h-4 text-[#1D1D1F]" aria-hidden="true" />
                   <span>External Storefronts &amp; Independent Domains</span>
                 </div>
-                <h2 className="font-display text-2xl font-bold text-[#292722]">
+                <h2 className="font-display text-2xl font-bold text-[#1D1D1F]">
                   Verified External Destinations.
                 </h2>
-                <ul className="divide-y divide-[#EFE9DE] text-sm">
+                <ul className="divide-y divide-[#1D1D1F]/8 text-sm">
                   <li className="py-3 flex items-center justify-between gap-4">
                     <div>
-                      <p className="font-semibold text-[#292722]">AICalc.in</p>
-                      <p className="text-xs text-[#77736C]">AI &amp; Manual Calculation Web App</p>
+                      <p className="font-semibold text-[#1D1D1F]">AICalc.in</p>
+                      <p className="text-xs text-[#6E6E73]">AI &amp; Manual Calculation Web App</p>
                     </div>
                     <a
                       href={EXTERNAL_VERTICAL_URLS.aicalc}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[#B66A50] hover:underline whitespace-nowrap"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline whitespace-nowrap"
                     >
                       aicalc.in
                       <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -432,14 +448,14 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
                   </li>
                   <li className="py-3 flex items-center justify-between gap-4">
                     <div>
-                      <p className="font-semibold text-[#292722]">Kartigo.online</p>
-                      <p className="text-xs text-[#77736C]">B2B Stock Supply &amp; Commerce Platform</p>
+                      <p className="font-semibold text-[#1D1D1F]">Kartigo.online</p>
+                      <p className="text-xs text-[#6E6E73]">B2B Stock Supply &amp; Commerce Platform</p>
                     </div>
                     <a
                       href={EXTERNAL_VERTICAL_URLS.kartigo}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[#B66A50] hover:underline whitespace-nowrap"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline whitespace-nowrap"
                     >
                       kartigo.online
                       <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -447,14 +463,14 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
                   </li>
                   <li className="py-3 flex items-center justify-between gap-4">
                     <div>
-                      <p className="font-semibold text-[#292722]">BizNXT.online</p>
-                      <p className="text-xs text-[#77736C]">Business Guidance &amp; Consulting Platform</p>
+                      <p className="font-semibold text-[#1D1D1F]">BizNXT.online</p>
+                      <p className="text-xs text-[#6E6E73]">Business Guidance &amp; Consulting Platform</p>
                     </div>
                     <a
                       href={EXTERNAL_VERTICAL_URLS.biznxt}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[#B66A50] hover:underline whitespace-nowrap"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline whitespace-nowrap"
                     >
                       biznxt.online
                       <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -462,14 +478,14 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
                   </li>
                   <li className="py-3 flex items-center justify-between gap-4">
                     <div>
-                      <p className="font-semibold text-[#292722]">BudgetBazaar.org</p>
-                      <p className="text-xs text-[#77736C]">Affordable Consumer Retail Storefront</p>
+                      <p className="font-semibold text-[#1D1D1F]">BudgetBazaar.org</p>
+                      <p className="text-xs text-[#6E6E73]">Affordable Consumer Retail Storefront</p>
                     </div>
                     <a
                       href={EXTERNAL_VERTICAL_URLS.budgetBazaar}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[#B66A50] hover:underline whitespace-nowrap"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline whitespace-nowrap"
                     >
                       budgetbazaar.org
                       <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -477,14 +493,14 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
                   </li>
                   <li className="py-3 flex items-center justify-between gap-4">
                     <div>
-                      <p className="font-semibold text-[#292722]">Amazon Author Store</p>
-                      <p className="text-xs text-[#77736C]">AKYIN Publishing Titles on Amazon.com</p>
+                      <p className="font-semibold text-[#1D1D1F]">Amazon Author Store</p>
+                      <p className="text-xs text-[#6E6E73]">AKYIN Publishing Titles on Amazon.com</p>
                     </div>
                     <a
                       href={PUBLISHING_LINKS.amazonAuthorStore}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[#B66A50] hover:underline whitespace-nowrap"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline whitespace-nowrap"
                     >
                       Visit Store
                       <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -492,14 +508,14 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
                   </li>
                   <li className="py-3 flex items-center justify-between gap-4">
                     <div>
-                      <p className="font-semibold text-[#292722]">Google Play Books</p>
-                      <p className="text-xs text-[#77736C]">THE DISCIPLINE CODE by Akyin</p>
+                      <p className="font-semibold text-[#1D1D1F]">Google Play Books</p>
+                      <p className="text-xs text-[#6E6E73]">THE DISCIPLINE CODE by Akyin</p>
                     </div>
                     <a
                       href={PUBLISHING_LINKS.googlePlayDisciplineCode}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[#B66A50] hover:underline whitespace-nowrap"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline whitespace-nowrap"
                     >
                       Read Edition
                       <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -508,12 +524,12 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
                 </ul>
               </div>
 
-              <div className="lg:col-span-6 bg-[#FFFFFF] rounded-2xl border border-[#D9CCB9] p-7 sm:p-8 space-y-6">
+              <div className="lg:col-span-6 liquid-glass-panel rounded-3xl p-7 sm:p-8 space-y-6">
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold text-[#B66A50]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.06em] text-[#6E6E73]">
                     Direct Contact &amp; Official Social Accounts
                   </p>
-                  <h2 className="font-display text-2xl font-bold text-[#292722]">
+                  <h2 className="font-display text-2xl font-bold text-[#1D1D1F]">
                     Connect Directly With AKYIN Ventures.
                   </h2>
                 </div>
@@ -521,33 +537,33 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                   <a
                     href={`mailto:${OFFICIAL_CONTACT.email}`}
-                    className="rounded-xl bg-[#F7F5F0] border border-[#D9CCB9] hover:border-[#B66A50] p-4 space-y-1 transition-colors"
+                    className="rounded-2xl liquid-glass-cta p-4 space-y-1 transition-all"
                   >
-                    <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#B66A50]">
+                    <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#1D1D1F]">
                       <Mail className="w-3.5 h-3.5" aria-hidden="true" />
                       <span>Corporate Email</span>
                     </div>
-                    <p className="text-sm font-bold text-[#292722]">{OFFICIAL_CONTACT.email}</p>
+                    <p className="text-sm font-bold text-[#1D1D1F]">{OFFICIAL_CONTACT.email}</p>
                   </a>
 
                   <a
                     href={OFFICIAL_CONTACT.whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-xl bg-[#F7F5F0] border border-[#D9CCB9] hover:border-[#B66A50] p-4 space-y-1 transition-colors"
+                    className="rounded-2xl liquid-glass-cta p-4 space-y-1 transition-all"
                   >
-                    <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#B66A50]">
+                    <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#1D1D1F]">
                       <Phone className="w-3.5 h-3.5" aria-hidden="true" />
                       <span>WhatsApp / Phone</span>
                     </div>
-                    <p className="font-mono-num text-sm font-bold text-[#292722]">
+                    <p className="font-mono-num text-sm font-bold text-[#1D1D1F]">
                       {OFFICIAL_CONTACT.phoneDisplay}
                     </p>
                   </a>
                 </div>
 
-                <div className="space-y-3 pt-2 border-t border-[#EFE9DE]">
-                  <p className="text-xs font-semibold text-[#77736C]">
+                <div className="space-y-3 pt-2 border-t border-[#1D1D1F]/8">
+                  <p className="text-xs font-semibold text-[#6E6E73]">
                     Official Social Media Channels ({OFFICIAL_CONTACT.marketingSocialHandle})
                   </p>
                   <SocialLinks variant="inline" />

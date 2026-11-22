@@ -6,6 +6,7 @@ import {
   ShieldAlert,
   X,
 } from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
 import {
   ABOUT_PILLARS,
   EXPERIENCE_MILESTONES,
@@ -20,14 +21,21 @@ import {
 } from '../data/akyinData';
 import { ContactDispatcher } from '../components/ContactDispatcher';
 import { EditorialReveal } from '../components/EditorialReveal';
+import {
+  GlassButton,
+  GlassCard,
+  GlassImageFrame,
+  GlassPanel,
+} from '../components/liquid-glass';
 import { ResilientImage } from '../components/ResilientImage';
 import { SocialLinks } from '../components/SocialLinks';
 
 export function MarketingPage() {
+  const shouldReduceMotion = useReducedMotion();
   const [activeCategory, setActiveCategory] = useState<ServiceCategory>('all');
   const [rateSearch, setRateSearch] = useState('');
   const [selectedEnquiryType, setSelectedEnquiryType] = useState(
-    'Package A — Full Dealership Marketing & Lead Management'
+    'Package A — Full-Service Growth Marketing & Lead Management'
   );
 
   const filteredServices = useMemo(() => {
@@ -56,93 +64,133 @@ export function MarketingPage() {
 
   return (
     <div>
-      {/* 1. Warm Neutral Corporate Marketing Hero with Automotive Imagery */}
-      <section className="bg-[#F7F5F0] text-[#292722] pt-24 pb-16 lg:pt-32 lg:pb-24 border-b border-[#D9CCB9]">
+      {/* 1. Apple-Inspired Liquid Glass Marketing Agency Hero */}
+      <section className="surface-silver-gradient text-[#1D1D1F] pt-12 pb-16 lg:pt-16 lg:pb-24 border-b border-[#E8E8ED]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          <div className="lg:col-span-6 space-y-6">
-            <p className="text-xs sm:text-sm font-semibold tracking-wide text-[#B66A50]">
-              AKYIN MARKETINGS · Automotive Dealership Growth &amp; Sales Training
+          <motion.div
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-6 space-y-6"
+          >
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.06em] text-[#6E6E73]">
+              AKYIN MARKETINGS · Full-Service Marketing Agency &amp; Growth Solutions
             </p>
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight leading-[1.06] text-[#292722] text-balance">
-              Drive More Enquiries. Build Stronger Dealerships.
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-[54px] font-bold tracking-[-0.025em] leading-[1.06] text-[#1D1D1F] text-balance">
+              Drive Qualified Demand. Grow Stronger Brands.
             </h1>
-            <p className="text-base sm:text-lg text-[#77736C] leading-relaxed">
-              AKYIN MARKETINGS helps automobile dealerships attract potential buyers, qualify customer enquiries and strengthen showroom sales performance through digital marketing, AI-assisted lead management and practical automotive sales expertise.
+            <p className="text-base sm:text-lg text-[#6E6E73] leading-relaxed">
+              AKYIN MARKETINGS is a full-service marketing agency helping retail brands, service businesses, B2B companies, and dealerships generate qualified leads, manage AI-assisted enquiry follow-up, and elevate commercial sales conversion.
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              <a
-                href="#marketing-services"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-[#B66A50] hover:bg-[#9E5740] text-white text-sm font-semibold transition-colors whitespace-nowrap"
-              >
-                Explore Services
+            <div className="flex flex-wrap items-center gap-3.5 pt-2">
+              <GlassButton href="#marketing-services" variant="primary" size="lg">
+                <span>Explore Agency Services</span>
                 <ArrowRight className="w-4 h-4" aria-hidden="true" />
-              </a>
-              <button
-                type="button"
+              </GlassButton>
+              <GlassButton
+                variant="glass"
+                size="lg"
                 onClick={() =>
-                  handleEnquireItem('Package A — Full Dealership Marketing & Lead Management')
+                  handleEnquireItem('Package A — Full-Service Growth Marketing & Lead Management')
                 }
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-[#FFFFFF] hover:bg-[#EFE9DE] text-[#292722] border border-[#D9CCB9] text-sm font-semibold transition-colors whitespace-nowrap cursor-pointer"
               >
-                Request a Proposal
-              </button>
+                Request an Agency Proposal
+              </GlassButton>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="lg:col-span-6">
-            <div className="rounded-2xl overflow-hidden border border-[#D9CCB9] shadow-lg aspect-[4/3] bg-[#EFE9DE]">
-              <ResilientImage
-                src={IMAGES.salesTraining}
-                alt="Automotive dealership showroom sales executives presenting a vehicle walkaround"
-                loading="eager"
-                fallbackTitle="AKYIN MARKETINGS Automotive Showroom"
-                className="w-full h-full object-cover"
-              />
+          <motion.div
+            initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.985 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.55, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-6"
+          >
+            <GlassImageFrame>
+              <div className="aspect-[4/3] bg-[#FFFFFF] overflow-hidden">
+                <ResilientImage
+                  src={IMAGES.salesTraining}
+                  alt="Apple-style isolated anodized aluminum marketing agency workstation with AKYIN emblem on seamless pure white studio background"
+                  loading="eager"
+                  fallbackTitle="AKYIN MARKETINGS Agency"
+                  className="w-full h-full bg-[#FFFFFF]"
+                  imageClassName="object-contain p-3"
+                />
+              </div>
+            </GlassImageFrame>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Automotive Marketing Dedicated Division Banner */}
+      <section className="py-10 bg-white border-b border-[#E8E8ED]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <GlassPanel className="p-8 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-purple-50/50 via-white to-amber-50/30">
+            <div className="space-y-2 max-w-2xl">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#6E6E73]">
+                Specialised Industry Division
+              </span>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#1D1D1F]">
+                Looking for AKYIN Automotive Marketing &amp; Dealership Growth?
+              </h2>
+              <p className="text-sm sm:text-base text-[#6E6E73]">
+                Explore our dedicated automotive division featuring 16 specialised dealership services and an interactive 19-slide company presentation viewer.
+              </p>
             </div>
-          </div>
+            <GlassButton
+              href="/marketing/automotive"
+              variant="primary"
+              size="lg"
+              className="shrink-0"
+              onClick={(e: React.MouseEvent) => {
+                e.preventDefault();
+                window.history.pushState({}, '', '/marketing/automotive');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }}
+            >
+              <span>Visit Automotive Marketing</span>
+              <ArrowRight className="w-4 h-4" />
+            </GlassButton>
+          </GlassPanel>
         </div>
       </section>
 
       {/* 2. About AKYIN MARKETINGS */}
-      <section className="py-20 lg:py-24 bg-[#EFE9DE]">
+      <section className="py-20 lg:py-24 bg-[#F5F5F7]">
         <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
             <div className="lg:col-span-7 space-y-3">
-              <p className="text-xs font-semibold tracking-wide text-[#B66A50]">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
                 About AKYIN MARKETINGS
               </p>
-              <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-[#292722] text-balance">
-                Automotive Knowledge. Marketing Intelligence. Sales Performance.
+              <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F] text-balance">
+                Brand Strategy. Performance Intelligence. Sales Conversion.
               </h2>
             </div>
             <div className="lg:col-span-5">
-              <p className="text-base text-[#292722]/85 leading-relaxed">
-                Grounded in <span className="font-semibold">16 years of automobile industry experience</span> with exposure to leading brands from <span className="font-semibold">Maruti Suzuki to Audi</span>.
+              <p className="text-base text-[#1D1D1F]/85 leading-relaxed">
+                Grounded in <span className="font-semibold">16 years of multi-sector commercial &amp; automobile industry experience</span> with exposure to leading brands from <span className="font-semibold">Maruti Suzuki to Audi</span>.
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {ABOUT_PILLARS.map((pillar) => (
-              <div
-                key={pillar.number}
-                className="glass-panel-warm rounded-2xl p-7 sm:p-8 space-y-4"
-              >
-                <div className="flex items-center gap-2 text-xs font-medium text-[#77736C]">
-                  <span className="font-mono-num font-bold text-[#B66A50]">
+              <GlassCard key={pillar.number} interactive className="p-7 sm:p-8 space-y-4">
+                <div className="flex items-center gap-2 text-xs font-medium text-[#6E6E73]">
+                  <span className="font-mono-num font-bold text-[#1D1D1F]">
                     {pillar.number}
                   </span>
                   <span aria-hidden="true">·</span>
                   <span>{pillar.meta}</span>
                 </div>
-                <h3 className="font-display text-xl font-bold text-[#292722]">
+                <h3 className="font-display text-xl font-bold text-[#1D1D1F]">
                   {pillar.title}
                 </h3>
-                <p className="text-sm text-[#77736C] leading-relaxed">
+                <p className="text-sm text-[#6E6E73] leading-relaxed">
                   {pillar.description}
                 </p>
-              </div>
+              </GlassCard>
             ))}
           </div>
         </EditorialReveal>
@@ -151,20 +199,20 @@ export function MarketingPage() {
       {/* 3. Complete 18-Service Catalogue */}
       <section
         id="marketing-services"
-        className="py-20 lg:py-24 bg-[#FFFFFF] border-t border-[#D9CCB9]"
+        className="py-20 lg:py-24 bg-[#FFFFFF] border-t border-[#E8E8ED]"
       >
         <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div className="max-w-2xl space-y-3">
-              <p className="text-xs font-semibold tracking-wide text-[#B66A50]">
-                Complete Service Catalogue · 18 Services
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
+                Complete Agency Service Catalogue · 18 Services
               </p>
-              <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-[#292722] text-balance">
-                Automotive Dealership Marketing, Qualification &amp; Training.
+              <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F] text-balance">
+                Full-Service Marketing, Lead Qualification &amp; Commercial Training.
               </h2>
-              <p className="text-sm sm:text-base text-[#77736C] leading-relaxed">
-                <span className="font-semibold text-[#292722]">Lead Generation</span> and{' '}
-                <span className="font-semibold text-[#292722]">Lead Filtering &amp; Qualification</span>{' '}
+              <p className="text-sm sm:text-base text-[#6E6E73] leading-relaxed">
+                <span className="font-semibold text-[#1D1D1F]">Lead Generation</span> and{' '}
+                <span className="font-semibold text-[#1D1D1F]">Lead Filtering &amp; Qualification</span>{' '}
                 are strictly distinct services. AKYIN manages AI calling and pipeline workflows internally and does not sell standalone CRM software.
               </p>
             </div>
@@ -172,7 +220,7 @@ export function MarketingPage() {
             <div
               role="tablist"
               aria-label="Filter marketing services"
-              className="flex flex-wrap gap-1.5 p-1.5 bg-[#F7F5F0] rounded-xl border border-[#D9CCB9]"
+              className="flex flex-wrap gap-1.5 p-1.5 liquid-glass-nav rounded-2xl"
             >
               {SERVICE_CATEGORIES.map((tab) => {
                 const isActive = activeCategory === tab.id;
@@ -183,10 +231,10 @@ export function MarketingPage() {
                     role="tab"
                     aria-selected={isActive}
                     onClick={() => setActiveCategory(tab.id)}
-                    className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                       isActive
-                        ? 'bg-[#B66A50] text-white'
-                        : 'text-[#292722] hover:bg-[#FFFFFF]'
+                        ? 'bg-[#1D1D1F] text-white shadow-xs'
+                        : 'text-[#1D1D1F] hover:bg-white/80'
                     }`}
                   >
                     {tab.label}
@@ -200,33 +248,33 @@ export function MarketingPage() {
             {filteredServices.map((svc) => (
               <article
                 key={svc.id}
-                className="rounded-2xl p-6 sm:p-7 flex flex-col justify-between space-y-5 border border-[#D9CCB9] bg-[#F7F5F0]/55 hover:bg-[#FFFFFF] transition-colors"
+                className="liquid-glass-card rounded-2xl p-6 sm:p-7 flex flex-col justify-between space-y-5 transition-all duration-200"
               >
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2 text-xs text-[#77736C]">
+                  <div className="flex items-center justify-between gap-2 text-xs text-[#6E6E73]">
                     <span>
-                      <span className="font-mono-num font-bold text-[#B66A50]">
+                      <span className="font-mono-num font-bold text-[#1D1D1F]">
                         {svc.number}
                       </span>{' '}
                       <span aria-hidden="true">·</span> {svc.categoryLabel}
                     </span>
                   </div>
-                  <h3 className="font-display text-xl font-bold text-[#292722]">
+                  <h3 className="font-display text-xl font-bold text-[#1D1D1F]">
                     {svc.title}
                   </h3>
                   {svc.scopeNote && (
-                    <p className="text-xs font-semibold text-[#B66A50] leading-snug">
+                    <p className="text-xs font-semibold text-[#3A3A3F] leading-snug">
                       {svc.scopeNote}
                     </p>
                   )}
-                  <p className="text-sm text-[#77736C] leading-relaxed">
+                  <p className="text-sm text-[#6E6E73] leading-relaxed">
                     {svc.summary}
                   </p>
-                  <ul className="space-y-1.5 pt-1 text-xs text-[#292722]/85">
+                  <ul className="space-y-1.5 pt-1 text-xs text-[#1D1D1F]/85">
                     {svc.deliverables.map((d) => (
                       <li key={d} className="flex items-start gap-2">
                         <CheckCircle2
-                          className="w-3.5 h-3.5 text-[#83866A] shrink-0 mt-0.5"
+                          className="w-3.5 h-3.5 text-[#1D1D1F] shrink-0 mt-0.5"
                           aria-hidden="true"
                         />
                         <span>{d}</span>
@@ -235,18 +283,18 @@ export function MarketingPage() {
                   </ul>
                 </div>
 
-                <div className="pt-4 border-t border-[#D9CCB9] flex items-center justify-between gap-3">
-                  <span className="text-xs text-[#77736C] truncate">
+                <div className="pt-4 border-t border-[#1D1D1F]/8 flex items-center justify-between gap-3">
+                  <span className="text-xs text-[#6E6E73] truncate">
                     {svc.rateCardMatch}
                   </span>
-                  <button
-                    type="button"
+                  <GlassButton
+                    variant="primary"
+                    size="sm"
                     onClick={() => handleEnquireItem(svc.rateCardMatch)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#B66A50] hover:bg-[#9E5740] text-white text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
-                    Enquire
+                    <span>Enquire</span>
                     <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                  </button>
+                  </GlassButton>
                 </div>
               </article>
             ))}
@@ -254,132 +302,139 @@ export function MarketingPage() {
         </EditorialReveal>
       </section>
 
-      {/* 4. 16 Years of Automotive Industry Experience */}
-      <section className="py-20 lg:py-24 bg-[#EFE9DE] border-t border-[#D9CCB9]">
+      {/* 4. 16 Years of Multi-Industry & Automotive Commercial Experience */}
+      <section className="py-20 lg:py-24 bg-[#F5F5F7] border-t border-[#E8E8ED]">
         <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-6 space-y-5">
-              <p className="text-xs font-semibold tracking-wide text-[#B66A50]">
-                16 Years of Automotive Industry Experience
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
+                16 Years of Commercial &amp; Industry Track Record
               </p>
-              <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-[#292722] text-balance">
-                Exposure Across Leading Brands from Maruti Suzuki to Audi.
+              <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F] text-balance">
+                Proven Experience Across Diverse Markets—Including Maruti Suzuki to Audi.
               </h2>
-              <p className="text-base text-[#77736C] leading-relaxed">
-                Sixteen years inside showroom floors, dealership BDC workflows, vehicle deliveries, and multi-segment customer conversations—ensuring digital marketing aligns with actual showroom processes.
+              <p className="text-base text-[#6E6E73] leading-relaxed">
+                Sixteen years working across customer acquisition funnels, BDC follow-up systems, commercial teams, and brand growth initiatives—from retail and B2B businesses to leading automotive dealerships—ensuring marketing campaigns align with actual sales conversions.
               </p>
             </div>
             <div className="lg:col-span-6">
-              <div className="rounded-2xl overflow-hidden border border-[#D9CCB9] aspect-[4/3] bg-[#FFFFFF]">
-                <ResilientImage
-                  src={IMAGES.automotiveHeritage}
-                  alt="Multi-brand automotive dealership floor spanning compact hatchbacks to executive sedans"
-                  loading="lazy"
-                  fallbackTitle="Automotive Industry Experience"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              <GlassImageFrame>
+                <div className="aspect-[4/3] bg-[#FFFFFF] overflow-hidden">
+                  <ResilientImage
+                    src={IMAGES.automotiveHeritage}
+                    alt="Apple-style minimal architectural glass podium display featuring the engraved AKYIN ribbon emblem"
+                    loading="lazy"
+                    fallbackTitle="Commercial Marketing Heritage"
+                    className="w-full h-full bg-[#FFFFFF]"
+                    imageClassName="object-contain p-3"
+                  />
+                </div>
+              </GlassImageFrame>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {EXPERIENCE_MILESTONES.map((milestone) => (
-              <div
+              <GlassCard
                 key={milestone.number}
-                className="bg-[#FFFFFF] rounded-2xl border border-[#D9CCB9] p-6 sm:p-7 space-y-3"
+                interactive
+                className="p-6 sm:p-7 space-y-3"
               >
-                <div className="flex items-center gap-2 text-xs text-[#77736C]">
-                  <span className="font-mono-num font-bold text-[#B66A50]">
+                <div className="flex items-center gap-2 text-xs text-[#6E6E73]">
+                  <span className="font-mono-num font-bold text-[#1D1D1F]">
                     {milestone.number}
                   </span>
                   <span aria-hidden="true">·</span>
                   <span>{milestone.spectrum}</span>
                 </div>
-                <h3 className="font-display text-lg font-bold text-[#292722]">
+                <h3 className="font-display text-lg font-bold text-[#1D1D1F]">
                   {milestone.title}
                 </h3>
-                <p className="text-sm text-[#77736C] leading-relaxed">
+                <p className="text-sm text-[#6E6E73] leading-relaxed">
                   {milestone.description}
                 </p>
-              </div>
+              </GlassCard>
             ))}
           </div>
         </EditorialReveal>
       </section>
 
-      {/* 5. Dedicated Sales Training Section */}
-      <section className="py-20 lg:py-24 bg-[#F7F5F0] border-t border-[#D9CCB9]">
+      {/* 5. Dedicated Commercial Sales Training Section */}
+      <section className="py-20 lg:py-24 surface-silver-gradient border-t border-[#E8E8ED]">
         <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
           <div className="lg:col-span-5">
-            <div className="h-full min-h-[340px] rounded-2xl overflow-hidden border border-[#D9CCB9] bg-[#FFFFFF]">
-              <ResilientImage
-                src={IMAGES.heroShowroom}
-                alt="Contemporary automotive showroom bay prepared for vehicle delivery and sales coaching"
-                loading="lazy"
-                fallbackTitle="Automotive Sales Training"
-                className="w-full h-full object-cover"
-              />
-            </div>
+            <GlassImageFrame className="h-full">
+              <div className="h-full min-h-[340px] bg-[#FFFFFF] flex items-center justify-center">
+                <ResilientImage
+                  src={IMAGES.heroShowroom}
+                  alt="Apple-style sleek frosted presentation tablet stand with engraved AKYIN emblem"
+                  loading="lazy"
+                  fallbackTitle="Commercial Sales Training"
+                  className="w-full h-full bg-[#FFFFFF]"
+                  imageClassName="object-contain p-4"
+                />
+              </div>
+            </GlassImageFrame>
           </div>
 
           <div className="lg:col-span-7 flex flex-col justify-between space-y-7">
             <div className="space-y-4">
-              <p className="text-xs font-semibold tracking-wide text-[#B66A50]">
-                Automotive Sales Training &amp; Personality Development
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
+                Commercial &amp; Showroom Sales Training · Personality Development
               </p>
-              <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-[#292722] text-balance">
-                Develop Better Sales Executives. Create Better Customer Experiences.
+              <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F] text-balance">
+                Develop Stronger Sales Executives. Create Better Customer Experiences.
               </h2>
-              <p className="text-base text-[#77736C] leading-relaxed">
-                Structured on-site dealership training focused on showroom discipline, vehicle presentation, customer confidence, and conversion craft.
+              <p className="text-base text-[#6E6E73] leading-relaxed">
+                Structured on-site and team sales training focused on client discipline, product presentation, consultative objection handling, and conversion craft across retail, service, and automotive environments.
               </p>
             </div>
 
-            <div className="bg-[#FFFFFF] rounded-2xl border border-[#D9CCB9] p-6 sm:p-7 space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#EFE9DE]">
+            <GlassPanel className="rounded-3xl p-6 sm:p-7 space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1D1D1F]/8">
                 <div>
-                  <p className="text-xs font-medium text-[#77736C]">Training Session Fee</p>
-                  <p className="font-mono-num text-2xl sm:text-3xl font-bold text-[#292722] mt-0.5">
-                    ₹25,000 <span className="text-sm font-medium text-[#77736C]">per session</span>
+                  <p className="text-xs font-medium text-[#6E6E73]">Training Session Fee</p>
+                  <p className="font-mono-num text-2xl sm:text-3xl font-bold text-[#1D1D1F] mt-0.5">
+                    ₹25,000 <span className="text-sm font-medium text-[#6E6E73]">per session</span>
                   </p>
                 </div>
-                <button
-                  type="button"
+                <GlassButton
+                  variant="primary"
+                  size="md"
                   onClick={() => handleEnquireItem('Sales training')}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#B66A50] hover:bg-[#9E5740] text-white text-sm font-semibold transition-colors whitespace-nowrap cursor-pointer"
                 >
-                  Request Training Proposal
+                  <span>Request Training Proposal</span>
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
-                </button>
+                </GlassButton>
               </div>
 
-              <p className="text-xs text-[#77736C]">
+              <p className="text-xs text-[#6E6E73]">
                 Scope, duration, participant count, and location are agreed in writing before booking.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
                 {TRAINING_CURRICULUM.map((topic, index) => (
-                  <div key={topic} className="flex items-start gap-2.5 text-sm text-[#292722]">
-                    <span className="font-mono-num text-xs font-bold text-[#B66A50] mt-0.5">
+                  <div key={topic} className="flex items-start gap-2.5 text-sm text-[#1D1D1F]">
+                    <span className="font-mono-num text-xs font-bold text-[#1D1D1F] mt-0.5">
                       {String(index + 1).padStart(2, '0')}.
                     </span>
                     <span>{topic}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </GlassPanel>
           </div>
         </EditorialReveal>
       </section>
 
       {/* 6. Packages & Complete Searchable Rate Card */}
-      <section className="py-20 lg:py-24 bg-[#FFFFFF] border-t border-[#D9CCB9]">
+      <section className="py-20 lg:py-24 bg-[#FFFFFF] border-t border-[#E8E8ED]">
         <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
           <div className="max-w-2xl space-y-3">
-            <p className="text-xs font-semibold tracking-wide text-[#B66A50]">
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
               Transparent Pricing &amp; Commercial Terms
             </p>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-[#292722] text-balance">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F] text-balance">
               Retainer Packages &amp; Individual Service Rate Card.
             </h2>
           </div>
@@ -388,53 +443,53 @@ export function MarketingPage() {
             {PRICING_PACKAGES.map((pkg) => (
               <div
                 key={pkg.id}
-                className={`rounded-2xl p-7 sm:p-9 flex flex-col justify-between space-y-7 border ${
+                className={`rounded-3xl p-7 sm:p-9 flex flex-col justify-between space-y-7 transition-shadow ${
                   pkg.featured
-                    ? 'bg-[#EFE9DE] border-[#B66A50]/50'
-                    : 'bg-[#F7F5F0] border-[#D9CCB9]'
+                    ? 'liquid-glass-panel border border-[#1D1D1F]/25'
+                    : 'liquid-glass-card'
                 }`}
               >
                 <div className="space-y-5">
                   <div className="flex items-center justify-between gap-4">
-                    <span className="font-mono-num text-xs font-bold text-[#B66A50]">
+                    <span className="font-mono-num text-xs font-bold text-[#1D1D1F]">
                       {pkg.code}
                     </span>
-                    <span className="text-xs font-medium text-[#77736C]">
+                    <span className="text-xs font-medium text-[#6E6E73]">
                       Commercial Retainer
                     </span>
                   </div>
 
                   <div>
-                    <h3 className="font-display text-2xl font-bold text-[#292722]">
+                    <h3 className="font-display text-2xl font-bold text-[#1D1D1F]">
                       {pkg.name}
                     </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-[#77736C]">
+                    <p className="mt-2 text-sm leading-relaxed text-[#6E6E73]">
                       {pkg.subtitle}
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 py-4 border-y border-[#D9CCB9]">
+                  <div className="grid grid-cols-2 gap-4 py-4 border-y border-[#1D1D1F]/8">
                     <div>
-                      <p className="text-xs text-[#77736C]">One-time Setup</p>
-                      <p className="font-mono-num text-2xl font-bold text-[#292722] mt-1">
+                      <p className="text-xs text-[#6E6E73]">One-time Setup</p>
+                      <p className="font-mono-num text-2xl font-bold text-[#1D1D1F] mt-1">
                         {pkg.setupFee}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#77736C]">Monthly Maintenance</p>
-                      <p className="font-mono-num text-2xl font-bold text-[#292722] mt-1">
+                      <p className="text-xs text-[#6E6E73]">Monthly Maintenance</p>
+                      <p className="font-mono-num text-2xl font-bold text-[#1D1D1F] mt-1">
                         {pkg.monthlyFee}
                       </p>
                     </div>
                   </div>
 
                   <div className="space-y-2.5">
-                    <p className="text-xs font-semibold text-[#292722]">Included Scope</p>
-                    <ul className="space-y-2 text-sm text-[#292722]">
+                    <p className="text-xs font-semibold text-[#1D1D1F]">Included Scope</p>
+                    <ul className="space-y-2 text-sm text-[#1D1D1F]">
                       {pkg.includes.map((inc) => (
                         <li key={inc} className="flex items-start gap-2.5">
                           <CheckCircle2
-                            className="w-4 h-4 text-[#83866A] shrink-0 mt-0.5"
+                            className="w-4 h-4 text-[#1D1D1F] shrink-0 mt-0.5"
                             aria-hidden="true"
                           />
                           <span>{inc}</span>
@@ -444,14 +499,14 @@ export function MarketingPage() {
                   </div>
 
                   <div className="space-y-2 pt-1">
-                    <p className="text-xs font-semibold text-[#77736C]">
+                    <p className="text-xs font-semibold text-[#6E6E73]">
                       Explicitly Excluded
                     </p>
-                    <ul className="space-y-1.5 text-xs text-[#77736C]">
+                    <ul className="space-y-1.5 text-xs text-[#6E6E73]">
                       {pkg.excludes.map((exc) => (
                         <li key={exc} className="flex items-start gap-2">
                           <ShieldAlert
-                            className="w-3.5 h-3.5 shrink-0 mt-0.5 text-[#A99C8B]"
+                            className="w-3.5 h-3.5 shrink-0 mt-0.5 text-[#A1A1A6]"
                             aria-hidden="true"
                           />
                           <span>{exc}</span>
@@ -461,56 +516,54 @@ export function MarketingPage() {
                   </div>
                 </div>
 
-                <button
-                  type="button"
+                <GlassButton
+                  variant={pkg.featured ? 'primary' : 'subtle'}
+                  size="lg"
+                  className="w-full"
                   onClick={() => handleEnquireItem(pkg.enquiryServiceValue)}
-                  className={`w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
-                    pkg.featured
-                      ? 'bg-[#B66A50] hover:bg-[#9E5740] text-white'
-                      : 'bg-[#FFFFFF] border border-[#D9CCB9] hover:border-[#B66A50] text-[#292722]'
-                  }`}
                 >
-                  Enquire About {pkg.code}
+                  <span>Enquire About {pkg.code}</span>
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
-                </button>
+                </GlassButton>
               </div>
             ))}
           </div>
 
           {/* Searchable 21-item Individual Rate Card */}
-          <div className="rounded-2xl bg-[#F7F5F0] border border-[#D9CCB9] p-6 sm:p-8 space-y-6">
+          <div className="rounded-3xl liquid-glass-panel p-6 sm:p-8 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold text-[#B66A50]">
+                <p className="text-xs font-semibold uppercase tracking-[0.06em] text-[#6E6E73]">
                   Individual Service Rate Card
                 </p>
-                <h3 className="font-display text-2xl font-bold text-[#292722] mt-1">
+                <h3 className="font-display text-2xl font-bold text-[#1D1D1F] mt-1">
                   Searchable Service Fee Schedule
                 </h3>
-                <p className="text-xs text-[#77736C] mt-1.5">
+                <p className="text-xs text-[#6E6E73] mt-1.5">
                   Indicative service fees subject to written quotation · Applicable GST extra · External costs (Meta ad spend, extra AI minutes, creator fees, special video shoots) charged separately.
                 </p>
               </div>
 
               <div className="relative w-full md:w-80 shrink-0">
                 <Search
-                  className="w-4 h-4 text-[#A99C8B] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                  className="w-4 h-4 text-[#A1A1A6] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
                   aria-hidden="true"
                 />
                 <input
                   type="text"
+                  maxLength={80}
                   value={rateSearch}
                   onChange={(e) => setRateSearch(e.target.value)}
                   placeholder="Search service or category..."
                   aria-label="Search rate card"
-                  className="w-full pl-10 pr-9 py-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CCB9] text-sm text-[#292722] placeholder:text-[#A99C8B] focus:outline-none focus:border-[#B66A50]"
+                  className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[#FFFFFF] border border-[#E8E8ED] text-sm text-[#1D1D1F] placeholder:text-[#A1A1A6] focus:outline-none focus:border-[#1D1D1F] focus:ring-2 focus:ring-[#1D1D1F]/15"
                 />
                 {rateSearch && (
                   <button
                     type="button"
                     aria-label="Clear search"
                     onClick={() => setRateSearch('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#77736C] hover:text-[#292722] cursor-pointer"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#6E6E73] hover:text-[#1D1D1F] cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -519,23 +572,23 @@ export function MarketingPage() {
             </div>
 
             {filteredRates.length === 0 ? (
-              <div className="rounded-xl bg-[#FFFFFF] p-8 text-center border border-[#D9CCB9]">
-                <p className="text-sm font-semibold text-[#292722]">
+              <div className="rounded-2xl bg-[#FFFFFF] p-8 text-center border border-[#E8E8ED]">
+                <p className="text-sm font-semibold text-[#1D1D1F]">
                   No services matched &ldquo;{rateSearch}&rdquo;.
                 </p>
                 <button
                   type="button"
                   onClick={() => setRateSearch('')}
-                  className="mt-3 text-xs font-semibold text-[#B66A50] hover:underline cursor-pointer"
+                  className="mt-3 text-xs font-semibold text-[#1D1D1F] hover:underline cursor-pointer"
                 >
                   Reset Search
                 </button>
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-xl bg-[#FFFFFF] border border-[#D9CCB9]">
+              <div className="overflow-x-auto rounded-2xl bg-[#FFFFFF] border border-[#E8E8ED]">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-[#EFE9DE] text-xs font-semibold text-[#77736C]">
+                    <tr className="border-b border-[#E8E8ED] text-xs font-semibold text-[#6E6E73]">
                       <th className="py-3.5 px-4 sm:px-5">Service</th>
                       <th className="py-3.5 px-4 hidden md:table-cell">Category</th>
                       <th className="py-3.5 px-4 hidden lg:table-cell">Scope Notes</th>
@@ -543,32 +596,32 @@ export function MarketingPage() {
                       <th className="py-3.5 px-4 sm:px-5 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EFE9DE] text-sm">
+                  <tbody className="divide-y divide-[#E8E8ED] text-sm">
                     {filteredRates.map((item) => (
-                      <tr key={item.id} className="hover:bg-[#F7F5F0]/70 transition-colors">
-                        <td className="py-3.5 px-4 sm:px-5 font-semibold text-[#292722]">
+                      <tr key={item.id} className="hover:bg-[#F5F5F7]/70 transition-colors">
+                        <td className="py-3.5 px-4 sm:px-5 font-semibold text-[#1D1D1F]">
                           <div>{item.service}</div>
-                          <div className="text-xs font-normal text-[#77736C] md:hidden mt-0.5">
+                          <div className="text-xs font-normal text-[#6E6E73] md:hidden mt-0.5">
                             {item.category}
                           </div>
                         </td>
-                        <td className="py-3.5 px-4 text-xs font-medium text-[#77736C] hidden md:table-cell whitespace-nowrap">
+                        <td className="py-3.5 px-4 text-xs font-medium text-[#6E6E73] hidden md:table-cell whitespace-nowrap">
                           {item.category}
                         </td>
-                        <td className="py-3.5 px-4 text-xs text-[#77736C] hidden lg:table-cell">
+                        <td className="py-3.5 px-4 text-xs text-[#6E6E73] hidden lg:table-cell">
                           {item.notes}
                         </td>
                         <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                          <span className="font-mono-num font-bold text-[#292722]">
+                          <span className="font-mono-num font-bold text-[#1D1D1F]">
                             {item.fee}
                           </span>
-                          <span className="text-xs text-[#77736C]">{item.unit}</span>
+                          <span className="text-xs text-[#6E6E73]">{item.unit}</span>
                         </td>
                         <td className="py-3.5 px-4 sm:px-5 text-right whitespace-nowrap">
                           <button
                             type="button"
                             onClick={() => handleEnquireItem(item.service)}
-                            className="inline-flex items-center px-3 py-1.5 rounded-lg bg-[#EFE9DE] hover:bg-[#B66A50] text-[#292722] hover:text-white text-xs font-semibold transition-colors cursor-pointer"
+                            className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-[#ECECF0] hover:bg-[#1D1D1F] text-[#1D1D1F] hover:text-white text-xs font-semibold transition-colors cursor-pointer"
                           >
                             Enquire
                           </button>
@@ -582,19 +635,19 @@ export function MarketingPage() {
           </div>
 
           {/* Official @akyinmarketing Social Strip */}
-          <div className="rounded-2xl bg-[#EFE9DE] border border-[#D9CCB9] p-6 sm:p-8 space-y-5">
+          <GlassPanel className="p-6 sm:p-8 space-y-5">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold text-[#B66A50]">
+                <p className="text-xs font-semibold uppercase tracking-[0.06em] text-[#6E6E73]">
                   Official Social Channels · {OFFICIAL_CONTACT.marketingSocialHandle}
                 </p>
-                <h3 className="font-display text-xl font-bold text-[#292722] mt-1">
+                <h3 className="font-display text-xl font-bold text-[#1D1D1F] mt-1">
                   Follow AKYIN MARKETINGS
                 </h3>
               </div>
             </div>
             <SocialLinks variant="card" />
-          </div>
+          </GlassPanel>
         </EditorialReveal>
       </section>
 
@@ -605,8 +658,8 @@ export function MarketingPage() {
           defaultCategory="Marketing Services Enquiry"
           defaultVertical="Akyin Marketing"
           defaultEnquiryType={selectedEnquiryType}
-          heading="Request a Dealership Proposal."
-          subheading="Pre-select any package or service above and send your structured dealership enquiry directly via WhatsApp or Email."
+          heading="Request an Agency Proposal."
+          subheading="Pre-select any package or individual service above and send your structured marketing enquiry directly via WhatsApp or Email."
         />
       </EditorialReveal>
     </div>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AKYIN Business Advisory — Consultation Request</title>
+  <style>
+    :root {
+      --ivory: #F7F5F0;
+      --cream: #EFE9DE;
+      --white: #FFFFFF;
+      --beige: #D9CCB9;
+      --ink: #292722;
+      --muted: #77736C;
+      --terracotta: #B66A50;
+    }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: var(--ivory);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .card {
+      max-width: 680px;
+      margin: 0 auto;
+      background: var(--white);
+      border: 1px solid var(--beige);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    h1 { margin: 0 0 8px; font-size: 24px; }
+    p { color: var(--muted); font-size: 14px; line-height: 1.5; }
+    label { display: block; font-size: 12px; font-weight: 600; margin: 14px 0 6px; }
+    input, select, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--beige);
+      font-size: 14px;
+      color: var(--ink);
+    }
+    button {
+      margin-top: 18px;
+      background: var(--terracotta);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .notice {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 10px;
+      background: var(--cream);
+      border: 1px solid var(--beige);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Your Business. Your Vision. A Clearer Direction.</h1>
+    <p>AKYIN Business Advisory consultation scheduling (Asia/Kolkata IST). For the full corporate portal, visit akyin.com/advisory.</p>
+    <div id="statusBox" class="notice" style="display:none;"></div>
+    <form id="bookingForm">
+      <label for="customerName">Full Name *</label>
+      <input id="customerName" required />
+      <label for="phone">Phone *</label>
+      <input id="phone" required />
+      <label for="email">Email *</label>
+      <input id="email" type="email" required />
+      <label for="city">City *</label>
+      <input id="city" required />
+      <label for="country">Country *</label>
+      <input id="country" required />
+      <label for="businessStage">Business Stage *</label>
+      <select id="businessStage">
+        <option>Idea / Pre-Launch</option>
+        <option>Early Stage (0–2 Years)</option>
+        <option>Established Business</option>
+        <option>Dealership / Multi-Location</option>
+      </select>
+      <label for="consultationTopic">Consultation Topic *</label>
+      <input id="consultationTopic" value="Business Clarity & Strategic Direction" required />
+      <label for="appointmentDate">Appointment Date *</label>
+      <input id="appointmentDate" type="date" required />
+      <label for="slotSelect">IST Time Slot *</label>
+      <select id="slotSelect">
+        <option value="18:00|18:30">6:00 PM – 6:30 PM IST</option>
+        <option value="18:30|19:00">6:30 PM – 7:00 PM IST</option>
+      </select>
+      <label for="businessChallenge">Business Challenge *</label>
+      <textarea id="businessChallenge" rows="3" required></textarea>
+      <button type="submit">Request Consultation</button>
+    </form>
+  </div>
+  <script>
+    const ALLOWED_PARENT_ORIGIN = 'https://akyin.com';
+    const form = document.getElementById('bookingForm');
+    const statusBox = document.getElementById('statusBox');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const slotParts = document.getElementById('slotSelect').value.split('|');
+      const payload = {
+        customerName: document.getElementById('customerName').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        city: document.getElementById('city').value,
+        country: document.getElementById('country').value,
+        businessStage: document.getElementById('businessStage').value,
+        consultationTopic: document.getElementById('consultationTopic').value,
+        appointmentDate: document.getElementById('appointmentDate').value,
+        startTime: slotParts[0],
+        endTime: slotParts[1],
+        businessChallenge: document.getElementById('businessChallenge').value
+      };
+      google.script.run
+        .withSuccessHandler(function (res) {
+          statusBox.style.display = 'block';
+          statusBox.textContent = res.confirmationNotice + ' Reference: ' + res.bookingId;
+          if (window.parent && window.parent !== window) {
+            try {
+              window.parent.postMessage({ type: 'AKYIN_BOOKING_CREATED', bookingId: res.bookingId }, ALLOWED_PARENT_ORIGIN);
+            } catch (err) {}
+          }
+        })
+        .withFailureHandler(function (err) {
+          statusBox.style.display = 'block';
+          statusBox.textContent = err.message || 'Could not submit request.';
+        })
+        .createPublicBooking_(payload);
+    });
+  </script>
+</body>
+</html>

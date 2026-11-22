@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { ChevronDown, HelpCircle } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 
 interface FaqItem {
+  id: string;
   question: string;
   answer: string;
   category: string;
@@ -9,92 +11,124 @@ interface FaqItem {
 
 const FAQ_ITEMS: FaqItem[] = [
   {
+    id: 'group-architecture',
     category: 'Group Structure',
-    question: 'What is the operating model of AKYIN Ventures?',
+    question: 'How does AKYIN Ventures operate across its seven business verticals?',
     answer:
-      'AKYIN Ventures operates as a parent business group that develops, structures, and guides diverse operating initiatives across publishing, automotive marketing, fashion retail, AI calculation technology, and B2B stock commerce under a unified corporate direction.',
+      'AKYIN Ventures serves as the parent corporate group uniting seven distinct operating businesses: AKYIN Publishing, AKYIN Marketing, AKYIN Store (AKYIN Thrift), AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar (budgetbazaar.org). Each vertical focuses on a specific market need while sharing unified leadership, commercial discipline, and direct corporate governance.',
   },
   {
-    category: 'Venture Architecture',
-    question: 'Why do the business verticals operate on separate platforms and domains?',
+    id: 'ecosystem-distinction',
+    category: 'Ecosystem & Attribution',
+    question:
+      'How do owned ventures, clients like AutoClub, and third-party platforms differ in the ecosystem?',
     answer:
-      'Each vertical serves distinct audiences—readers, automobile dealerships, retail shoppers, engineering professionals, and B2B buyers. Operating on dedicated platforms (such as aicalc.in and kartigo.online) ensures a focused, uncompromised user experience tailored specifically to each industry.',
+      'We maintain clear attribution across every relationship shown on AKYIN.com. Owned verticals belong directly to AKYIN Ventures; AutoClub is clearly designated as an external Client relationship; and Amazon, Google Play Books, Shopify, and social media channels represent independent distribution and commerce platforms we utilize rather than claim to own.',
   },
   {
-    category: 'Commercial Standards',
-    question: 'How does AKYIN Ventures maintain quality and consistency across diverse industries?',
+    id: 'dedicated-platforms',
+    category: 'Platform Strategy',
+    question:
+      'Why do ventures like AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar have separate domains?',
     answer:
-      'We enforce strict commercial discipline, transparent scope definitions, written quotations, and real-world operational expertise (such as 16 years in automotive retail and structured editorial publishing) across every venture rather than relying on automated AI templates.',
+      'Readers, automobile dealerships, everyday retail shoppers, AI utility users, B2B stock buyers, and startup founders each require purpose-built workflows. Operating dedicated domains such as aicalc.in, kartigo.online, biznxt.online, and budgetbazaar.org prevents feature clutter while allowing AKYIN.com to act as the central corporate hub.',
   },
   {
-    category: 'Corporate Positioning',
-    question: 'Is AKYIN Ventures a large publicly listed corporation?',
+    id: 'advisory-marketing',
+    category: 'Services & Consulting',
+    question:
+      'What can businesses expect when engaging AKYIN Marketing Agency or BizNXT.online?',
     answer:
-      'No. AKYIN Ventures is structured as an ambitious, professionally managed private business group. We do not claim unverified public listings, corporate office addresses, employee counts, or fabricated awards.',
+      'AKYIN Marketing works as a full-service marketing agency supporting brands, retail companies, service businesses, and dealerships with lead generation, enquiry qualification, creative campaigns, and sales team training. BizNXT.online focuses on practical business guidance, opportunity evaluation, and consulting for entrepreneurs—always framed with transparent written scope and no fabricated guarantees.',
   },
   {
-    category: 'Enquiries & Collaboration',
-    question: 'How can clients, partners, or customers connect with a specific vertical?',
+    id: 'security-privacy',
+    category: 'Security & Privacy',
+    question: 'How does AKYIN.com protect visitor privacy and verify external ecosystem links?',
     answer:
-      'Every vertical features direct enquiry routing on its dedicated page. You can also use our central enquiry desk or connect directly via WhatsApp and email draft options with zero intermediary form brokers.',
+      'AKYIN.com applies strict Content Security Policy controls, HTTPS link allowlisting, and real-time client-side Zod input validation with automated spam safeguards. Enquiries are prepared locally inside your browser and logged securely or opened directly in your own WhatsApp or Email client rather than passing through hidden third-party form brokers.',
   },
 ];
 
 export function BusinessFAQs() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
+  const shouldReduceMotion = useReducedMotion();
 
   const toggleFaq = (index: number) => {
-    setOpenIdx(openIdx === index ? null : index);
+    setOpenIdx((prev) => (prev === index ? null : index));
   };
 
   return (
-    <div className="space-y-6">
-      <div className="max-w-xl space-y-2">
-        <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#B66A50]">
-          <HelpCircle className="w-4 h-4" aria-hidden="true" />
-          <span>Frequently Asked Questions</span>
+    <div className="space-y-8">
+      <div className="max-w-2xl space-y-2.5">
+        <div className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wide text-[#6E6E73]">
+          <HelpCircle className="w-4 h-4 text-[#1D1D1F]" aria-hidden="true" />
+          <span>AKYIN Ventures Ecosystem · FAQ</span>
         </div>
-        <h3 className="font-display text-2xl sm:text-3xl font-bold text-[#292722]">
-          About Our Diversified Business Model
-        </h3>
-        <p className="text-sm text-[#77736C]">
-          Clear answers regarding how AKYIN Ventures structures its operating verticals and maintains commercial standards.
+        <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F] text-balance">
+          Frequently Asked Questions.
+        </h2>
+        <p className="text-sm sm:text-base text-[#6E6E73] leading-relaxed">
+          Clear, straightforward answers regarding the AKYIN Ventures multi-business portfolio, full-service marketing agency, independent platforms, and privacy standards.
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div className="liquid-glass-panel rounded-3xl divide-y divide-[#1D1D1F]/10 overflow-hidden">
         {FAQ_ITEMS.map((item, index) => {
           const isOpen = openIdx === index;
+          const triggerId = `faq-trigger-${item.id}`;
+          const panelId = `faq-panel-${item.id}`;
+
           return (
-            <div
-              key={item.question}
-              className="bg-[#FFFFFF] rounded-xl border border-[#D9CCB9] overflow-hidden transition-colors"
-            >
+            <div key={item.id} className="transition-colors">
               <button
+                id={triggerId}
                 type="button"
                 aria-expanded={isOpen}
+                aria-controls={panelId}
                 onClick={() => toggleFaq(index)}
-                className="w-full px-6 py-4 flex items-center justify-between gap-4 text-left cursor-pointer hover:bg-[#F7F5F0]/50 transition-colors"
+                className="w-full px-6 sm:px-8 py-5.5 flex items-center justify-between gap-4 text-left cursor-pointer hover:bg-white/55 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#1D1D1F]"
               >
-                <div className="space-y-0.5">
-                  <span className="text-[11px] font-semibold text-[#83866A] uppercase tracking-wider">
+                <div className="space-y-1 min-w-0">
+                  <span className="text-[11px] font-semibold tracking-wide text-[#6E6E73]">
                     {item.category}
                   </span>
-                  <p className="font-display text-base font-bold text-[#292722]">
+                  <p className="font-display text-base sm:text-[17px] font-semibold text-[#1D1D1F] leading-snug">
                     {item.question}
                   </p>
                 </div>
                 <div
-                  className={`w-8 h-8 rounded-full bg-[#EFE9DE] text-[#292722] flex items-center justify-center shrink-0 transition-transform duration-200 ${
-                    isOpen ? 'rotate-180 bg-[#B66A50] text-white' : ''
+                  className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 ${
+                    isOpen
+                      ? 'rotate-180 bg-[#1D1D1F] text-white'
+                      : 'bg-white/80 text-[#1D1D1F] border border-white/90 shadow-xs'
                   }`}
                 >
                   <ChevronDown className="w-4 h-4" aria-hidden="true" />
                 </div>
               </button>
 
-              {isOpen && (
-                <div className="px-6 pb-5 pt-1 text-sm text-[#77736C] leading-relaxed border-t border-[#EFE9DE]/70 bg-[#F7F5F0]/30">
+              <AnimatePresence initial={false}>
+                {isOpen && (
+                  <motion.div
+                    id={panelId}
+                    role="region"
+                    aria-labelledby={triggerId}
+                    initial={shouldReduceMotion ? false : { height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={shouldReduceMotion ? undefined : { height: 0, opacity: 0 }}
+                    transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    className="overflow-hidden"
+                  >
+                    <div className="px-6 sm:px-8 pb-6 pt-3 text-sm sm:text-[15px] text-[#6E6E73] leading-relaxed bg-[#F5F5F7]/50 border-t border-[#E8E8ED]">
+                      {item.answer}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {!isOpen && (
+                <div className="hidden print:block px-6 pb-4 pt-1 text-xs text-[#6E6E73] leading-relaxed">
                   {item.answer}
                 </div>
               )}

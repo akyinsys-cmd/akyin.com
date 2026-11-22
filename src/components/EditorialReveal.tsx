@@ -5,6 +5,7 @@ interface EditorialRevealProps {
   children: ReactNode;
   className?: string;
   delay?: number;
+  duration?: number;
   y?: number;
 }
 
@@ -12,7 +13,8 @@ export function EditorialReveal({
   children,
   className = '',
   delay = 0,
-  y = 18,
+  duration = 0.52,
+  y = 20,
 }: EditorialRevealProps) {
   const shouldReduceMotion = useReducedMotion();
 
@@ -24,11 +26,11 @@ export function EditorialReveal({
     <motion.div
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 'some', margin: '0px 0px -36px 0px' }}
+      viewport={{ once: true, amount: 'some', margin: '0px 0px -32px 0px' }}
       transition={{
-        duration: 0.5,
+        duration,
         delay,
-        ease: [0.16, 1, 0.3, 1],
+        ease: [0.22, 1, 0.36, 1],
       }}
       className={className}
     >

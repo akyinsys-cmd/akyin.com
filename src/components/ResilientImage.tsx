@@ -1,71 +1,56 @@
-import { useState } from 'react';
-import { Layers } from 'lucide-react';
+import { ImgHTMLAttributes, useState } from 'react';
 
-interface ResilientImageProps {
+interface ResilientImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'> {
   src: string;
   alt: string;
-  className?: string;
-  imageClassName?: string;
-  loading?: 'eager' | 'lazy';
   fallbackTitle?: string;
+  imageClassName?: string;
   branded?: boolean;
 }
 
 export function ResilientImage({
   src,
   alt,
+  fallbackTitle,
   className = '',
   imageClassName = '',
+  branded: _branded,
   loading = 'lazy',
-  fallbackTitle,
-  branded = true,
+  decoding = 'async',
+  ...rest
 }: ResilientImageProps) {
   const [hasError, setHasError] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
 
   if (hasError) {
     return (
       <div
         role="img"
         aria-label={alt}
-        className={`flex flex-col items-center justify-center bg-gradient-to-br from-[#EFE9DE] via-[#F7F5F0] to-[#D9CCB9] text-[#292722] p-6 ${className}`}
+        className={`relative flex flex-col items-center justify-center bg-[#FFFFFF] border border-[#E8E8ED] p-6 text-center text-[#1D1D1F] ${className}`}
       >
-        <Layers className="w-7 h-7 text-[#B66A50] mb-2" aria-hidden="true" />
-        <span className="text-xs font-medium tracking-wide text-center text-[#77736C]">
+        <p className="text-[11px] font-semibold tracking-wide text-[#6E6E73]">
+          AKYIN Ventures
+        </p>
+        <p className="mt-1.5 font-display text-base font-bold tracking-tight text-[#1D1D1F] max-w-xs">
           {fallbackTitle || alt}
-        </span>
+        </p>
       </div>
     );
   }
 
+  const hasFitUtility = /\bobject-(contain|cover|fill|none|scale-down)\b/.test(imageClassName);
+
   return (
-    <div className={`relative overflow-hidden bg-[#EFE9DE] ${className}`}>
-      {/* Blur-up placeholder skeleton layer until loaded */}
-      {!isLoaded && (
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-r from-[#EFE9DE] via-[#F7F5F0] to-[#EFE9DE] animate-pulse"
-        />
-      )}
+    <div className={`relative overflow-hidden bg-[#FFFFFF] ${className}`}>
       <img
         src={src}
         alt={alt}
         loading={loading}
-        referrerPolicy="no-referrer"
-        onLoad={() => setIsLoaded(true)}
+        decoding={decoding}
         onError={() => setHasError(true)}
-        className={`w-full h-full object-cover transition-[opacity,transform,filter] duration-500 ease-out ${
-          isLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-sm scale-[1.02]'
-        } ${imageClassName}`}
+        className={`w-full h-full ${hasFitUtility ? '' : 'object-cover'} transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${imageClassName}`}
+        {...rest}
       />
-      {branded && isLoaded && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none select-none absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded bg-[#292722]/50 backdrop-blur-[4px] border border-white/20 text-[#F7F5F0]/90 font-display text-[9px] sm:text-[10px] font-bold tracking-[0.16em]"
-        >
-          AKYIN
-        </div>
-      )}
     </div>
   );
 }

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AKYIN Ventures — Apps Script Admin View</title>
+  <style>
+    :root {
+      --ivory: #F7F5F0;
+      --white: #FFFFFF;
+      --beige: #D9CCB9;
+      --ink: #292722;
+      --muted: #77736C;
+      --terracotta: #B66A50;
+    }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: var(--ivory);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .panel {
+      max-width: 960px;
+      margin: 0 auto;
+      background: var(--white);
+      border: 1px solid var(--beige);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    input, button {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--beige);
+      font-size: 14px;
+    }
+    button {
+      background: var(--terracotta);
+      color: #fff;
+      border: 0;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--beige);
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>AKYIN Ventures — Admin Service Console</h1>
+    <p style="color: var(--muted); font-size: 14px;">
+      Use the primary branded console at <strong>https://akyin.com/admin</strong>, or sign in here with your owner password.
+    </p>
+    <div id="authBox">
+      <input id="adminPass" type="password" placeholder="Owner password" />
+      <button id="loginBtn" type="button">Sign In</button>
+    </div>
+    <p id="msg" style="color: var(--terracotta); font-size: 13px;"></p>
+    <div id="dashboard" style="display:none;">
+      <h2 style="font-size:18px;">Recent Appointments</h2>
+      <table>
+        <thead>
+          <tr><th>Booking ID</th><th>Name</th><th>Date</th><th>Slot</th><th>Status</th></tr>
+        </thead>
+        <tbody id="apptRows"></tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    let sessionToken = '';
+    const msg = document.getElementById('msg');
+    document.getElementById('loginBtn').addEventListener('click', function () {
+      const pw = document.getElementById('adminPass').value;
+      google.script.run
+        .withSuccessHandler(function (session) {
+          sessionToken = session.token;
+          document.getElementById('authBox').style.display = 'none';
+          document.getElementById('dashboard').style.display = 'block';
+          loadData();
+        })
+        .withFailureHandler(function (err) {
+          msg.textContent = err.message || 'Sign in failed.';
+        })
+        .authenticateAdmin_(pw);
+    });
+
+    function loadData() {
+      google.script.run
+        .withSuccessHandler(function (data) {
+          const tbody = document.getElementById('apptRows');
+          tbody.innerHTML = '';
+          (data.appointments || []).forEach(function (item) {
+            const tr = document.createElement('tr');
+            [item.bookingId, item.customerName, item.appointmentDate, item.startTime + '-' + item.endTime, item.bookingStatus]
+              .forEach(function (val) {
+                const td = document.createElement('td');
+                td.textContent = String(val || '');
+                tr.appendChild(td);
+              });
+            tbody.appendChild(tr);
+          });
+        })
+        .withFailureHandler(function (err) {
+          msg.textContent = err.message || 'Failed to load appointments.';
+        })
+        .getAdminDashboardData_();
+    }
+  </script>
+</body>
+</html>
