@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-editorial: 'Playfair Display', Georgia, serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+    --ivory: #F7F5F0;
+    --cream: #EFE9DE;
+    --white: #FFFFFF;
+    --beige: #D9CCB9;
+    --taupe: #A99C8B;
+    --ink: #292722;
+    --ink-muted: #77736C;
+    --terracotta: #B66A50;
+    --olive: #83866A;
+  }
+
+  html {
+    font-family: var(--font-body);
+    scroll-behavior: smooth;
+    background-color: #F7F5F0;
+    color: #292722;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-editorial {
+    font-family: var(--font-editorial);
+  }
+
+  .font-mono-num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Warm Subtle Glass Surfaces */
+.glass-nav-warm {
+  background: rgba(247, 245, 240, 0.86);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(217, 204, 185, 0.75);
+  box-shadow: 0 6px 24px rgba(41, 39, 34, 0.04);
+}
+
+.glass-nav-white {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(217, 204, 185, 0.8);
+  box-shadow: 0 8px 28px rgba(41, 39, 34, 0.06);
+}
+
+.glass-dropdown-warm {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid #D9CCB9;
+  box-shadow: 0 18px 42px rgba(41, 39, 34, 0.1);
+}
+
+.glass-panel-warm {
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(217, 204, 185, 0.85);
+  box-shadow:
+    0 12px 32px rgba(41, 39, 34, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+@keyframes akyin-marquee-left {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes akyin-marquee-right {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.akyin-marquee-track-left {
+  display: flex;
+  width: max-content;
+  animation: akyin-marquee-left 44s linear infinite;
+  will-change: transform;
+}
+
+.akyin-marquee-track-right {
+  display: flex;
+  width: max-content;
+  animation: akyin-marquee-right 38s linear infinite;
+  will-change: transform;
+}
+
+.akyin-marquee-container:hover .akyin-marquee-track-left,
+.akyin-marquee-container:hover .akyin-marquee-track-right,
+.akyin-marquee-container:focus-within .akyin-marquee-track-left,
+.akyin-marquee-container:focus-within .akyin-marquee-track-right {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .akyin-marquee-track-left,
+  .akyin-marquee-track-right {
+    animation: none;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
