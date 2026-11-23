@@ -12,7 +12,11 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AutomotiveLeadFunnel } from '../components/AutomotiveLeadFunnel';
+import { AutomotiveResultsSection } from '../components/AutomotiveResultsSection';
+import { AutomotiveSuccessStories } from '../components/AutomotiveSuccessStories';
 import { ContactDispatcher } from '../components/ContactDispatcher';
+import { DealershipGrowthCalculator } from '../components/DealershipGrowthCalculator';
 import {
   GlassButton,
   GlassCard,
@@ -20,6 +24,7 @@ import {
   GlassPanel,
 } from '../components/liquid-glass';
 import { ResilientImage } from '../components/ResilientImage';
+import { VerifiedAutomotiveBadge } from '../components/VerifiedAutomotiveBadge';
 import { AppRoute, IMAGES } from '../data/akyinData';
 
 interface AutomotiveMarketingPageProps {
@@ -347,17 +352,40 @@ const PRESENTATION_SLIDES = [
 export function AutomotiveMarketingPage({}: AutomotiveMarketingPageProps) {
   const shouldReduceMotion = useReducedMotion();
   const [activeSlide, setActiveSlide] = useState(1);
-  const [, setSelectedEnquiry] = useState(
-    'Lead Generation & Dealership Growth Consultation'
-  );
+  const [enquiryMessage, setEnquiryMessage] = useState('');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
-  const handleEnquire = (serviceTitle: string) => {
-    setSelectedEnquiry(`Automotive Service Enquiry: ${serviceTitle}`);
+  const scrollToEnquiry = () => {
     const el = document.getElementById('dealership-enquiry');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  };
+
+  const handleEnquire = (serviceTitle: string) => {
+    setEnquiryMessage(
+      `Automotive Dealership Enquiry — Interested in: ${serviceTitle}. Please share a tailored proposal for our showroom.`
+    );
+    scrollToEnquiry();
+  };
+
+  const handleCalculatorAudit = (summary: {
+    budget: number;
+    segmentLabel: string;
+    totalEnquiries: number;
+    qualifiedLeads: number;
+    testDrives: number;
+    projectedBookings: number;
+  }) => {
+    const formattedBudget = new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(summary.budget);
+    setEnquiryMessage(
+      `Dealership Growth Calculator Audit Request — Segment: ${summary.segmentLabel} | Monthly Ad Budget: ${formattedBudget} | Benchmark Estimate: ~${summary.totalEnquiries} enquiries, ~${summary.qualifiedLeads} qualified leads, ~${summary.testDrives} test drives, ~${summary.projectedBookings} bookings/mo.`
+    );
+    scrollToEnquiry();
   };
 
   const nextSlide = () => {
@@ -379,9 +407,12 @@ export function AutomotiveMarketingPage({}: AutomotiveMarketingPageProps) {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-7 space-y-6"
           >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full frosted-glass border border-[#1D1D1F]/10 text-xs font-semibold uppercase tracking-[0.08em] text-[#1D1D1F]">
-              <Sparkles className="w-3.5 h-3.5 text-[#1D1D1F]" aria-hidden="true" />
-              <span>AKYIN Marketing · Automotive &amp; Dealership Growth</span>
+            <div className="flex flex-wrap items-center gap-3">
+              <VerifiedAutomotiveBadge />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full frosted-glass border border-[#1D1D1F]/10 text-xs font-semibold uppercase tracking-[0.08em] text-[#1D1D1F]">
+                <Sparkles className="w-3.5 h-3.5 text-[#1D1D1F]" aria-hidden="true" />
+                <span>AKYIN Marketing · Dealership Growth</span>
+              </div>
             </div>
 
             <h1 className="font-display text-4xl sm:text-5xl lg:text-[60px] font-bold tracking-[-0.025em] leading-[1.05] text-[#1D1D1F] text-balance">
@@ -500,6 +531,9 @@ export function AutomotiveMarketingPage({}: AutomotiveMarketingPageProps) {
         </div>
       </section>
 
+      {/* Interactive Lead Generation & Qualification Funnel */}
+      <AutomotiveLeadFunnel onEnquireStage={handleEnquire} />
+
       {/* 3. Complete 16-Service Catalogue (with 3D-Tilt Framer Motion effect on all cards) */}
       <section id="service-catalogue" className="py-20 lg:py-28 bg-[#F5F5F7]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
@@ -570,6 +604,9 @@ export function AutomotiveMarketingPage({}: AutomotiveMarketingPageProps) {
           </div>
         </div>
       </section>
+
+      {/* Automotive Results (Recharts Dealership KPI Visualizations) */}
+      <AutomotiveResultsSection />
 
       {/* 4. Service Tier Comparison Table */}
       <section className="py-20 lg:py-28 bg-[#FFFFFF] border-t border-[#E8E8ED]">
@@ -657,6 +694,12 @@ export function AutomotiveMarketingPage({}: AutomotiveMarketingPageProps) {
           </div>
         </div>
       </section>
+
+      {/* Interactive Dealership Growth Calculator */}
+      <DealershipGrowthCalculator onRequestAudit={handleCalculatorAudit} />
+
+      {/* Featured Automotive Client Success Stories */}
+      <AutomotiveSuccessStories />
 
       {/* 5. Company Presentation Viewer Section */}
       <section id="presentation-viewer" className="py-20 lg:py-28 bg-[#F5F5F7] border-t border-[#E8E8ED]">
@@ -812,25 +855,15 @@ export function AutomotiveMarketingPage({}: AutomotiveMarketingPageProps) {
       </section>
 
       {/* 7. Dealership Growth Enquiry Section */}
-      <section id="dealership-enquiry" className="py-20 lg:py-28 bg-[#F5F5F7] border-t border-[#E8E8ED]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="text-center space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-              Ready to Grow Your Showroom Footfalls?
-            </p>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F]">
-              Schedule a Dealership Growth Consultation
-            </h2>
-            <p className="text-base text-[#6E6E73] leading-relaxed max-w-2xl mx-auto">
-              Connect directly with AKYIN’s automotive marketing directors to discuss custom lead generation, CRM integration, and sales team training for your dealership group.
-            </p>
-          </div>
-
-          <GlassCard className="p-8 sm:p-10 shadow-lg" tilt={false} interactive={false}>
-            <ContactDispatcher defaultCategory="Automotive Marketing Agency" />
-          </GlassCard>
-        </div>
-      </section>
+      <ContactDispatcher
+        sectionId="dealership-enquiry"
+        defaultCategory="Marketing Services Enquiry"
+        defaultVertical="Akyin Marketing"
+        defaultEnquiryType="Package A — Full-Service Growth Marketing & Lead Management"
+        defaultMessage={enquiryMessage}
+        heading="Schedule a Dealership Growth Consultation."
+        subheading="Connect directly with AKYIN’s automotive marketing directors to discuss custom lead generation, two-tier lead qualification, CRM integration, and sales team training for your dealership group."
+      />
     </div>
   );
 }

@@ -25,6 +25,7 @@ interface ContactDispatcherProps {
   defaultCategory?: string;
   defaultVertical?: string;
   defaultEnquiryType?: string;
+  defaultMessage?: string;
   sectionId?: string;
   heading?: string;
   subheading?: string;
@@ -48,6 +49,7 @@ export function ContactDispatcher({
   defaultCategory = ENQUIRY_CATEGORIES[0],
   defaultVertical = BUSINESS_VERTICAL_OPTIONS[0],
   defaultEnquiryType = ENQUIRY_TYPE_OPTIONS[0],
+  defaultMessage = '',
   sectionId = 'contact-form',
   heading = "Let's Start a Conversation.",
   subheading = 'Select your enquiry category and complete the details below to record your enquiry and prepare a structured WhatsApp or Email draft directly to AKYIN Ventures.',
@@ -62,7 +64,7 @@ export function ContactDispatcher({
   const [phone, setPhone] = useState('');
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState(defaultMessage);
   const [honeypot, setHoneypot] = useState('');
 
   const { settings } = useSiteConfig();
@@ -104,6 +106,13 @@ export function ContactDispatcher({
       setDispatchReady(false);
     }
   }, [defaultEnquiryType]);
+
+  useEffect(() => {
+    if (defaultMessage) {
+      setMessage(defaultMessage);
+      setDispatchReady(false);
+    }
+  }, [defaultMessage]);
 
   const payload: EnquiryPayload = {
     category,
