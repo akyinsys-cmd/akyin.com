@@ -13,25 +13,25 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'group-architecture',
     category: 'Group Structure',
-    question: 'How does AKYIN Ventures operate across its seven business verticals?',
+    question: 'How does AKYIN Ventures operate its business ventures and client relationships?',
     answer:
-      'AKYIN Ventures serves as the parent corporate group uniting seven distinct operating businesses: AKYIN Publishing, AKYIN Marketing, AKYIN Store (AKYIN Thrift), AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar (budgetbazaar.org). Each vertical focuses on a specific market need while sharing unified leadership, commercial discipline, and direct corporate governance.',
+      'AKYIN Ventures serves as the parent corporate group operating three core businesses: AKYIN Publishing, AKYIN Marketing (including its specialized Automotive Division), and AKYIN Store (AKYIN Thrift). Concurrently, AKYIN acts as a growth, digital solutions, and marketing partner for 58+ client businesses—including AICalc, Kartigo, BizNXT, Budget Bazaar, and AutoClub—which remain independent businesses supported by our services.',
   },
   {
     id: 'ecosystem-distinction',
     category: 'Ecosystem & Attribution',
     question:
-      'How do owned ventures, clients like AutoClub, and third-party platforms differ in the ecosystem?',
+      'How do owned ventures, clients, and third-party platforms differ in the ecosystem?',
     answer:
-      'We maintain clear attribution across every relationship shown on AKYIN.com. Owned verticals belong directly to AKYIN Ventures; AutoClub is clearly designated as an external Client relationship; and Amazon, Google Play Books, Shopify, and social media channels represent independent distribution and commerce platforms we utilize rather than claim to own.',
+      'We maintain strict attribution across every relationship shown on AKYIN.com: (1) AKYIN Ventures (Publishing, Marketing Agency, and Store) are owned and operated directly by AKYIN; (2) Our Clients (including AICalc, Kartigo, BizNXT, Budget Bazaar, AutoClub, Arosco Ventures, MEI Cosmetics, Krutika Cosmetics, Nyika Traders, and NS Traders) are independent business clients supported by AKYIN; and (3) Platforms & Ecosystem (Amazon, Google Play Books, Shopify, YouTube, etc.) are third-party distribution channels we leverage.',
   },
   {
     id: 'dedicated-platforms',
     category: 'Platform Strategy',
     question:
-      'Why do ventures like AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar have separate domains?',
+      'Why do client businesses like AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar have separate websites?',
     answer:
-      'Readers, automobile dealerships, everyday retail shoppers, AI utility users, B2B stock buyers, and startup founders each require purpose-built workflows. Operating dedicated domains such as aicalc.in, kartigo.online, biznxt.online, and budgetbazaar.org prevents feature clutter while allowing AKYIN.com to act as the central corporate hub.',
+      'AICalc, Kartigo, BizNXT, and Budget Bazaar are independent client businesses with their own distinct operations, customer bases, and digital infrastructures. Operating dedicated domains (such as aicalc.in, kartigo.online, biznxt.online, and budgetbazaar.org) ensures each business serves its specific audience directly, while AKYIN provides external digital solutions, marketing execution, and growth strategy.',
   },
   {
     id: 'advisory-marketing',

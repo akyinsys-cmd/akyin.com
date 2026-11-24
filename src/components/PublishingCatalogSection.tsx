@@ -33,15 +33,15 @@ export function PublishingCatalogSection({
               <BookOpen className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
               <span>AKYIN PUBLISHING</span>
               <span aria-hidden="true" className="text-[#A1A1A6]">·</span>
-              <span className="text-[#6E6E73]">5 Published Titles</span>
+              <span className="text-[#6E6E73]">{PUBLISHING_BOOKS.length} Published Books</span>
             </div>
 
             <h2 className="font-editorial text-3xl sm:text-4xl lg:text-[44px] font-bold tracking-[-0.025em] leading-[1.1] text-[#1D1D1F] text-balance">
-              Stories, Knowledge &amp; Ideas Worth Sharing.
+              Explore Our Books on Amazon
             </h2>
 
             <p className="text-base sm:text-lg text-[#6E6E73] leading-relaxed">
-              Discover books published by AKYIN, created to inspire learning, personal development and new perspectives.
+              Stories, knowledge, and ideas worth sharing—practical titles published by AKYIN to inspire learning, personal development, and disciplined execution.
             </p>
           </div>
 
@@ -60,8 +60,8 @@ export function PublishingCatalogSection({
           </div>
         </div>
 
-        {/* Responsive 5-Book Catalog Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+        {/* Responsive 7-Book Amazon Catalog Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {PUBLISHING_BOOKS.map((book, idx) => {
             const safeAmazonHref = sanitizeHref(book.amazonUrl, 'https://www.amazon.com');
 
@@ -73,7 +73,7 @@ export function PublishingCatalogSection({
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{
                   duration: 0.42,
-                  delay: shouldReduceMotion ? 0 : idx * 0.05,
+                  delay: shouldReduceMotion ? 0 : idx * 0.04,
                   ease: [0.16, 1, 0.3, 1],
                 }}
                 className="h-full"
@@ -87,12 +87,12 @@ export function PublishingCatalogSection({
                 >
                   <div>
                     {/* Consistent 2:3 Studio Cover Frame */}
-                    <div className="relative aspect-[2/3] w-full bg-gradient-to-b from-[#F4F6F9] to-[#FFFFFF] border-b border-[#E8E8ED]/80 overflow-hidden p-3 sm:p-3.5">
+                    <div className="relative aspect-[2/3] w-full bg-gradient-to-b from-[#F4F6F9] to-[#FFFFFF] border-b border-[#E8E8ED]/80 overflow-hidden p-3 sm:p-4">
                       <div className="w-full h-full rounded-xl overflow-hidden shadow-[0_8px_22px_rgba(0,0,0,0.08)] bg-[#FFFFFF]">
                         <ResilientImage
                           src={book.coverImage}
                           alt={book.coverAlt}
-                          loading={idx < 2 ? 'eager' : 'lazy'}
+                          loading="lazy"
                           fallbackTitle={book.title}
                           className="w-full h-full bg-[#FFFFFF]"
                           imageClassName="object-contain group-hover:scale-[1.03]"
@@ -117,7 +117,7 @@ export function PublishingCatalogSection({
                         </span>
                       </div>
 
-                      <h3 className="font-editorial text-[16px] font-bold tracking-[-0.01em] leading-snug text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors line-clamp-2">
+                      <h3 className="font-editorial text-[16px] font-bold tracking-[-0.01em] leading-snug text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors line-clamp-2 min-h-[2.75rem]">
                         {book.title}
                       </h3>
 
@@ -125,15 +125,15 @@ export function PublishingCatalogSection({
                         By {book.author}
                       </p>
 
-                      <p className="text-xs text-[#6E6E73] leading-relaxed line-clamp-3">
+                      <p className="text-xs text-[#6E6E73] leading-relaxed line-clamp-3 min-h-[3.375rem]">
                         {book.subtitle}
                       </p>
                     </div>
                   </div>
 
-                  {/* Prominent View on Amazon CTA */}
+                  {/* Unified Glassmorphism View on Amazon CTA */}
                   <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-3 border-t border-[#1D1D1F]/8">
-                    <span className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold text-white bg-[#1D1D1F] group-hover:bg-[#0071E3] shadow-xs transition-all duration-200 whitespace-nowrap shrink-0">
+                    <span className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold liquid-glass-cta text-[#1D1D1F] group-hover:bg-[#0071E3] group-hover:text-white group-hover:border-[#0071E3] group-hover:shadow-[0_12px_26px_rgba(0,113,227,0.22)] transition-all duration-200 whitespace-nowrap shrink-0">
                       <span>View on Amazon</span>
                       <ArrowUpRight
                         className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"

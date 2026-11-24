@@ -221,7 +221,7 @@ export function buildFormattedEnquiryText(payload: EnquiryPayload): string {
 export function buildWhatsAppDispatchUrl(payload: EnquiryPayload): string {
   const text = buildFormattedEnquiryText(payload);
   const candidate = `https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=${encodeURIComponent(text)}`;
-  return sanitizeHref(candidate, OFFICIAL_CONTACT.whatsappUrl, false);
+  return sanitizeHref(candidate, `https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}`, false);
 }
 
 export function buildEmailDispatchUrl(payload: EnquiryPayload): string {

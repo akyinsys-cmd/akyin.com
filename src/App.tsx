@@ -8,6 +8,7 @@ import {
 } from './data/akyinData';
 import { BreadcrumbBar } from './components/BreadcrumbBar';
 import { CopyToast } from './components/CopyToast';
+import { FloatingContactWidget } from './components/FloatingContactWidget';
 import { Footer } from './components/Footer';
 import { Navbar } from './components/Navbar';
 import { ReadingProgressBar } from './components/ReadingProgressBar';
@@ -80,12 +81,14 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
           description:
             'Multi-business parent group and full-service marketing agency overseeing seven operating verticals across publishing, performance marketing, fashion retail, AI utilities, B2B wholesale trade, and business consulting.',
           email: 'connect@akyin.com',
-          telephone: '+91-6305694011',
+          telephone: '+91-6395694011',
+          founder: { '@type': 'Person', name: 'Shaikh Nazir' },
+          areaServed: ['IN', 'AE'],
           sameAs: [
-            'https://www.instagram.com/akyinmarketing/',
-            'https://www.facebook.com/akyinmarketing/',
-            'https://x.com/akyinmarketing',
-            'https://www.youtube.com/@akyinmarketing',
+            'https://www.facebook.com/profile.php?id=61595204474890',
+            'https://youtube.com/@akyinmarketing?si=hgB_tEfczt79H7wW',
+            'https://www.instagram.com/akyinventures/',
+            'https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U',
             'https://www.amazon.com/stores/author/B0DT3L2T15/allbooks',
             'https://play.google.com/store/books/details/Akyin_s_THE_DISCIPLINE_CODE?id=seHuEQAAQBAJ',
             'https://aicalc.in',
@@ -96,7 +99,7 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
           contactPoint: [
             {
               '@type': 'ContactPoint',
-              telephone: '+91-6305694011',
+              telephone: '+91-6395694011',
               contactType: 'customer service',
               email: 'connect@akyin.com',
               availableLanguage: ['English', 'Hindi', 'Telugu'],
@@ -109,7 +112,7 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
           name: 'AKYIN Ventures & Marketing Agency',
           image: 'https://akyin.com/assets/aistudio/akyin_logo_clean.png',
           url: 'https://akyin.com/',
-          telephone: '+91-6305694011',
+          telephone: '+91-6395694011',
           email: 'connect@akyin.com',
           priceRange: '₹1,999 - ₹49,999',
           address: {
@@ -117,10 +120,10 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
             addressCountry: 'IN',
           },
           sameAs: [
-            'https://www.instagram.com/akyinmarketing/',
-            'https://www.facebook.com/akyinmarketing/',
-            'https://x.com/akyinmarketing',
-            'https://www.youtube.com/@akyinmarketing',
+            'https://www.facebook.com/profile.php?id=61595204474890',
+            'https://youtube.com/@akyinmarketing?si=hgB_tEfczt79H7wW',
+            'https://www.instagram.com/akyinventures/',
+            'https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U',
           ],
           aggregateRating: {
             '@type': 'AggregateRating',
@@ -297,9 +300,9 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/ventures/publishing': {
-    title: 'AKYIN Publishing — Stories, Knowledge & Ideas Worth Sharing | akyin.com',
+    title: 'AKYIN Publishing — Ideas That Inspire. Knowledge That Empowers. | akyin.com',
     description:
-      'Discover five books published by AKYIN on Amazon, created to inspire learning, personal development, and new perspectives.',
+      'Explore eight books on Amazon and three digital guides & productivity tools published by AKYIN.',
     structuredData: {
       '@context': 'https://schema.org',
       '@graph': [
@@ -354,6 +357,51 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
           bookFormat: 'https://schema.org/EBook',
           url: 'https://a.co/d/0h7g4V7g',
         },
+        {
+          '@type': 'Book',
+          name: 'THE DISCIPLINE RESET: Break Bad Habits, Beat Distractions, Build Self-Discipline, and Achieve Consistent Success',
+          author: { '@type': 'Person', name: 'Akyin S.' },
+          publisher: { '@type': 'Organization', name: 'AKYIN Publishing' },
+          inLanguage: 'en',
+          bookFormat: 'https://schema.org/EBook',
+          url: 'https://a.co/d/02kzLiOu',
+        },
+        {
+          '@type': 'Book',
+          name: 'THE OVERTHINKING RESET: Why Intelligent People Overthink, the Invisible Damage It Causes, and How to Break the First Mental Illusion',
+          author: { '@type': 'Person', name: 'Akyin S.' },
+          publisher: { '@type': 'Organization', name: 'AKYIN Publishing' },
+          inLanguage: 'en',
+          bookFormat: 'https://schema.org/EBook',
+          url: 'https://a.co/d/0atu9L9M',
+        },
+        {
+          '@type': 'Book',
+          name: 'The Dopamine Reset Code: Break Phone Addiction, Rewire Your Brain, Build Laser Focus, and Reclaim Your Productivity in 30 Days',
+          author: { '@type': 'Person', name: 'Akyin S.' },
+          publisher: { '@type': 'Organization', name: 'AKYIN Publishing' },
+          inLanguage: 'en',
+          bookFormat: 'https://schema.org/EBook',
+          url: 'https://a.co/d/0c9NrwA7',
+        },
+        {
+          '@type': 'DigitalDocument',
+          name: 'India ATS Resume & Job Search Kit',
+          publisher: { '@type': 'Organization', name: 'AKYIN Publishing' },
+          url: 'https://akyinspire.gumroad.com/l/atsresumekit',
+        },
+        {
+          '@type': 'DigitalDocument',
+          name: 'THE SCROLL RECOVERY PLAN',
+          publisher: { '@type': 'Organization', name: 'AKYIN Publishing' },
+          url: 'https://akyinspire.gumroad.com/l/THESCROLLRECOVERYPLAN?wanted=true',
+        },
+        {
+          '@type': 'DigitalDocument',
+          name: 'THE MONEY OS™ | Complete Personal Finance Planner & Budgeting System',
+          publisher: { '@type': 'Organization', name: 'AKYIN Publishing' },
+          url: 'https://akyinspire.gumroad.com/l/the-money-os?wanted=true',
+        },
       ],
     },
   },
@@ -372,7 +420,7 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
         'Full-service digital marketing agency delivering Meta lead generation, brand campaigns, AI-assisted lead qualification, and commercial sales training across retail, B2B, services, and automotive.',
       priceRange: '$$',
       areaServed: ['IN', 'AE', 'US', 'GB'],
-      telephone: '+91-6305694011',
+      telephone: '+91-6395694011',
       email: 'connect@akyin.com',
     },
   },
@@ -396,7 +444,7 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
             'Book qualified showroom test drives, not cold clicks. Targeted Meta & Google auto ads, lead vetting, and floor sales coaching. Get a quote.',
           priceRange: '$$',
           areaServed: ['IN', 'AE', 'US', 'GB'],
-          telephone: '+91-6305694011',
+          telephone: '+91-6395694011',
           email: 'connect@akyin.com',
         },
         {
@@ -620,7 +668,7 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
       mainEntity: {
         '@type': 'Corporation',
         name: 'AKYIN Ventures',
-        telephone: '+91-6305694011',
+        telephone: '+91-6395694011',
         email: 'connect@akyin.com',
       },
     },
@@ -843,9 +891,9 @@ function AppShell() {
           <BusinessesPage onNavigate={navigate} onStartEnquiry={handleStartEnquiry} />
         );
       case '/ventures/publishing':
-        return <PublishingPage />;
+        return <PublishingPage onNavigate={navigate} />;
       case '/ventures/marketing':
-        return <MarketingPage />;
+        return <MarketingPage onNavigate={navigate} />;
       case '/marketing/automotive':
         return <AutomotiveMarketingPage onNavigate={navigate} />;
       case '/ventures/store':
@@ -874,6 +922,7 @@ function AppShell() {
             defaultCategory={contactDefaults.category}
             defaultVertical={contactDefaults.vertical}
             defaultEnquiryType={contactDefaults.enquiryType}
+            onNavigate={navigate}
           />
         );
       case '/sitemap':
@@ -919,6 +968,8 @@ function AppShell() {
         onCopyLink={handleCopyLink}
         copied={copyToastVisible}
       />
+
+      <FloatingContactWidget currentRoute={currentRoute} onNavigate={navigate} />
 
       <CopyToast visible={copyToastVisible} copiedUrl={copiedUrl} />
     </div>

@@ -369,7 +369,7 @@ export function AdminSettingsSection({
                   Public Phone Display
                 </label>
                 <input
-                  value={draft.contactPhone || '+91-6305694011'}
+                  value={draft.contactPhone || '+91 63956 94011'}
                   onChange={(e) => updateKey('contactPhone', e.target.value)}
                   className={`${inputCls} font-mono-num`}
                 />
@@ -379,7 +379,7 @@ export function AdminSettingsSection({
                   WhatsApp Digits (Country + Number)
                 </label>
                 <input
-                  value={draft.whatsappNumber || '916305694011'}
+                  value={draft.whatsappNumber || '916395694011'}
                   onChange={(e) => updateKey('whatsappNumber', e.target.value)}
                   className={`${inputCls} font-mono-num`}
                 />

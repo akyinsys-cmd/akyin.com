@@ -40,158 +40,43 @@ const TOPIC_TABS: Array<{ id: NewsTopic; label: string }> = [
   { id: 'crm', label: 'Showroom AI & CRM' },
 ];
 
-const CURATED_FALLBACK_ARTICLES: Record<NewsTopic, NewsArticle[]> = {
-  all: [
-    {
-      headline: 'Dealerships Pivot to Two-Tier Lead Filtering as Unqualified Meta Inquiries Surge',
-      summary:
-        'Regional dealership principals report a 40% increase in test-drive completions after separating cold ad generation from dedicated telephonic buyer vetting.',
-      category: 'Lead Quality & Conversion',
-      publisher: 'Automotive News',
-      publishedHint: 'Curated Intelligence',
-      url: 'https://akyin.com/marketing/automotive',
-    },
-    {
-      headline: 'Sub-5-Minute Response SLAs Linked to 2.4x Higher Showroom Delivery Rates',
-      summary:
-        'Industry survey highlights immediate automated WhatsApp engagement as the highest converting sales touchpoint for multi-brand car dealership networks.',
-      category: 'Sales Floor Velocity',
-      publisher: 'Dealer Marketing Magazine',
-      publishedHint: 'Curated Intelligence',
-      url: 'https://akyin.com/marketing/automotive',
-    },
-    {
-      headline: 'Hyperlocal Map Pack Optimisation Drives Record Walk-In Footfall for Metro Dealers',
-      summary:
-        'Dealers capturing local Google Business intent generate higher immediate intent inquiries compared to broad national social ad campaigns.',
-      category: 'Local SEO & Showroom Footfall',
-      publisher: 'WardsAuto',
-      publishedHint: 'Curated Intelligence',
-      url: 'https://akyin.com/marketing/automotive',
-    },
-  ],
-  leadgen: [
-    {
-      headline: 'Lead Form Qualification Filters Cut Dealership Waste Ad Spend by 38%',
-      summary:
-        'Shifting ad objectives from high-volume lead quantity to intent-filtered lead forms dramatically improves showroom floor closing efficiency.',
-      category: 'Paid Search & Meta Ads',
-      publisher: 'Dealer Marketing Magazine',
-      publishedHint: 'Curated Intelligence',
-      url: 'https://akyin.com/marketing/automotive',
-    },
-    {
-      headline: 'Short-Form Video Test Drive Previews Outperform Static Banners Across Key Segments',
-      summary:
-        'Showroom walkarounds, interior feature showcases, and real customer handovers achieve 65% higher organic engagement on Meta Reels.',
-      category: 'Creative Production',
-      publisher: 'Autocar Professional',
-      publishedHint: 'Curated Intelligence',
-      url: 'https://akyin.com/marketing/automotive',
-    },
-    {
-      headline: 'Google Search High-Intent Keywords Attract Ready-to-Buy Festive Shoppers',
-      summary:
-        'Dealerships targeting geo-fenced model pricing and EMI search terms report higher closing ratios compared to broad automotive audience interest targeting.',
-      category: 'Search Engine Marketing',
-      publisher: 'Automotive News',
-      publishedHint: 'Curated Intelligence',
-      url: 'https://akyin.com/marketing/automotive',
-    },
-  ],
-  ev: [
-    {
-      headline: 'Dealerships Establish Dedicated EV Experience Desks to Accelerate Buyer Trust',
-      summary:
-        'As EV product adoption matures, dealerships that educate customers on home charging, battery warranty, and running costs convert 35% faster.',
-      category: 'Electric Vehicle Retail',
-      publisher: 'Autocar Professional',
-      publishedHint: 'Curated Intelligence',
-      url: 'https://akyin.com/marketing/automotive',
-    },
-    {
-      headline: 'Digital Total Cost of Ownership (TCO) Calculators Boost EV Inquiries',
-      summary:
-        'Interactive online fuel-versus-charging calculators on dealership landing pages increase high-intent buyer inquiries by over 50%.',
-      category: 'Digital Showroom Retail',
-      publisher: 'CleanTechnica',
-      publishedHint: 'Curated Intelligence',
-      url: 'https://akyin.com/marketing/automotive',
-    },
-    {
-      headline: 'Commercial & Fleet EV Adoption Opens Lucrative B2B Pipeline for Dealerships',
-      summary:
-        'Dealers deploying dedicated B2B corporate outreach secure significant bulk fleet contracts with local logistics and ride-hailing operators.',
-      category: 'Fleet & Corporate Sales',
-      publisher: 'Financial Express Auto',
-      publishedHint: 'Curated Intelligence',
-      url: 'https://akyin.com/marketing/automotive',
-    },
-  ],
-  crm: [
-    {
-      headline: 'CRM Telephonic Qualification Scripts Eliminate Floor Representative Burnout',
-      summary:
-        'Dealership sales teams experience significantly higher morale and closing rates when only pre-vetted, budget-qualified prospects reach their desks.',
-      category: 'Showroom CRM Process',
-      publisher: 'Auto Remarketing',
-      publishedHint: 'Curated Intelligence',
-      url: 'https://akyin.com/marketing/automotive',
-    },
-    {
-      headline: 'Automated WhatsApp Test Drive Reminders Slash Weekend No-Shows by 42%',
-      summary:
-        'Two-way conversational WhatsApp workflows with Google Calendar sync ensure prospective car buyers arrive on time for scheduled showroom appointments.',
-      category: 'Appointment Automation',
-      publisher: 'WardsAuto',
-      publishedHint: 'Curated Intelligence',
-      url: 'https://akyin.com/marketing/automotive',
-    },
-    {
-      headline: 'Unified Lead & Target Apps Provide Real-Time Floor Attribution for General Managers',
-      summary:
-        'Custom internal mobile trackers replace disconnected spreadsheets, giving dealership leadership instantaneous visibility into ad spend to delivery ROI.',
-      category: 'Custom App Development',
-      publisher: 'DealerTrack Report',
-      publishedHint: 'Curated Intelligence',
-      url: 'https://akyin.com/marketing/automotive',
-    },
-  ],
-};
-
 export function AutomotiveIndustryNews() {
   const [activeTopic, setActiveTopic] = useState<NewsTopic>('all');
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [sources, setSources] = useState<GroundingSource[]>([]);
   const [fetchedAt, setFetchedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isCurated, setIsCurated] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>('');
 
   const loadHeadlines = useCallback(async (topic: NewsTopic) => {
     setLoading(true);
     setErrorMsg('');
-    setIsCurated(false);
     try {
       const response = await fetch(`/api/automotive-news?topic=${encodeURIComponent(topic)}`);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      const data = (await response.json()) as Partial<NewsResponsePayload> & { error?: string };
+      const data = (await response.json().catch(() => null)) as
+        | (Partial<NewsResponsePayload> & { error?: string })
+        | null;
 
-      if (data.error || !Array.isArray(data.articles) || data.articles.length === 0) {
-        throw new Error(data.error || 'No live articles returned');
+      if (!response.ok) {
+        throw new Error(data?.error || `Unable to load headlines (HTTP ${response.status}).`);
+      }
+
+      if (data?.error || !Array.isArray(data?.articles) || data.articles.length === 0) {
+        throw new Error(data?.error || 'No live articles returned from Google Search.');
       }
 
       setArticles(data.articles);
       setSources(Array.isArray(data.sources) ? data.sources : []);
       setFetchedAt(data.fetchedAt || new Date().toISOString());
-    } catch {
-      // Graceful fallback to authentic curated industry trends (ideal for static Hostinger deployment)
-      setArticles(CURATED_FALLBACK_ARTICLES[topic] ?? CURATED_FALLBACK_ARTICLES.all);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error && err.message
+          ? err.message
+          : 'Unable to fetch live automotive headlines right now. Please try again shortly.';
+      setArticles([]);
       setSources([]);
-      setFetchedAt(new Date().toISOString());
-      setIsCurated(true);
+      setFetchedAt(null);
+      setErrorMsg(message);
     } finally {
       setLoading(false);
     }
@@ -217,9 +102,9 @@ export function AutomotiveIndustryNews() {
             <div className="space-y-2 max-w-2xl">
               <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-purple-700">
                 <Globe className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                <span>{isCurated ? 'Curated Market Intelligence' : 'Google Search Grounding'}</span>
+                <span>Google Search Grounding</span>
                 <span aria-hidden="true">·</span>
-                <span>{isCurated ? 'Dealership Industry Trends' : 'Live Dealership Market Intelligence'}</span>
+                <span>Live Dealership Market Intelligence</span>
               </div>
               <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F] text-balance">
                 Automotive Industry News

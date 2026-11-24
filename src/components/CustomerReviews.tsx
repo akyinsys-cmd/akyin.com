@@ -95,7 +95,7 @@ const INITIAL_REVIEWS: CustomerReviewItem[] = [
     companyOrContext: 'Gujarat Commercial Trade',
     location: 'Ahmedabad, India',
     vertical: 'tech-b2b',
-    verticalLabel: 'Kartigo.online & B2B Supply',
+    verticalLabel: 'Client Platform · Kartigo.online',
     rating: 5,
     quote:
       'Kartigo makes wholesale stock sourcing predictable. Bulk lot listings have transparent unit pricing and real verified quantities. It eliminates the traditional middleman friction that slows down commercial trading.',
@@ -109,7 +109,7 @@ const INITIAL_REVIEWS: CustomerReviewItem[] = [
     companyOrContext: 'FinEdge Analytics',
     location: 'Pune, India',
     vertical: 'tech-b2b',
-    verticalLabel: 'AICalc.in Utility',
+    verticalLabel: 'Client Platform · AICalc.in',
     rating: 5,
     quote:
       'AICalc.in has replaced three different calculation spreadsheet templates for our daily financial modeling. Being able to type queries in natural language and verify the math with manual keypad controls is remarkably well executed.',
@@ -123,7 +123,7 @@ const INITIAL_REVIEWS: CustomerReviewItem[] = [
     companyOrContext: 'BizNXT Consulting Cohort',
     location: 'Chennai, India',
     vertical: 'advisory',
-    verticalLabel: 'BizNXT.online Advisory',
+    verticalLabel: 'Client Platform · BizNXT.online',
     rating: 5,
     quote:
       'BizNXT guided our commercial restructure during a pivotal expansion phase. Their disciplined focus on cash-flow cycles and realistic customer acquisition costs was the steady hand our board needed.',
@@ -137,7 +137,7 @@ const INITIAL_REVIEWS: CustomerReviewItem[] = [
     companyOrContext: 'Customer at Budget Bazaar',
     location: 'Vijayawada, India',
     vertical: 'store',
-    verticalLabel: 'Budget Bazaar Retail',
+    verticalLabel: 'Client Platform · Budget Bazaar',
     rating: 5,
     quote:
       'Everyday home essentials at prices that actually respect a middle-class family budget. Transparent pricing with zero gimmicks. Budget Bazaar delivered exactly what was ordered on time.',

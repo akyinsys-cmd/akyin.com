@@ -11,6 +11,7 @@ import {
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import {
   AppRoute,
+  GUMROAD_DIGITAL_PRODUCTS,
   PUBLISHING_BOOKS,
   VENTURES_PORTFOLIO,
 } from '../data/akyinData';
@@ -33,11 +34,11 @@ const CORPORATE_SEARCH_ENTRIES: SearchEntry[] = [
   {
     id: 'page-home',
     title: 'Home — AKYIN Ventures',
-    subtitle: 'Corporate overview, 7 operating verticals, ecosystem & reviews',
+    subtitle: 'Corporate overview, 58+ business ecosystem, ROI tools & 7 operating verticals',
     category: 'page',
     categoryLabel: 'Information Page',
     route: '/',
-    keywords: 'home corporate group overview ecosystem reviews pricing summary akyin ventures',
+    keywords: 'home corporate group overview ecosystem reviews pricing summary akyin ventures roi calculator budget planner service finder autoclub arosco mei krutika nyika ns traders',
   },
   {
     id: 'page-about',
@@ -96,11 +97,11 @@ const CORPORATE_SEARCH_ENTRIES: SearchEntry[] = [
   {
     id: 'page-contact',
     title: 'Contact AKYIN Ventures',
-    subtitle: 'Central enquiry desk, email (connect@akyin.com) & WhatsApp (+91-6305694011)',
+    subtitle: 'Shaikh Nazir · connect@akyin.com · +91 63956 94011 (India & UAE)',
     category: 'page',
     categoryLabel: 'Contact',
     route: '/contact',
-    keywords: 'contact enquiry email whatsapp phone support help connect',
+    keywords: 'contact enquiry email phone shaikh nazir india uae 63956 94011 connect',
   },
   {
     id: 'page-terms',
@@ -151,10 +152,21 @@ const BOOK_SEARCH_ENTRIES: SearchEntry[] = PUBLISHING_BOOKS.map((book) => ({
   keywords: `${book.title} ${book.subtitle} ${book.author} amazon book ebook kindle publishing`.toLowerCase(),
 }));
 
+const DIGITAL_PRODUCT_SEARCH_ENTRIES: SearchEntry[] = GUMROAD_DIGITAL_PRODUCTS.map((product) => ({
+  id: product.id,
+  title: product.shortTitle,
+  subtitle: product.description,
+  category: 'book',
+  categoryLabel: 'AKYIN Publishing · Gumroad',
+  externalUrl: product.gumroadUrl,
+  keywords: `${product.shortTitle} ${product.title} ${product.description} gumroad digital guide tool resume money scroll`.toLowerCase(),
+}));
+
 const ALL_SEARCH_ENTRIES: SearchEntry[] = [
   ...VENTURE_SEARCH_ENTRIES,
   ...CORPORATE_SEARCH_ENTRIES,
   ...BOOK_SEARCH_ENTRIES,
+  ...DIGITAL_PRODUCT_SEARCH_ENTRIES,
 ];
 
 const QUICK_FEATURED_IDS = [

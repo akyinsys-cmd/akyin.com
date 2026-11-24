@@ -1,6 +1,6 @@
 import { ArrowRight, ArrowUpRight, ChevronDown, Sparkles } from 'lucide-react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import {
   AppRoute,
   EXTERNAL_VERTICAL_URLS,
@@ -12,6 +12,12 @@ import { ContactDispatcher } from '../components/ContactDispatcher';
 import { CustomerReviews } from '../components/CustomerReviews';
 import { EcosystemSection } from '../components/EcosystemSection';
 import { EditorialReveal } from '../components/EditorialReveal';
+import { EthicalGrowthProofSection } from '../components/EthicalGrowthProofSection';
+import { SocialLinks } from '../components/SocialLinks';
+import {
+  BusinessWidgetTabId,
+  InteractiveBusinessWidgets,
+} from '../components/InteractiveBusinessWidgets';
 import {
   FloatingGlassCTA,
   GlassButton,
@@ -20,8 +26,12 @@ import {
   GlassPanel,
 } from '../components/liquid-glass';
 import { ResilientImage } from '../components/ResilientImage';
-import { SocialLinks } from '../components/SocialLinks';
-import { SuccessStoriesCarousel } from '../components/SuccessStoriesCarousel';
+import { ClientSuccessCarousel } from '../components/ClientSuccessCarousel';
+import { DirectContactSection } from '../components/DirectContactSection';
+import { DownloadablePresentationsSection } from '../components/DownloadablePresentationsSection';
+import { InternationalAvailabilitySection } from '../components/InternationalAvailabilitySection';
+import { OurClientsSection } from '../components/OurClientsSection';
+import { VerifiedClientPartners } from '../components/VerifiedClientPartners';
 import { useSiteConfig } from '../context/SiteConfigContext';
 
 interface HomePageProps {
@@ -36,12 +46,21 @@ interface HomePageProps {
 export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
   const { settings, ventures: ventureOverrides } = useSiteConfig();
   const shouldReduceMotion = useReducedMotion();
+  const [widgetTab, setWidgetTab] = useState<BusinessWidgetTabId>('roi');
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ['start start', 'end start'],
   });
   const heroImageY = useTransform(scrollYProgress, [0, 1], [0, 32]);
+
+  const jumpToWidgetTab = (tab: BusinessWidgetTabId) => {
+    setWidgetTab(tab);
+    document.getElementById('business-growth-tools')?.scrollIntoView({
+      behavior: shouldReduceMotion ? 'auto' : 'smooth',
+      block: 'start',
+    });
+  };
 
   const activeVentures = VENTURES_PORTFOLIO.map((baseVenture) => {
     const override = ventureOverrides.find((v) => v.id === baseVenture.id);
@@ -54,10 +73,6 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
       externalUrl: override?.externalUrl || baseVenture.externalUrl,
     };
   }).filter((v): v is NonNullable<typeof v> => Boolean(v));
-
-  const rowOneVentures = activeVentures.slice(0, 2);
-  const rowTwoVentures = activeVentures.slice(2, 5);
-  const rowThreeVentures = activeVentures.slice(5);
 
   return (
     <div>
@@ -113,6 +128,19 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
                 {settings.heroSubheadline ||
                   'AKYIN Ventures operates a diverse portfolio of seven independent businesses alongside a full-service marketing agency—spanning publishing, retail, AI tools, B2B supply, consulting, and multi-sector brand growth.'}
               </motion.p>
+
+              <motion.div
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                className="flex flex-wrap items-center gap-2 text-xs font-medium text-[#6E6E73]"
+              >
+                <span className="font-semibold text-[#1D1D1F]">INDIA 🇮🇳 | UAE 🇦🇪</span>
+                <span aria-hidden="true">·</span>
+                <span>Building Businesses. Creating Opportunities.</span>
+                <span aria-hidden="true">·</span>
+                <span>Serving businesses across India and the UAE.</span>
+              </motion.div>
 
               <motion.div
                 initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
@@ -214,6 +242,9 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
         </div>
       </section>
 
+      {/* Verified Client Partners Section */}
+      <VerifiedClientPartners />
+
       {/* 2. About AKYIN Ventures (Pure White Editorial Composition) */}
       <section className="py-20 lg:py-28 bg-[#FFFFFF]">
         <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -223,16 +254,16 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
                 About AKYIN Ventures
               </p>
               <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.025em] text-[#1D1D1F] text-balance">
-                One Parent Group. Seven Distinct Verticals.
+                One Business Group. Core Operating Ventures &amp; 58+ Growing Clients.
               </h2>
             </div>
             <div className="lg:col-span-7 space-y-5 text-base text-[#6E6E73] leading-relaxed">
               <p className="text-[#1D1D1F] font-medium text-lg leading-relaxed">
-                AKYIN Ventures operates as a diversified business group and marketing agency overseeing seven specialized verticals across independent publishing, full-service marketing and brand growth, fashion retail, value consumer retail, AI-enabled calculation tools, B2B stock commerce, and business consulting.
+                AKYIN Ventures operates as a diversified business group and growth marketing agency overseeing core operating ventures in independent publishing, full-service marketing and brand growth, and fashion retail—alongside supporting 58+ independent client businesses across AI technology, commerce, automotive dealerships, and consulting.
               </p>
               <p>
-                Each vertical runs with its own dedicated brand, domain, and operating model—giving readers, growing brands, shoppers, entrepreneurs, and commercial buyers focused execution under the central umbrella of{' '}
-                <span className="font-semibold text-[#1D1D1F]">akyin.com</span>.
+                Each venture operates with focused domain leadership under the central stewardship of{' '}
+                <span className="font-semibold text-[#1D1D1F]">akyin.com</span>, while independent client businesses receive specialized marketing, technology, and sales enablement services.
               </p>
               <div className="pt-2">
                 <button
@@ -240,7 +271,7 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
                   onClick={() => onNavigate('/about')}
                   className="group inline-flex items-center gap-2 text-sm font-semibold text-[#1D1D1F] hover:underline transition-colors cursor-pointer"
                 >
-                  <span>Read the Corporate Profile</span>
+                  <span>Read Corporate Profile</span>
                   <ArrowRight
                     className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
                     aria-hidden="true"
@@ -252,18 +283,21 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
         </EditorialReveal>
       </section>
 
-      {/* 3. Our Business Portfolio — Asymmetric Apple Bento & Editorial Showcase (All 7 Verticals) */}
+      {/* 3. Our Business Portfolio — Core AKYIN Operating Verticals */}
       <section className="py-20 lg:py-28 bg-[#F5F5F7] border-t border-[#E8E8ED]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <EditorialReveal>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div className="max-w-2xl space-y-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-                  Our Business Portfolio
+                  AKYIN Ventures Portfolio
                 </p>
                 <h2 className="font-display text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-[-0.025em] text-[#1D1D1F] text-balance">
-                  Equal Focus Across Seven Operating Industries.
+                  Core AKYIN Operating Verticals.
                 </h2>
+                <p className="text-sm sm:text-base text-[#6E6E73]">
+                  Genuine operating divisions owned and built by AKYIN across publishing, full-service growth marketing, and retail commerce.
+                </p>
               </div>
               <button
                 type="button"
@@ -279,204 +313,97 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
             </div>
           </EditorialReveal>
 
-          {/* Row 1: Verticals 01 & 02 — Flagship 2-Up Spotlight */}
-          {rowOneVentures.length > 0 && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {rowOneVentures.map((venture, idx) => (
-                <EditorialReveal key={venture.id} delay={idx * 0.05} className="h-full">
-                  <article className="h-full group liquid-glass-card rounded-3xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5">
-                    <div>
-                      <div className="aspect-[4/3] bg-[#FFFFFF] overflow-hidden border-b border-[#E8E8ED]/70">
-                        <ResilientImage
-                          src={venture.image}
-                          alt={venture.imageAlt}
-                          loading="lazy"
-                          fallbackTitle={venture.name}
-                          className="w-full h-full bg-[#FFFFFF]"
-                          imageClassName="object-contain p-3 sm:p-4 group-hover:scale-[1.03]"
-                        />
-                      </div>
-                      <div className="p-7 sm:p-8 space-y-3">
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-[#6E6E73]">
-                          <span className="font-mono-num font-bold text-[#1D1D1F]">
-                            {venture.code}
-                          </span>
-                          <span aria-hidden="true">·</span>
-                          <span className="font-medium">{venture.sector}</span>
-                        </div>
-                        <h3 className="font-display text-2xl font-bold tracking-[-0.015em] text-[#1D1D1F] group-hover:text-[#3A3A3F] transition-colors">
-                          {venture.name}
-                        </h3>
-                        <p className="text-sm font-semibold text-[#1D1D1F]/80">
-                          {venture.positioning}
-                        </p>
-                        <p className="text-sm text-[#6E6E73] leading-relaxed">
-                          {venture.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="px-7 sm:px-8 pb-7 pt-4 border-t border-[#1D1D1F]/8 flex flex-wrap items-center justify-between gap-4">
-                      <GlassButton
-                        variant="primary"
-                        size="sm"
-                        onClick={() => onNavigate(venture.route)}
-                      >
-                        <span>Explore Venture</span>
-                        <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                      </GlassButton>
-
-                      {venture.externalUrl && (
-                        <a
-                          href={venture.externalUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1D1D1F] hover:text-[#6E6E73] transition-colors"
-                        >
-                          <span>Visit {venture.externalLabel}</span>
-                          <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
-                        </a>
-                      )}
-                    </div>
-                  </article>
-                </EditorialReveal>
-              ))}
-            </div>
-          )}
-
-          {/* Row 2: Verticals 03, 04 & 05 — 3-Up Balanced Showcase */}
-          {rowTwoVentures.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {rowTwoVentures.map((venture, idx) => (
-                <EditorialReveal key={venture.id} delay={idx * 0.05} className="h-full">
-                  <article className="h-full group liquid-glass-card rounded-3xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5">
-                    <div>
-                      <div className="aspect-[4/3] bg-[#FFFFFF] overflow-hidden border-b border-[#E8E8ED]/70">
-                        <ResilientImage
-                          src={venture.image}
-                          alt={venture.imageAlt}
-                          loading="lazy"
-                          fallbackTitle={venture.name}
-                          className="w-full h-full bg-[#FFFFFF]"
-                          imageClassName="object-contain p-3 group-hover:scale-[1.03]"
-                        />
-                      </div>
-                      <div className="p-6 sm:p-7 space-y-2.5">
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-[#6E6E73]">
-                          <span className="font-mono-num font-bold text-[#1D1D1F]">
-                            {venture.code}
-                          </span>
-                          <span aria-hidden="true">·</span>
-                          <span className="font-medium truncate">{venture.sector}</span>
-                        </div>
-                        <h3 className="font-display text-xl font-bold tracking-[-0.015em] text-[#1D1D1F] group-hover:text-[#3A3A3F] transition-colors">
-                          {venture.name}
-                        </h3>
-                        <p className="text-xs font-semibold text-[#1D1D1F]/80">
-                          {venture.positioning}
-                        </p>
-                        <p className="text-sm text-[#6E6E73] leading-relaxed">
-                          {venture.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="px-6 sm:px-7 pb-6 pt-4 border-t border-[#1D1D1F]/8 flex flex-wrap items-center justify-between gap-3">
-                      <button
-                        type="button"
-                        onClick={() => onNavigate(venture.route)}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1D1D1F] hover:underline cursor-pointer"
-                      >
-                        <span>Explore Venture</span>
-                        <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                      </button>
-
-                      {venture.externalUrl && (
-                        <a
-                          href={venture.externalUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#6E6E73] hover:text-[#1D1D1F] transition-colors"
-                        >
-                          <span>{venture.externalLabel}</span>
-                          <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
-                        </a>
-                      )}
-                    </div>
-                  </article>
-                </EditorialReveal>
-              ))}
-            </div>
-          )}
-
-          {/* Row 3: Verticals 06 & 07 — Wide Editorial Cards */}
-          {rowThreeVentures.length > 0 && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {rowThreeVentures.map((venture, idx) => (
-                <EditorialReveal key={venture.id} delay={idx * 0.05} className="h-full">
-                  <article className="h-full group liquid-glass-card rounded-3xl overflow-hidden grid grid-cols-1 sm:grid-cols-12 items-stretch transition-all duration-300 hover:-translate-y-0.5">
-                    <div className="sm:col-span-5 aspect-[4/3] sm:aspect-auto bg-[#FFFFFF] overflow-hidden border-b sm:border-b-0 sm:border-r border-[#E8E8ED]/70">
+          {/* 3 Genuine AKYIN Ventures Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+            {activeVentures.map((venture, idx) => (
+              <EditorialReveal key={venture.id} delay={idx * 0.08} className="h-full flex flex-col">
+                <article className="h-full group liquid-glass-card rounded-3xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl bg-white border border-[#E8E8ED]">
+                  <div>
+                    <div className="aspect-[4/3] bg-[#FFFFFF] overflow-hidden border-b border-[#E8E8ED]/70">
                       <ResilientImage
                         src={venture.image}
                         alt={venture.imageAlt}
                         loading="lazy"
                         fallbackTitle={venture.name}
                         className="w-full h-full bg-[#FFFFFF]"
-                        imageClassName="object-contain p-3 group-hover:scale-[1.03]"
+                        imageClassName="object-contain p-3 sm:p-4 group-hover:scale-[1.03]"
                       />
                     </div>
-                    <div className="sm:col-span-7 p-6 sm:p-7 flex flex-col justify-between space-y-4">
-                      <div className="space-y-2.5">
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-[#6E6E73]">
-                          <span className="font-mono-num font-bold text-[#1D1D1F]">
-                            {venture.code}
-                          </span>
-                          <span aria-hidden="true">·</span>
-                          <span className="font-medium">{venture.sector}</span>
-                        </div>
-                        <h3 className="font-display text-xl font-bold tracking-[-0.015em] text-[#1D1D1F] group-hover:text-[#3A3A3F] transition-colors">
-                          {venture.name}
-                        </h3>
-                        <p className="text-xs font-semibold text-[#1D1D1F]/80">
-                          {venture.positioning}
-                        </p>
-                        <p className="text-sm text-[#6E6E73] leading-relaxed">
-                          {venture.description}
-                        </p>
+                    <div className="p-6 sm:p-7 space-y-3">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-[#6E6E73]">
+                        <span className="font-mono-num font-bold text-[#1D1D1F]">
+                          {venture.code}
+                        </span>
+                        <span aria-hidden="true">·</span>
+                        <span className="font-medium">{venture.sector}</span>
                       </div>
+                      <h3 className="font-display text-2xl font-bold tracking-[-0.015em] text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors">
+                        {venture.name}
+                      </h3>
+                      <p className="text-xs sm:text-sm font-semibold text-[#1D1D1F]/80">
+                        {venture.positioning}
+                      </p>
+                      <p className="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
+                        {venture.description}
+                      </p>
 
-                      <div className="pt-3 border-t border-[#1D1D1F]/8 flex flex-wrap items-center justify-between gap-3">
-                        <button
-                          type="button"
-                          onClick={() => onNavigate(venture.route)}
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1D1D1F] hover:underline cursor-pointer"
-                        >
-                          <span>Explore Venture</span>
-                          <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                        </button>
-
-                        {venture.externalUrl && (
-                          <a
-                            href={venture.externalUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-[#6E6E73] hover:text-[#1D1D1F] transition-colors"
+                      {venture.id === 'marketing' && (
+                        <div className="pt-2">
+                          <button
+                            type="button"
+                            onClick={() => onNavigate('/marketing/automotive')}
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0071E3] hover:underline"
                           >
-                            <span>{venture.externalLabel}</span>
-                            <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
-                          </a>
-                        )}
-                      </div>
+                            <span>Includes Automotive Marketing Division →</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  </article>
-                </EditorialReveal>
-              ))}
-            </div>
-          )}
+                  </div>
+
+                  <div className="px-6 sm:px-7 pb-6 pt-4 border-t border-[#1D1D1F]/8 flex flex-wrap items-center justify-between gap-3">
+                    <GlassButton
+                      variant="primary"
+                      size="sm"
+                      onClick={() => onNavigate(venture.route)}
+                    >
+                      <span>Explore Venture</span>
+                      <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                    </GlassButton>
+
+                    {venture.externalUrl && (
+                      <a
+                        href={venture.externalUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-[#6E6E73] hover:text-[#1D1D1F] transition-colors"
+                      >
+                        <span>{venture.externalLabel}</span>
+                        <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
+                      </a>
+                    )}
+                  </div>
+                </article>
+              </EditorialReveal>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* 4. Our Business Ecosystem — Ventures Ticker, AutoClub Client, Platforms Ticker */}
+      {/* 3B. Dedicated OUR CLIENTS Section (Businesses That Trust AKYIN for Their Growth) */}
+      <OurClientsSection
+        id="our-clients"
+        onNavigate={onNavigate}
+        backgroundClass="bg-[#FFFFFF]"
+      />
+
+      {/* 3C. Downloadable Business Services and Pricing Presentations */}
+      <DownloadablePresentationsSection
+        id="services-pricing-downloads"
+        backgroundClass="bg-[#F5F5F7]"
+      />
+
+      {/* 4. Our Business Ecosystem — 3 Separate Ticker Categories (Ventures, Clients, Platforms) */}
       <EcosystemSection onNavigate={onNavigate} />
 
       {/* 5. Explore Our Ventures — Architectural Liquid Glass Composition */}
@@ -577,31 +504,46 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
         </div>
       </section>
 
-      {/* 7. Featured Products & Platforms (All 7 Verticals Gateways) */}
+      {/* 7. Flagship Operating Divisions & Direct Gateways */}
       <section className="py-20 lg:py-28 bg-[#FFFFFF] border-t border-[#E8E8ED]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <EditorialReveal>
-            <div className="max-w-2xl space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-                Featured Products &amp; Platforms
-              </p>
-              <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.025em] text-[#1D1D1F] text-balance">
-                Direct Gateways Across All Seven Verticals.
-              </h2>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div className="max-w-2xl space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
+                  AKYIN Group Divisions
+                </p>
+                <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.025em] text-[#1D1D1F] text-balance">
+                  Direct Gateways Across Core Operating Ventures.
+                </h2>
+                <p className="text-sm sm:text-base text-[#6E6E73]">
+                  Direct access to AKYIN’s owned and operated business divisions across publishing, full-service marketing, automotive dealership growth, and fashion retail.
+                </p>
+              </div>
+              <a
+                href="#our-clients"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('our-clients')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                className="group inline-flex items-center gap-2 text-sm font-semibold text-[#0071E3] hover:underline transition-colors cursor-pointer whitespace-nowrap"
+              >
+                <span>View Our 58 Clients Directory →</span>
+              </a>
             </div>
           </EditorialReveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {/* 1. Publishing */}
             <EditorialReveal delay={0} className="h-full">
-              <GlassCard interactive className="h-full group rounded-3xl p-6 flex flex-col justify-between space-y-5">
+              <GlassCard interactive className="h-full group rounded-3xl p-6 flex flex-col justify-between space-y-5 bg-[#FFFFFF] border border-[#E8E8ED]">
                 <div className="space-y-2.5">
-                  <p className="text-xs font-semibold text-[#0071E3]">Publishing · 5 Books</p>
+                  <p className="text-xs font-semibold text-[#0071E3]">Publishing · Amazon &amp; Google</p>
                   <h3 className="font-editorial text-lg font-bold text-[#1D1D1F]">
                     AKYIN Publishing
                   </h3>
                   <p className="text-xs text-[#6E6E73] leading-relaxed">
-                    Five published titles on Amazon—including <span className="font-semibold text-[#1D1D1F]">The Discipline Code</span>, <span className="font-semibold text-[#1D1D1F]">The Reset Code</span>, and <span className="font-semibold text-[#1D1D1F]">The Wealth Trap</span>.
+                    Eight published titles on Amazon and digital productivity guides—including <span className="font-semibold text-[#1D1D1F]">The Discipline Code</span>, <span className="font-semibold text-[#1D1D1F]">The Reset Code</span>, and <span className="font-semibold text-[#1D1D1F]">The Wealth Trap</span>.
                   </p>
                 </div>
                 <div className="pt-3 border-t border-[#1D1D1F]/8 flex items-center justify-between gap-2">
@@ -628,17 +570,17 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
 
             {/* 2. Marketing Agency */}
             <EditorialReveal delay={0.05} className="h-full">
-              <GlassCard interactive className="h-full group rounded-3xl p-6 flex flex-col justify-between space-y-5">
+              <GlassCard interactive className="h-full group rounded-3xl p-6 flex flex-col justify-between space-y-5 bg-[#FFFFFF] border border-[#E8E8ED]">
                 <div className="space-y-2.5">
-                  <p className="text-xs font-semibold text-[#6E6E73]">Marketing Agency</p>
+                  <p className="text-xs font-semibold text-[#0071E3]">Marketing Agency</p>
                   <h3 className="font-display text-lg font-bold text-[#1D1D1F]">
                     AKYIN Marketing
                   </h3>
                   <p className="text-xs text-[#6E6E73] leading-relaxed">
-                    Full-service performance marketing, creative strategy, lead qualification, and commercial sales training.
+                    Full-service performance marketing, creative strategy, lead qualification retainers, and sales training.
                   </p>
                 </div>
-                <div className="pt-3 border-t border-[#1D1D1F]/8">
+                <div className="pt-3 border-t border-[#1D1D1F]/8 flex items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => onNavigate('/ventures/marketing')}
@@ -647,20 +589,52 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
                     <span>Explore Agency</span>
                     <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('/pricing')}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#0071E3] hover:underline cursor-pointer"
+                  >
+                    <span>Pricing</span>
+                  </button>
                 </div>
               </GlassCard>
             </EditorialReveal>
 
-            {/* 3. Store / Thrift */}
+            {/* 3. Automotive Marketing Division */}
             <EditorialReveal delay={0.1} className="h-full">
-              <GlassCard interactive className="h-full group rounded-3xl p-6 flex flex-col justify-between space-y-5">
+              <GlassCard interactive className="h-full group rounded-3xl p-6 flex flex-col justify-between space-y-5 bg-[#FFFFFF] border border-[#E8E8ED]">
+                <div className="space-y-2.5">
+                  <p className="text-xs font-semibold text-[#34C759]">Dealership Specialists</p>
+                  <h3 className="font-display text-lg font-bold text-[#1D1D1F]">
+                    Automotive Division
+                  </h3>
+                  <p className="text-xs text-[#6E6E73] leading-relaxed">
+                    Specialized automotive dealership marketing, qualified test-drive leads, model campaigns, and showroom sales coaching.
+                  </p>
+                </div>
+                <div className="pt-3 border-t border-[#1D1D1F]/8">
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('/marketing/automotive')}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline cursor-pointer"
+                  >
+                    <span>Dealership Growth</span>
+                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  </button>
+                </div>
+              </GlassCard>
+            </EditorialReveal>
+
+            {/* 4. Store / Thrift */}
+            <EditorialReveal delay={0.15} className="h-full">
+              <GlassCard interactive className="h-full group rounded-3xl p-6 flex flex-col justify-between space-y-5 bg-[#FFFFFF] border border-[#E8E8ED]">
                 <div className="space-y-2.5">
                   <p className="text-xs font-semibold text-[#6E6E73]">Fashion Retail</p>
                   <h3 className="font-display text-lg font-bold text-[#1D1D1F]">
-                    AKYIN Thrift
+                    AKYIN Store · Thrift
                   </h3>
                   <p className="text-xs text-[#6E6E73] leading-relaxed">
-                    Fashionable men’s and women’s clothing at exceptional discounted prices.
+                    Curated fashion sub-brand offering men’s and women’s apparel at exceptional discounted value.
                   </p>
                 </div>
                 <div className="pt-3 border-t border-[#1D1D1F]/8">
@@ -675,126 +649,29 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
                 </div>
               </GlassCard>
             </EditorialReveal>
+          </div>
 
-            {/* 4. AICalc */}
-            <EditorialReveal delay={0.15} className="h-full">
-              <GlassCard interactive className="h-full group rounded-3xl p-6 flex flex-col justify-between space-y-5">
-                <div className="space-y-2.5">
-                  <p className="text-xs font-semibold text-[#6E6E73]">Technology</p>
-                  <h3 className="font-display text-lg font-bold text-[#1D1D1F]">
-                    AICalc.in
-                  </h3>
-                  <p className="text-xs text-[#6E6E73] leading-relaxed">
-                    Natural-language AI calculation queries paired with manual calculator controls.
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-[#1D1D1F]/8">
-                  <a
-                    href={EXTERNAL_VERTICAL_URLS.aicalc}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline"
-                  >
-                    <span>Visit AICalc.in</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
-                  </a>
-                </div>
-              </GlassCard>
-            </EditorialReveal>
-
-            {/* 5. Kartigo */}
-            <EditorialReveal delay={0.05} className="h-full">
-              <GlassCard interactive className="h-full group rounded-3xl p-6 flex flex-col justify-between space-y-5">
-                <div className="space-y-2.5">
-                  <p className="text-xs font-semibold text-[#6E6E73]">B2B Supply</p>
-                  <h3 className="font-display text-lg font-bold text-[#1D1D1F]">
-                    Kartigo.online
-                  </h3>
-                  <p className="text-xs text-[#6E6E73] leading-relaxed">
-                    Dedicated B2B stock supply and wholesale commerce platform for businesses.
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-[#1D1D1F]/8">
-                  <a
-                    href={EXTERNAL_VERTICAL_URLS.kartigo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline"
-                  >
-                    <span>Explore Kartigo</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
-                  </a>
-                </div>
-              </GlassCard>
-            </EditorialReveal>
-
-            {/* 6. BizNXT */}
-            <EditorialReveal delay={0.1} className="h-full">
-              <GlassCard interactive className="h-full group rounded-3xl p-6 flex flex-col justify-between space-y-5">
-                <div className="space-y-2.5">
-                  <p className="text-xs font-semibold text-[#6E6E73]">Consulting</p>
-                  <h3 className="font-display text-lg font-bold text-[#1D1D1F]">
-                    BizNXT.online
-                  </h3>
-                  <p className="text-xs text-[#6E6E73] leading-relaxed">
-                    Business guidance and consulting helping entrepreneurs make informed decisions.
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-[#1D1D1F]/8 flex items-center justify-between gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onNavigate('/ventures/biznxt')}
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline cursor-pointer"
-                  >
-                    <span>Overview</span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-                  </button>
-                  <a
-                    href={EXTERNAL_VERTICAL_URLS.biznxt}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#6E6E73] hover:text-[#1D1D1F]"
-                  >
-                    <span>biznxt.online</span>
-                    <ArrowUpRight className="w-3 h-3" aria-hidden="true" />
-                  </a>
-                </div>
-              </GlassCard>
-            </EditorialReveal>
-
-            {/* 7. Budget Bazaar */}
-            <EditorialReveal delay={0.15} className="h-full sm:col-span-2 lg:col-span-2">
-              <GlassCard interactive className="h-full group rounded-3xl p-6 flex flex-col justify-between space-y-5">
-                <div className="space-y-2.5">
-                  <p className="text-xs font-semibold text-[#6E6E73]">Affordable Retail</p>
-                  <h3 className="font-display text-lg font-bold text-[#1D1D1F]">
-                    Budget Bazaar (budgetbazaar.org)
-                  </h3>
-                  <p className="text-xs text-[#6E6E73] leading-relaxed max-w-xl">
-                    Value-oriented retail storefront bringing affordable household goods and everyday essentials directly to budget-conscious shoppers.
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-[#1D1D1F]/8 flex flex-wrap items-center justify-between gap-4">
-                  <button
-                    type="button"
-                    onClick={() => onNavigate('/ventures/budget-bazaar')}
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline cursor-pointer"
-                  >
-                    <span>Explore Budget Bazaar</span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-                  </button>
-                  <a
-                    href={EXTERNAL_VERTICAL_URLS.budgetBazaar}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#6E6E73] hover:text-[#1D1D1F]"
-                  >
-                    <span>Visit budgetbazaar.org</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
-                  </a>
-                </div>
-              </GlassCard>
-            </EditorialReveal>
+          {/* Client Relationship Banner Callout */}
+          <div className="p-6 rounded-2xl bg-[#F5F5F7] border border-[#E8E8ED] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="space-y-1 text-center sm:text-left">
+              <p className="text-sm font-semibold text-[#1D1D1F]">
+                Looking for Client Platforms &amp; Independent Businesses?
+              </p>
+              <p className="text-xs text-[#6E6E73]">
+                AICalc, Kartigo, BizNXT, Budget Bazaar, and our partner portfolio are featured under Our Clients.
+              </p>
+            </div>
+            <a
+              href="#our-clients"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('our-clients')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#1D1D1F] text-[#FFFFFF] hover:bg-[#0071E3] transition-colors cursor-pointer shrink-0"
+            >
+              <span>Explore Our Clients (58+)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </a>
           </div>
         </div>
       </section>
@@ -803,20 +680,41 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
       <section className="py-12 surface-silver-gradient border-t border-[#E8E8ED]">
         <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.06em] text-[#6E6E73]">
-              Connect Across Social Platforms · @akyinmarketing
+            <p className="text-xs font-semibold uppercase tracking-[0.06em] text-[#0071E3]">
+              Follow AKYIN · Official Channels
             </p>
             <h3 className="font-display text-xl font-bold text-[#1D1D1F] mt-1">
-              Follow Our Official Channels
+              Connect Across Platforms
             </h3>
           </div>
           <SocialLinks variant="inline" />
         </EditorialReveal>
       </section>
 
-      {/* Automotive & B2B Client Success Stories Carousel */}
+      {/* Ethical FOMO & Configurable Consultation Availability Proof */}
+      <EthicalGrowthProofSection
+        onNavigate={onNavigate}
+        onJumpToConsultationWidget={() => jumpToWidgetTab('booking')}
+        onJumpToLeadWidget={() => jumpToWidgetTab('enquiry')}
+        backgroundClass="bg-[#FFFFFF]"
+      />
+
+      {/* Interactive Business Toolkit (ROI, Budget Planner, Assessment, Service Finder, Enquiry, Booking) */}
+      <InteractiveBusinessWidgets
+        sectionId="business-growth-tools"
+        onNavigate={onNavigate}
+        activeTab={widgetTab}
+        onTabChange={setWidgetTab}
+        backgroundClass="surface-silver-gradient"
+      />
+
+      {/* Automotive & Business Client Success Carousel */}
       <EditorialReveal>
-        <SuccessStoriesCarousel onNavigate={onNavigate} />
+        <ClientSuccessCarousel
+          onNavigate={onNavigate}
+          defaultSegment="all"
+          backgroundClass="bg-[#FFFFFF]"
+        />
       </EditorialReveal>
 
       {/* 8. Customer & Client Endorsements — Verified Reviews across AKYIN Ventures */}
@@ -887,8 +785,8 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
                 connect@akyin.com
               </a>
               <span aria-hidden="true">·</span>
-              <a href="tel:+916305694011" className="font-mono-num font-semibold text-[#1D1D1F] hover:underline">
-                +91-6305694011
+              <a href="tel:+916395694011" className="font-mono-num font-semibold text-[#1D1D1F] hover:underline">
+                +91 63956 94011
               </a>
               <span aria-hidden="true">·</span>
               <a
@@ -930,6 +828,12 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
           </div>
         </div>
       </section>
+
+      {/* International Service Availability (India & UAE) */}
+      <InternationalAvailabilitySection onNavigate={onNavigate} />
+
+      {/* Direct Contact Section */}
+      <DirectContactSection onNavigate={onNavigate} />
     </div>
   );
 }

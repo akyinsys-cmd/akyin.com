@@ -17,7 +17,7 @@
 
 ## Operating Verticals
 
-- [AKYIN Publishing](https://akyin.com/ventures/publishing): Independent book publishing featuring five titles on Amazon (*The Discipline Code*, *BIOPIC OF LOSER*, *The Scroll Recovery Plan*, *The Wealth Trap*, *The Reset Code*) and Google Play Books.
+- [AKYIN Publishing](https://akyin.com/ventures/publishing): Independent publishing featuring eight Amazon books (*The Discipline Code*, *BIOPIC OF LOSER*, *The Scroll Recovery Plan*, *The Wealth Trap*, *The Reset Code*, *The Discipline Reset*, *The Overthinking Reset*, *The Dopamine Reset Code*), three Gumroad digital productivity kits (*ATS Resume Kit*, *The Scroll Recovery Plan*, *The Money OS*), Google Play Books, and Pinterest.
 - [AKYIN MARKETINGS (Marketing Agency)](https://akyin.com/ventures/marketing): 18-service performance marketing, AI-assisted enquiry qualification, creative production, and sales team coaching.
 - [AKYIN Automotive Marketing Division](https://akyin.com/marketing/automotive): Specialized 16-service growth engine for car dealerships, lead density mapping, ROI calculators, and showroom sales training.
 - [AKYIN Store · AKYIN THRIFT](https://akyin.com/ventures/store): Curated men's and women's discounted fashion apparel retail.
@@ -36,7 +36,8 @@
 ## Official Contact & Agent Endpoints
 
 - **Email**: mailto:connect@akyin.com
-- **Phone / WhatsApp**: tel:+916305694011 (`+91-6305694011`)
-- **Social Channels (`@akyinmarketing`)**: Instagram, Facebook, X, YouTube
+- **Phone**: tel:+916395694011 (`+91 63956 94011`)
+- **Service Availability**: INDIA | UAE (Serving businesses across India and the UAE)
+- **Follow AKYIN**: Facebook, YouTube, Instagram, WhatsApp Channel
 - **MCP Server Card**: https://akyin.com/.well-known/mcp/server-card.json
 - **Robots & Content Signals**: https://akyin.com/robots.txt (`search=yes, ai-input=yes, ai-train=no`)

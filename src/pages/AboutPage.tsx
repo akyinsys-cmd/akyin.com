@@ -3,6 +3,7 @@ import { AppRoute, IMAGES, VENTURES_PORTFOLIO } from '../data/akyinData';
 import { BusinessFAQs } from '../components/BusinessFAQs';
 import { EditorialReveal } from '../components/EditorialReveal';
 import { InteractiveTimeline } from '../components/InteractiveTimeline';
+import { LeadershipSection } from '../components/LeadershipSection';
 import { GlassButton, GlassImageFrame } from '../components/liquid-glass';
 import { ResilientImage } from '../components/ResilientImage';
 
@@ -78,6 +79,9 @@ export function AboutPage({ onNavigate }: AboutPageProps) {
           </div>
         </EditorialReveal>
       </section>
+
+      {/* Our Leadership */}
+      <LeadershipSection onNavigate={onNavigate} />
 
       {/* Interactive Growth Milestones Timeline */}
       <section

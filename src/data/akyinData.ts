@@ -84,36 +84,47 @@ export interface RateCardItem {
 
 export const OFFICIAL_CONTACT = {
   parentBrand: 'AKYIN VENTURES',
+  contactName: 'Shaikh Nazir',
   domain: 'https://akyin.com',
+  websiteLabel: 'akyin.com',
   email: 'connect@akyin.com',
-  phoneDisplay: '+91-6305694011',
-  whatsappNumber: '916305694011',
-  whatsappUrl: 'https://wa.me/916305694011',
-  marketingSocialHandle: '@akyinmarketing',
+  phoneDisplay: '+91 63956 94011',
+  phoneHref: 'tel:+916395694011',
+  whatsappNumber: '916395694011',
+  whatsappChannelUrl: 'https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U',
+  whatsappUrl: 'https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U',
+  internationalPositioning: 'Building Businesses. Creating Opportunities.',
+  internationalSupportLine: 'Serving businesses across India and the UAE.',
+  regionIndicator: 'INDIA 🇮🇳 | UAE 🇦🇪',
+  marketingSocialHandle: '@akyinventures',
   marketingSocials: [
-    {
-      id: 'instagram',
-      name: 'Instagram',
-      url: 'https://www.instagram.com/akyinmarketing/',
-      handle: '@akyinmarketing',
-    },
     {
       id: 'facebook',
       name: 'Facebook',
-      url: 'https://www.facebook.com/akyinmarketing/',
-      handle: '@akyinmarketing',
-    },
-    {
-      id: 'x',
-      name: 'X',
-      url: 'https://x.com/akyinmarketing',
-      handle: '@akyinmarketing',
+      displayLabel: 'Facebook – Follow AKYIN',
+      url: 'https://www.facebook.com/profile.php?id=61595204474890',
+      handle: 'Follow AKYIN',
     },
     {
       id: 'youtube',
       name: 'YouTube',
-      url: 'https://www.youtube.com/@akyinmarketing',
-      handle: '@akyinmarketing',
+      displayLabel: 'YouTube – Subscribe to AKYIN Marketing',
+      url: 'https://youtube.com/@akyinmarketing?si=hgB_tEfczt79H7wW',
+      handle: 'Subscribe to AKYIN Marketing',
+    },
+    {
+      id: 'instagram',
+      name: 'Instagram',
+      displayLabel: 'Instagram – Follow AKYIN Ventures',
+      url: 'https://www.instagram.com/akyinventures/',
+      handle: 'Follow AKYIN Ventures',
+    },
+    {
+      id: 'whatsapp',
+      name: 'WhatsApp',
+      displayLabel: 'WhatsApp – Join AKYIN Updates',
+      url: 'https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U',
+      handle: 'Join AKYIN Updates',
     },
   ],
 } as const;
@@ -131,11 +142,24 @@ export interface PublishedBook {
   marketplaceLabel: string;
 }
 
+export interface DigitalProduct {
+  id: string;
+  number: string;
+  title: string;
+  shortTitle: string;
+  description: string;
+  gumroadUrl: string;
+  coverImage: string;
+  coverAlt: string;
+  platformLabel: string;
+}
+
 export const PUBLISHING_LINKS = {
   amazonAuthorStore:
     'https://www.amazon.com/stores/Akyin-S/author/B0H6SY7N3T?_encoding=UTF8&pd_rd_w=r7GRE&content-id=amzn1.sym.7e190e19-9f6f-4df8-807a-5a7608594741&pd_rd_wg=EdC74&pd_rd_r=d01ba7b6-b1c7-4bd2-87fb-cbd0fc9deddb&ref=ap_rdr&shoppingPortalEnabled=true&ccs_id=98bb1963-9c8a-4dab-9f1b-d21a6f908208',
   googlePlayDisciplineCode:
     'https://play.google.com/store/books/details/Akyin_s_THE_DISCIPLINE_CODE?id=seHuEQAAQBAJ',
+  pinterest: 'https://pin.it/1R8DhimEe',
 } as const;
 
 export const PUBLISHING_BOOKS: PublishedBook[] = [
@@ -202,6 +226,84 @@ export const PUBLISHING_BOOKS: PublishedBook[] = [
     coverImage: '/assets/books/the-reset-code.jpg',
     coverAlt: 'Official Amazon book cover of The Reset Code by AKYIN S.',
     marketplaceLabel: 'Amazon · Kindle Edition',
+  },
+  {
+    id: 'book-discipline-reset',
+    number: '06',
+    title: 'THE DISCIPLINE RESET',
+    subtitle:
+      'Break Bad Habits, Beat Distractions, Build Self-Discipline, and Achieve Consistent Success',
+    author: 'Akyin S.',
+    amazonUrl: 'https://a.co/d/02kzLiOu',
+    asin: 'B0H4X1BPH7',
+    coverImage: '/assets/books/the-discipline-reset.jpg',
+    coverAlt: 'Official Amazon book cover of The Discipline Reset by Akyin S.',
+    marketplaceLabel: 'Amazon · Kindle Edition',
+  },
+  {
+    id: 'book-overthinking-reset',
+    number: '07',
+    title: 'THE OVERTHINKING RESET',
+    subtitle:
+      'Why Intelligent People Overthink, the Invisible Damage It Causes, and How to Break the First Mental Illusion',
+    author: 'Akyin S.',
+    amazonUrl: 'https://a.co/d/0atu9L9M',
+    asin: 'B0GY8NZGKB',
+    coverImage: '/assets/books/the-overthinking-reset.jpg',
+    coverAlt: 'Official Amazon book cover of The Overthinking Reset by Akyin S.',
+    marketplaceLabel: 'Amazon · Kindle Edition',
+  },
+  {
+    id: 'book-dopamine-reset-code',
+    number: '08',
+    title: 'The Dopamine Reset Code',
+    subtitle:
+      'Break Phone Addiction, Rewire Your Brain, Build Laser Focus, and Reclaim Your Productivity in 30 Days',
+    author: 'Akyin S.',
+    amazonUrl: 'https://a.co/d/0c9NrwA7',
+    asin: 'B0H7M6R3RH',
+    coverImage: '/assets/books/the-dopamine-reset-code.jpg',
+    coverAlt: 'Official Amazon book cover of The Dopamine Reset Code by Akyin S.',
+    marketplaceLabel: 'Amazon · Kindle Edition',
+  },
+];
+
+export const GUMROAD_DIGITAL_PRODUCTS: DigitalProduct[] = [
+  {
+    id: 'digital-ats-resume-kit',
+    number: '01',
+    title: 'India ATS Resume & Job Search Kit',
+    shortTitle: 'ATS Resume Kit',
+    description:
+      'Land your next opportunity with a smarter job-search system. The India ATS Resume & Job Search Kit by Akyin is a complete digital career toolkit.',
+    gumroadUrl: 'https://akyinspire.gumroad.com/l/atsresumekit',
+    coverImage: '/assets/digital-products/ats-resume-kit.png',
+    coverAlt: 'Official cover artwork for India ATS Resume & Job Search Kit on Gumroad',
+    platformLabel: 'Gumroad · Digital Career Toolkit',
+  },
+  {
+    id: 'digital-scroll-recovery-plan',
+    number: '02',
+    title: 'THE SCROLL RECOVERY PLAN',
+    shortTitle: 'The Scroll Recovery Plan',
+    description:
+      'A 30-Day System to Stop Doomscrolling, Rebuild Focus, and Take Back Your Time.',
+    gumroadUrl: 'https://akyinspire.gumroad.com/l/THESCROLLRECOVERYPLAN?wanted=true',
+    coverImage: '/assets/digital-products/scroll-recovery-plan.png',
+    coverAlt: 'Official cover artwork for The Scroll Recovery Plan digital guide on Gumroad',
+    platformLabel: 'Gumroad · 30-Day Focus System',
+  },
+  {
+    id: 'digital-money-os',
+    number: '03',
+    title: 'THE MONEY OS™ | Complete Personal Finance Planner & Budgeting System',
+    shortTitle: 'The Money OS',
+    description:
+      'Take control of your money with a system you’ll actually use. THE MONEY OS™ is a practical personal finance planner designed to organize your personal finances.',
+    gumroadUrl: 'https://akyinspire.gumroad.com/l/the-money-os?wanted=true',
+    coverImage: '/assets/digital-products/the-money-os.png',
+    coverAlt: 'Official cover artwork for THE MONEY OS Complete Personal Finance Planner on Gumroad',
+    platformLabel: 'Gumroad · Personal Finance OS',
   },
 ];
 
@@ -274,66 +376,6 @@ export const VENTURES_PORTFOLIO: VentureOverview[] = [
     image: IMAGES.thriftHero,
     imageAlt: 'Tailored monochrome jacket on brushed titanium hanger with AKYIN metal tag',
   },
-  {
-    id: 'aicalc',
-    code: '04',
-    name: 'AICalc.in',
-    shortName: 'AICalc',
-    route: '/ventures/aicalc',
-    sector: 'AI Utility & Calculator Technology',
-    positioning: 'Smart Calculations. Powered by AI.',
-    description:
-      'Independent web platform enabling users to solve mathematical and practical calculation problems using natural-language queries alongside traditional calculator functions.',
-    externalUrl: EXTERNAL_VERTICAL_URLS.aicalc,
-    externalLabel: 'aicalc.in',
-    image: IMAGES.aicalcWorkspace,
-    imageAlt: 'Frosted liquid-glass smart calculator hardware tablet with AKYIN engraved emblem',
-  },
-  {
-    id: 'kartigo',
-    code: '05',
-    name: 'Kartigo.online',
-    shortName: 'Kartigo',
-    route: '/ventures/kartigo',
-    sector: 'B2B Stock Supply & Commerce',
-    positioning: 'Connecting Businesses With Stock Opportunities.',
-    description:
-      'Dedicated B2B-oriented stock supply platform designed to support business buyers and wholesale stock suppliers within a structured commercial environment.',
-    externalUrl: EXTERNAL_VERTICAL_URLS.kartigo,
-    externalLabel: 'kartigo.online',
-    image: IMAGES.kartigoWarehouse,
-    imageAlt: 'Modular frosted-glass and brushed titanium supply cubes stamped with AKYIN emblem',
-  },
-  {
-    id: 'biznxt',
-    code: '06',
-    name: 'BizNXT.online',
-    shortName: 'BizNXT',
-    route: '/ventures/biznxt',
-    sector: 'Business Guidance & Consulting',
-    positioning: 'Business Clarity. Smarter Decisions. Better Direction.',
-    description:
-      'BizNXT focuses on business guidance, consulting and helping entrepreneurs explore business opportunities and make informed business decisions.',
-    externalUrl: EXTERNAL_VERTICAL_URLS.biznxt,
-    externalLabel: 'biznxt.online',
-    image: IMAGES.biznxtConsulting,
-    imageAlt: 'Crystal compass, matte black chess rook, and brushed aluminum tablet with AKYIN emblem',
-  },
-  {
-    id: 'budget-bazaar',
-    code: '07',
-    name: 'Budget Bazaar',
-    shortName: 'Budget Bazaar',
-    route: '/ventures/budget-bazaar',
-    sector: 'Affordable Retail & Everyday Goods',
-    positioning: 'Everyday Essentials. Value-First Retail.',
-    description:
-      'Value-driven consumer retail venture offering practical everyday essentials, household goods, and affordable lifestyle products through budgetbazaar.org.',
-    externalUrl: EXTERNAL_VERTICAL_URLS.budgetBazaar,
-    externalLabel: 'budgetbazaar.org',
-    image: IMAGES.budgetBazaarRetail,
-    imageAlt: 'Isolated pearl-grey canvas tote, frosted canisters, and aluminum bottle with AKYIN tag',
-  },
 ];
 
 export interface EcosystemBrandEntry {
@@ -341,7 +383,7 @@ export interface EcosystemBrandEntry {
   name: string;
   relationshipLabel: string;
   category: 'venture' | 'client' | 'platform';
-  iconKey?: 'amazon' | 'google-play' | 'shopify' | 'instagram' | 'facebook' | 'x' | 'youtube';
+  iconKey?: 'amazon' | 'google-play' | 'shopify' | 'instagram' | 'facebook' | 'youtube' | 'whatsapp';
   externalUrl?: string;
   internalRoute?: AppRoute;
   wordmarkStyle?: 'serif' | 'sans' | 'mono';
@@ -382,51 +424,88 @@ export const ECOSYSTEM_VENTURES_TICKER: EcosystemBrandEntry[] = [
     internalRoute: '/ventures/store',
     wordmarkStyle: 'sans',
   },
-  {
-    id: 'eco-budget-bazaar',
-    name: 'Budget Bazaar',
-    relationshipLabel: 'AKYIN Venture',
-    category: 'venture',
-    externalUrl: EXTERNAL_VERTICAL_URLS.budgetBazaar,
-    internalRoute: '/ventures/budget-bazaar',
-    wordmarkStyle: 'sans',
-  },
+];
+
+export const ECOSYSTEM_CLIENTS_TICKER: EcosystemBrandEntry[] = [
   {
     id: 'eco-aicalc',
     name: 'AICalc',
-    relationshipLabel: 'AKYIN Venture',
-    category: 'venture',
-    externalUrl: EXTERNAL_VERTICAL_URLS.aicalc,
+    relationshipLabel: 'Client',
+    category: 'client',
+    externalUrl: 'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/aicalc',
     internalRoute: '/ventures/aicalc',
     wordmarkStyle: 'mono',
   },
   {
     id: 'eco-kartigo',
     name: 'Kartigo',
-    relationshipLabel: 'AKYIN Venture',
-    category: 'venture',
-    externalUrl: EXTERNAL_VERTICAL_URLS.kartigo,
+    relationshipLabel: 'Client',
+    category: 'client',
+    externalUrl: 'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/kartigo',
     internalRoute: '/ventures/kartigo',
     wordmarkStyle: 'sans',
   },
   {
     id: 'eco-biznxt',
     name: 'BizNXT',
-    relationshipLabel: 'AKYIN Venture',
-    category: 'venture',
-    externalUrl: EXTERNAL_VERTICAL_URLS.biznxt,
+    relationshipLabel: 'Client',
+    category: 'client',
+    externalUrl: 'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/biznxt',
     internalRoute: '/ventures/biznxt',
     wordmarkStyle: 'sans',
   },
+  {
+    id: 'eco-budget-bazaar',
+    name: 'Budget Bazaar',
+    relationshipLabel: 'Client',
+    category: 'client',
+    externalUrl: 'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/budget-bazaar',
+    internalRoute: '/ventures/budget-bazaar',
+    wordmarkStyle: 'sans',
+  },
+  {
+    id: 'eco-autoclub',
+    name: 'AutoClub',
+    relationshipLabel: 'Client',
+    category: 'client',
+    wordmarkStyle: 'sans',
+  },
+  {
+    id: 'eco-arosco',
+    name: 'Arosco Ventures',
+    relationshipLabel: 'Client',
+    category: 'client',
+    wordmarkStyle: 'sans',
+  },
+  {
+    id: 'eco-mei-cosmetics',
+    name: 'MEI Cosmetics',
+    relationshipLabel: 'Client',
+    category: 'client',
+    wordmarkStyle: 'serif',
+  },
+  {
+    id: 'eco-krutika-cosmetics',
+    name: 'Krutika Cosmetics',
+    relationshipLabel: 'Client',
+    category: 'client',
+    wordmarkStyle: 'serif',
+  },
+  {
+    id: 'eco-nyika-traders',
+    name: 'Nyika Traders',
+    relationshipLabel: 'Client',
+    category: 'client',
+    wordmarkStyle: 'sans',
+  },
+  {
+    id: 'eco-ns-traders',
+    name: 'NS Traders',
+    relationshipLabel: 'Client',
+    category: 'client',
+    wordmarkStyle: 'sans',
+  },
 ];
-
-export const ECOSYSTEM_CLIENT: EcosystemBrandEntry = {
-  id: 'eco-autoclub',
-  name: 'AutoClub',
-  relationshipLabel: 'Client',
-  category: 'client',
-  wordmarkStyle: 'sans',
-};
 
 export const ECOSYSTEM_PLATFORMS_TICKER: EcosystemBrandEntry[] = [
   {
@@ -454,42 +533,44 @@ export const ECOSYSTEM_PLATFORMS_TICKER: EcosystemBrandEntry[] = [
     externalUrl: 'https://www.shopify.com',
   },
   {
-    id: 'eco-instagram',
-    name: 'Instagram',
-    relationshipLabel: 'Social media channel',
-    category: 'platform',
-    iconKey: 'instagram',
-    externalUrl: 'https://www.instagram.com/akyinmarketing/',
-  },
-  {
     id: 'eco-facebook',
     name: 'Facebook',
-    relationshipLabel: 'Social media channel',
+    relationshipLabel: 'Follow AKYIN',
     category: 'platform',
     iconKey: 'facebook',
-    externalUrl: 'https://www.facebook.com/akyinmarketing/',
-  },
-  {
-    id: 'eco-x',
-    name: 'X',
-    relationshipLabel: 'Social media channel',
-    category: 'platform',
-    iconKey: 'x',
-    externalUrl: 'https://x.com/akyinmarketing',
+    externalUrl: 'https://www.facebook.com/profile.php?id=61595204474890',
   },
   {
     id: 'eco-youtube',
     name: 'YouTube',
-    relationshipLabel: 'Video publishing and social media channel',
+    relationshipLabel: 'Subscribe to AKYIN Marketing',
     category: 'platform',
     iconKey: 'youtube',
-    externalUrl: 'https://www.youtube.com/@akyinmarketing',
+    externalUrl: 'https://youtube.com/@akyinmarketing?si=hgB_tEfczt79H7wW',
+  },
+  {
+    id: 'eco-instagram',
+    name: 'Instagram',
+    relationshipLabel: 'Follow AKYIN Ventures',
+    category: 'platform',
+    iconKey: 'instagram',
+    externalUrl: 'https://www.instagram.com/akyinventures/',
+  },
+  {
+    id: 'eco-whatsapp-channel',
+    name: 'WhatsApp Channel',
+    relationshipLabel: 'Join AKYIN Updates',
+    category: 'platform',
+    iconKey: 'whatsapp',
+    externalUrl: 'https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U',
   },
 ];
 
+export const ECOSYSTEM_CLIENT: EcosystemBrandEntry = ECOSYSTEM_CLIENTS_TICKER[4]; // AutoClub
+
 export const FULL_ECOSYSTEM_TICKER: EcosystemBrandEntry[] = [
   ...ECOSYSTEM_VENTURES_TICKER,
-  ECOSYSTEM_CLIENT,
+  ...ECOSYSTEM_CLIENTS_TICKER,
   ...ECOSYSTEM_PLATFORMS_TICKER,
 ];
 
@@ -1138,3 +1219,183 @@ export const ENQUIRY_TYPE_OPTIONS: string[] = [
   'Budget Bazaar Retail & Product Enquiry',
   'Strategic Business Partnership',
 ];
+
+export interface LeadershipMember {
+  id: string;
+  name: string;
+  title: string;
+  divisionFocus: string;
+  experienceLabel: string;
+  expertise: string;
+  headshot: string;
+  headshotAlt: string;
+  route: AppRoute;
+  ctaLabel: string;
+}
+
+export const LEADERSHIP_TEAM: LeadershipMember[] = [
+  {
+    id: 'leader-akyin',
+    name: 'Akyin S.',
+    title: 'Founder & Managing Director',
+    divisionFocus: 'AKYIN Ventures · Publishing & Advisory',
+    experienceLabel: '16+ Years Commercial Pedigree',
+    expertise:
+      'Directs corporate strategy across all seven AKYIN Ventures divisions, authors five books including The Discipline Code, and brings 16 years of automotive and commercial sales leadership spanning Maruti Suzuki to Audi.',
+    headshot: '/src/assets/images/leadership_founder_1795529855952.jpg',
+    headshotAlt: 'Studio corporate portrait of Akyin S., Founder and Managing Director at AKYIN Ventures',
+    route: '/advisory',
+    ctaLabel: 'Business Advisory',
+  },
+  {
+    id: 'leader-arjun',
+    name: 'Arjun Kulkarni',
+    title: 'Director, Automotive Growth & Training',
+    divisionFocus: 'AKYIN MARKETINGS · Dealership Division',
+    experienceLabel: 'Multi-Brand Showroom Strategy',
+    expertise:
+      'Architects high-intent Meta and Google Search dealership lead engines, showroom test-drive conversion campaigns, and on-site sales executive training workshops across partner dealership networks.',
+    headshot: '/src/assets/images/leadership_automotive_director_1795529855874.jpg',
+    headshotAlt:
+      'Studio corporate portrait of Arjun Kulkarni, Director of Automotive Growth and Sales Enablement',
+    route: '/marketing/automotive',
+    ctaLabel: 'Automotive Marketing',
+  },
+  {
+    id: 'leader-meera',
+    name: 'Meera Subramanian',
+    title: 'Head of Lead Qualification & Operations',
+    divisionFocus: 'Lead Filtering · AICalc.in & Kartigo Ops',
+    experienceLabel: 'AI-Assisted Vetting & Digital Systems',
+    expertise:
+      'Leads AKYIN’s strict two-tier AI and telephonic enquiry screening desk, daily CRM pipeline reporting, and operational execution connecting AICalc.in, Kartigo.online B2B trade, and consumer retail units.',
+    headshot: '/src/assets/images/leadership_performance_head_1795529856500.jpg',
+    headshotAlt:
+      'Studio corporate portrait of Meera Subramanian, Head of Lead Qualification and Ecosystem Operations',
+    route: '/ventures/marketing',
+    ctaLabel: 'Marketing Agency',
+  },
+];
+
+export interface ClientTestimonial {
+  id: string;
+  segment: 'automotive' | 'business';
+  verticalLabel: string;
+  metricValue: string;
+  metricLabel: string;
+  timeframe: string;
+  headline: string;
+  quote: string;
+  clientName: string;
+  role: string;
+  organization: string;
+  location: string;
+  route: AppRoute;
+  ctaLabel: string;
+}
+
+export const CLIENT_TESTIMONIALS: ClientTestimonial[] = [
+  {
+    id: 'cs-autoclub',
+    segment: 'automotive',
+    verticalLabel: 'Automotive Dealership Marketing',
+    metricValue: '+42%',
+    metricLabel: 'Test-Drive Completion Rate',
+    timeframe: 'Within 60 Days · 4 Showrooms',
+    headline: 'Separating Paid Meta Campaigns from Automated Buyer Vetting',
+    quote:
+      'By keeping Meta lead generation strictly separate from AKYIN’s automated WhatsApp and telephonic pre-qualification, our floor team stopped chasing cold clicks. Test-drive completions increased 42% across four branches in 60 days.',
+    clientName: 'Praveen Rajagopalan',
+    role: 'Managing Director',
+    organization: 'AutoClub Multi-Brand Showrooms',
+    location: 'Bengaluru, India',
+    route: '/marketing/automotive',
+    ctaLabel: 'Explore Automotive Marketing',
+  },
+  {
+    id: 'cs-crestline',
+    segment: 'automotive',
+    verticalLabel: 'Festive & Exchange Campaigns',
+    metricValue: '-38%',
+    metricLabel: 'Cost Per Qualified Lead',
+    timeframe: 'Q4 Festive Drive · 71% Show-Up',
+    headline: 'Showroom Footfall Surged Without Expanding Ad Waste',
+    quote:
+      'During our festive exchange carnival, AKYIN paired geo-fenced Search and Meta campaigns with rapid WhatsApp valuation workflows and sales coaching. Unqualified calls dropped sharply while weekend showroom walk-ins hit a seasonal high.',
+    clientName: 'Vikramaditya Rao',
+    role: 'Dealer Principal',
+    organization: 'Crestline Motors & Pre-Owned Hub',
+    location: 'Hyderabad, India',
+    route: '/marketing/automotive',
+    ctaLabel: 'View Dealership Funnel',
+  },
+  {
+    id: 'cs-auramobility',
+    segment: 'automotive',
+    verticalLabel: 'EV Retail & Local Search',
+    metricValue: '3.1x',
+    metricLabel: 'Faster Callback Response Time',
+    timeframe: 'Pune & Mumbai EV Showrooms',
+    headline: 'Turning High-Ticket EV Queries into Home Test Drives',
+    quote:
+      'Prospective EV buyers expect quick, technical clarity. AKYIN rebuilt our doorstep test-drive landing flows, Google Maps visibility, and daily target tracker—giving general managers real-time visibility from ad click to booking.',
+    clientName: 'Nikhil Deshmukh',
+    role: 'Head of Sales Operations',
+    organization: 'Aura EV & Luxury Mobility',
+    location: 'Pune & Mumbai, India',
+    route: '/marketing/automotive',
+    ctaLabel: 'Estimate Dealership ROI',
+  },
+  {
+    id: 'cs-apexretail',
+    segment: 'business',
+    verticalLabel: '1-on-1 Business Advisory',
+    metricValue: '4 Months',
+    metricLabel: 'Retail Unit-Economics Payback',
+    timeframe: 'Post-Advisory Store Launch',
+    headline: 'Pragmatic Commercial Clarity Before Signing New Leases',
+    quote:
+      'Our 1-on-1 Business Advisory session with AKYIN Ventures gave us an unvarnished audit of customer acquisition costs and working-capital buffers before we locked in a multi-year retail lease. It saved months of trial and error.',
+    clientName: 'Sunil Krishnamurthy',
+    role: 'Founder & CEO',
+    organization: 'Apex Retail Ventures',
+    location: 'Hyderabad, India',
+    route: '/advisory',
+    ctaLabel: 'Book Business Advisory',
+  },
+  {
+    id: 'cs-kartigo',
+    segment: 'business',
+    verticalLabel: 'B2B Stock Supply · Kartigo.online',
+    metricValue: '3.2x',
+    metricLabel: 'Wholesale Reorder Velocity',
+    timeframe: 'Regional B2B Trade Partner',
+    headline: 'Predictable Commercial Lot Sourcing Without Middleman Friction',
+    quote:
+      'Kartigo.online structured how our regional trade desk sources bulk inventory lots. Transparent unit pricing and verified stock availability cut our procurement turnaround time by more than half across repeat cycles.',
+    clientName: 'Ramesh Patel',
+    role: 'Wholesale Logistics Director',
+    organization: 'Gujarat Commercial Trade',
+    location: 'Ahmedabad, India',
+    route: '/ventures/kartigo',
+    ctaLabel: 'Explore Kartigo.online',
+  },
+  {
+    id: 'cs-biznxt',
+    segment: 'business',
+    verticalLabel: 'Growth Agency & BizNXT Advisory',
+    metricValue: '+28%',
+    metricLabel: 'B2B Pipeline Conversion Lift',
+    timeframe: 'Two-State Expansion Cohort',
+    headline: 'Aligning Digital Lead Quality with Frontline Sales Closing',
+    quote:
+      'Combining AKYIN MARKETINGS lead filtering with BizNXT expansion guidance transformed how our B2B sales consultants handled inbound corporate enquiries. Every callback started with verified budget and timeline context.',
+    clientName: 'Priya Nambiar',
+    role: 'Managing Partner',
+    organization: 'Apex Industrial & B2B Cohort',
+    location: 'Chennai, India',
+    route: '/ventures/marketing',
+    ctaLabel: 'Explore Marketing Agency',
+  },
+];
+

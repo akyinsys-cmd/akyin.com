@@ -11,43 +11,188 @@ import { z } from "zod";
 // src/data/akyinData.ts
 var OFFICIAL_CONTACT = {
   parentBrand: "AKYIN VENTURES",
+  contactName: "Shaikh Nazir",
   domain: "https://akyin.com",
+  websiteLabel: "akyin.com",
   email: "connect@akyin.com",
-  phoneDisplay: "+91-6305694011",
-  whatsappNumber: "916305694011",
-  whatsappUrl: "https://wa.me/916305694011",
-  marketingSocialHandle: "@akyinmarketing",
+  phoneDisplay: "+91 63956 94011",
+  phoneHref: "tel:+916395694011",
+  whatsappNumber: "916395694011",
+  whatsappChannelUrl: "https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U",
+  whatsappUrl: "https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U",
+  internationalPositioning: "Building Businesses. Creating Opportunities.",
+  internationalSupportLine: "Serving businesses across India and the UAE.",
+  regionIndicator: "INDIA \u{1F1EE}\u{1F1F3} | UAE \u{1F1E6}\u{1F1EA}",
+  marketingSocialHandle: "@akyinventures",
   marketingSocials: [
-    {
-      id: "instagram",
-      name: "Instagram",
-      url: "https://www.instagram.com/akyinmarketing/",
-      handle: "@akyinmarketing"
-    },
     {
       id: "facebook",
       name: "Facebook",
-      url: "https://www.facebook.com/akyinmarketing/",
-      handle: "@akyinmarketing"
-    },
-    {
-      id: "x",
-      name: "X",
-      url: "https://x.com/akyinmarketing",
-      handle: "@akyinmarketing"
+      displayLabel: "Facebook \u2013 Follow AKYIN",
+      url: "https://www.facebook.com/profile.php?id=61595204474890",
+      handle: "Follow AKYIN"
     },
     {
       id: "youtube",
       name: "YouTube",
-      url: "https://www.youtube.com/@akyinmarketing",
-      handle: "@akyinmarketing"
+      displayLabel: "YouTube \u2013 Subscribe to AKYIN Marketing",
+      url: "https://youtube.com/@akyinmarketing?si=hgB_tEfczt79H7wW",
+      handle: "Subscribe to AKYIN Marketing"
+    },
+    {
+      id: "instagram",
+      name: "Instagram",
+      displayLabel: "Instagram \u2013 Follow AKYIN Ventures",
+      url: "https://www.instagram.com/akyinventures/",
+      handle: "Follow AKYIN Ventures"
+    },
+    {
+      id: "whatsapp",
+      name: "WhatsApp",
+      displayLabel: "WhatsApp \u2013 Join AKYIN Updates",
+      url: "https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U",
+      handle: "Join AKYIN Updates"
     }
   ]
 };
 var PUBLISHING_LINKS = {
   amazonAuthorStore: "https://www.amazon.com/stores/Akyin-S/author/B0H6SY7N3T?_encoding=UTF8&pd_rd_w=r7GRE&content-id=amzn1.sym.7e190e19-9f6f-4df8-807a-5a7608594741&pd_rd_wg=EdC74&pd_rd_r=d01ba7b6-b1c7-4bd2-87fb-cbd0fc9deddb&ref=ap_rdr&shoppingPortalEnabled=true&ccs_id=98bb1963-9c8a-4dab-9f1b-d21a6f908208",
-  googlePlayDisciplineCode: "https://play.google.com/store/books/details/Akyin_s_THE_DISCIPLINE_CODE?id=seHuEQAAQBAJ"
+  googlePlayDisciplineCode: "https://play.google.com/store/books/details/Akyin_s_THE_DISCIPLINE_CODE?id=seHuEQAAQBAJ",
+  pinterest: "https://pin.it/1R8DhimEe"
 };
+var PUBLISHING_BOOKS = [
+  {
+    id: "book-discipline-code",
+    number: "01",
+    title: "The Discipline Code",
+    subtitle: "Master Your Mind. Build Unbreakable Habits. Win Every Day.",
+    author: "Akyin S.",
+    amazonUrl: "https://a.co/d/0ggfRzci",
+    asin: "B0H6R3BCQR",
+    coverImage: "/assets/books/the-discipline-code.jpg",
+    coverAlt: "Official Amazon book cover of The Discipline Code by Akyin S.",
+    marketplaceLabel: "Amazon \xB7 Kindle Edition"
+  },
+  {
+    id: "book-biopic-of-loser",
+    number: "02",
+    title: "BIOPIC OF LOSER",
+    subtitle: "A Gritty Real-Life Biography of Failure, Resilience, and the Ultimate Corporate Automobile Hustle (1989\u20132013)",
+    author: "AKYIN S. & MAULA S.",
+    amazonUrl: "https://a.co/d/0ig3AHqX",
+    asin: "B0H2QTMXP9",
+    coverImage: "/assets/books/biopic-of-loser.jpg",
+    coverAlt: "Official Amazon book cover of Biopic of Loser by AKYIN S. and MAULA S.",
+    marketplaceLabel: "Amazon \xB7 Kindle Edition"
+  },
+  {
+    id: "book-scroll-recovery-plan",
+    number: "03",
+    title: "THE SCROLL RECOVERY PLAN",
+    subtitle: "A 30-Day System to Stop Doomscrolling, Rebuild Focus, and Take Back Your Time",
+    author: "Akyin S.",
+    amazonUrl: "https://a.co/d/0ewHC6eM",
+    asin: "B0HKQ8DDSY",
+    coverImage: "/assets/books/the-scroll-recovery-plan.jpg",
+    coverAlt: "Official Amazon book cover of The Scroll Recovery Plan by Akyin S.",
+    marketplaceLabel: "Amazon \xB7 Kindle Edition"
+  },
+  {
+    id: "book-wealth-trap",
+    number: "04",
+    title: "The Wealth Trap",
+    subtitle: "Why Smart People Stay Stuck, Make Emotional Money Mistakes, and Never Build the Wealth They Deserve",
+    author: "Akyin S.",
+    amazonUrl: "https://a.co/d/0eUuZA8r",
+    asin: "B0H4YG4CM9",
+    coverImage: "/assets/books/the-wealth-trap.jpg",
+    coverAlt: "Official Amazon book cover of The Wealth Trap by Akyin S.",
+    marketplaceLabel: "Amazon \xB7 Kindle Edition"
+  },
+  {
+    id: "book-reset-code",
+    number: "05",
+    title: "THE RESET CODE",
+    subtitle: "Why Smart People Stay Stuck, Self-Sabotage Success, and Repeat the Same Mistakes\u2014And How to Finally Change Their Life",
+    author: "AKYIN S.",
+    amazonUrl: "https://a.co/d/0h7g4V7g",
+    asin: "B0H5DRF16M",
+    coverImage: "/assets/books/the-reset-code.jpg",
+    coverAlt: "Official Amazon book cover of The Reset Code by AKYIN S.",
+    marketplaceLabel: "Amazon \xB7 Kindle Edition"
+  },
+  {
+    id: "book-discipline-reset",
+    number: "06",
+    title: "THE DISCIPLINE RESET",
+    subtitle: "Break Bad Habits, Beat Distractions, Build Self-Discipline, and Achieve Consistent Success",
+    author: "Akyin S.",
+    amazonUrl: "https://a.co/d/02kzLiOu",
+    asin: "B0H4X1BPH7",
+    coverImage: "/assets/books/the-discipline-reset.jpg",
+    coverAlt: "Official Amazon book cover of The Discipline Reset by Akyin S.",
+    marketplaceLabel: "Amazon \xB7 Kindle Edition"
+  },
+  {
+    id: "book-overthinking-reset",
+    number: "07",
+    title: "THE OVERTHINKING RESET",
+    subtitle: "Why Intelligent People Overthink, the Invisible Damage It Causes, and How to Break the First Mental Illusion",
+    author: "Akyin S.",
+    amazonUrl: "https://a.co/d/0atu9L9M",
+    asin: "B0GY8NZGKB",
+    coverImage: "/assets/books/the-overthinking-reset.jpg",
+    coverAlt: "Official Amazon book cover of The Overthinking Reset by Akyin S.",
+    marketplaceLabel: "Amazon \xB7 Kindle Edition"
+  },
+  {
+    id: "book-dopamine-reset-code",
+    number: "08",
+    title: "The Dopamine Reset Code",
+    subtitle: "Break Phone Addiction, Rewire Your Brain, Build Laser Focus, and Reclaim Your Productivity in 30 Days",
+    author: "Akyin S.",
+    amazonUrl: "https://a.co/d/0c9NrwA7",
+    asin: "B0H7M6R3RH",
+    coverImage: "/assets/books/the-dopamine-reset-code.jpg",
+    coverAlt: "Official Amazon book cover of The Dopamine Reset Code by Akyin S.",
+    marketplaceLabel: "Amazon \xB7 Kindle Edition"
+  }
+];
+var GUMROAD_DIGITAL_PRODUCTS = [
+  {
+    id: "digital-ats-resume-kit",
+    number: "01",
+    title: "India ATS Resume & Job Search Kit",
+    shortTitle: "ATS Resume Kit",
+    description: "Land your next opportunity with a smarter job-search system. The India ATS Resume & Job Search Kit by Akyin is a complete digital career toolkit.",
+    gumroadUrl: "https://akyinspire.gumroad.com/l/atsresumekit",
+    coverImage: "/assets/digital-products/ats-resume-kit.png",
+    coverAlt: "Official cover artwork for India ATS Resume & Job Search Kit on Gumroad",
+    platformLabel: "Gumroad \xB7 Digital Career Toolkit"
+  },
+  {
+    id: "digital-scroll-recovery-plan",
+    number: "02",
+    title: "THE SCROLL RECOVERY PLAN",
+    shortTitle: "The Scroll Recovery Plan",
+    description: "A 30-Day System to Stop Doomscrolling, Rebuild Focus, and Take Back Your Time.",
+    gumroadUrl: "https://akyinspire.gumroad.com/l/THESCROLLRECOVERYPLAN?wanted=true",
+    coverImage: "/assets/digital-products/scroll-recovery-plan.png",
+    coverAlt: "Official cover artwork for The Scroll Recovery Plan digital guide on Gumroad",
+    platformLabel: "Gumroad \xB7 30-Day Focus System"
+  },
+  {
+    id: "digital-money-os",
+    number: "03",
+    title: "THE MONEY OS\u2122 | Complete Personal Finance Planner & Budgeting System",
+    shortTitle: "The Money OS",
+    description: "Take control of your money with a system you\u2019ll actually use. THE MONEY OS\u2122 is a practical personal finance planner designed to organize your personal finances.",
+    gumroadUrl: "https://akyinspire.gumroad.com/l/the-money-os?wanted=true",
+    coverImage: "/assets/digital-products/the-money-os.png",
+    coverAlt: "Official cover artwork for THE MONEY OS Complete Personal Finance Planner on Gumroad",
+    platformLabel: "Gumroad \xB7 Personal Finance OS"
+  }
+];
 var EXTERNAL_VERTICAL_URLS = {
   aicalc: "https://aicalc.in",
   kartigo: "https://kartigo.online",
@@ -80,9 +225,9 @@ var VENTURES_PORTFOLIO = [
     name: "AKYIN Publishing",
     shortName: "Akyin Publishing",
     route: "/ventures/publishing",
-    sector: "Book & Digital Publishing",
-    positioning: "Ideas Worth Reading. Knowledge Worth Sharing.",
-    description: "Independent book and digital publishing initiative creating and distributing titles for readers across international marketplaces including Amazon and Google Play Books.",
+    sector: "Book & Digital Publishing \xB7 5 Books",
+    positioning: "Stories, Knowledge & Ideas Worth Sharing.",
+    description: "Discover books published by AKYIN, created to inspire learning, personal development and new perspectives across Amazon and Google Play Books.",
     externalUrl: PUBLISHING_LINKS.amazonAuthorStore,
     externalLabel: "Amazon Author Store",
     image: IMAGES.publishingHero,
@@ -111,62 +256,6 @@ var VENTURES_PORTFOLIO = [
     description: "Consumer clothing retail brand featuring fashion sub-brand AKYIN THRIFT, focused on offering carefully selected men\u2019s and women\u2019s apparel at exceptional discounted prices.",
     image: IMAGES.thriftHero,
     imageAlt: "Tailored monochrome jacket on brushed titanium hanger with AKYIN metal tag"
-  },
-  {
-    id: "aicalc",
-    code: "04",
-    name: "AICalc.in",
-    shortName: "AICalc",
-    route: "/ventures/aicalc",
-    sector: "AI Utility & Calculator Technology",
-    positioning: "Smart Calculations. Powered by AI.",
-    description: "Independent web platform enabling users to solve mathematical and practical calculation problems using natural-language queries alongside traditional calculator functions.",
-    externalUrl: EXTERNAL_VERTICAL_URLS.aicalc,
-    externalLabel: "aicalc.in",
-    image: IMAGES.aicalcWorkspace,
-    imageAlt: "Frosted liquid-glass smart calculator hardware tablet with AKYIN engraved emblem"
-  },
-  {
-    id: "kartigo",
-    code: "05",
-    name: "Kartigo.online",
-    shortName: "Kartigo",
-    route: "/ventures/kartigo",
-    sector: "B2B Stock Supply & Commerce",
-    positioning: "Connecting Businesses With Stock Opportunities.",
-    description: "Dedicated B2B-oriented stock supply platform designed to support business buyers and wholesale stock suppliers within a structured commercial environment.",
-    externalUrl: EXTERNAL_VERTICAL_URLS.kartigo,
-    externalLabel: "kartigo.online",
-    image: IMAGES.kartigoWarehouse,
-    imageAlt: "Modular frosted-glass and brushed titanium supply cubes stamped with AKYIN emblem"
-  },
-  {
-    id: "biznxt",
-    code: "06",
-    name: "BizNXT.online",
-    shortName: "BizNXT",
-    route: "/ventures/biznxt",
-    sector: "Business Guidance & Consulting",
-    positioning: "Business Clarity. Smarter Decisions. Better Direction.",
-    description: "BizNXT focuses on business guidance, consulting and helping entrepreneurs explore business opportunities and make informed business decisions.",
-    externalUrl: EXTERNAL_VERTICAL_URLS.biznxt,
-    externalLabel: "biznxt.online",
-    image: IMAGES.biznxtConsulting,
-    imageAlt: "Crystal compass, matte black chess rook, and brushed aluminum tablet with AKYIN emblem"
-  },
-  {
-    id: "budget-bazaar",
-    code: "07",
-    name: "Budget Bazaar",
-    shortName: "Budget Bazaar",
-    route: "/ventures/budget-bazaar",
-    sector: "Affordable Retail & Everyday Goods",
-    positioning: "Everyday Essentials. Value-First Retail.",
-    description: "Value-driven consumer retail venture offering practical everyday essentials, household goods, and affordable lifestyle products through budgetbazaar.org.",
-    externalUrl: EXTERNAL_VERTICAL_URLS.budgetBazaar,
-    externalLabel: "budgetbazaar.org",
-    image: IMAGES.budgetBazaarRetail,
-    imageAlt: "Isolated pearl-grey canvas tote, frosted canisters, and aluminum bottle with AKYIN tag"
   }
 ];
 var ECOSYSTEM_VENTURES_TICKER = [
@@ -203,51 +292,88 @@ var ECOSYSTEM_VENTURES_TICKER = [
     category: "venture",
     internalRoute: "/ventures/store",
     wordmarkStyle: "sans"
-  },
-  {
-    id: "eco-budget-bazaar",
-    name: "Budget Bazaar",
-    relationshipLabel: "AKYIN Venture",
-    category: "venture",
-    externalUrl: EXTERNAL_VERTICAL_URLS.budgetBazaar,
-    internalRoute: "/ventures/budget-bazaar",
-    wordmarkStyle: "sans"
-  },
+  }
+];
+var ECOSYSTEM_CLIENTS_TICKER = [
   {
     id: "eco-aicalc",
     name: "AICalc",
-    relationshipLabel: "AKYIN Venture",
-    category: "venture",
-    externalUrl: EXTERNAL_VERTICAL_URLS.aicalc,
+    relationshipLabel: "Client",
+    category: "client",
+    externalUrl: "https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/aicalc",
     internalRoute: "/ventures/aicalc",
     wordmarkStyle: "mono"
   },
   {
     id: "eco-kartigo",
     name: "Kartigo",
-    relationshipLabel: "AKYIN Venture",
-    category: "venture",
-    externalUrl: EXTERNAL_VERTICAL_URLS.kartigo,
+    relationshipLabel: "Client",
+    category: "client",
+    externalUrl: "https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/kartigo",
     internalRoute: "/ventures/kartigo",
     wordmarkStyle: "sans"
   },
   {
     id: "eco-biznxt",
     name: "BizNXT",
-    relationshipLabel: "AKYIN Venture",
-    category: "venture",
-    externalUrl: EXTERNAL_VERTICAL_URLS.biznxt,
+    relationshipLabel: "Client",
+    category: "client",
+    externalUrl: "https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/biznxt",
     internalRoute: "/ventures/biznxt",
+    wordmarkStyle: "sans"
+  },
+  {
+    id: "eco-budget-bazaar",
+    name: "Budget Bazaar",
+    relationshipLabel: "Client",
+    category: "client",
+    externalUrl: "https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/budget-bazaar",
+    internalRoute: "/ventures/budget-bazaar",
+    wordmarkStyle: "sans"
+  },
+  {
+    id: "eco-autoclub",
+    name: "AutoClub",
+    relationshipLabel: "Client",
+    category: "client",
+    wordmarkStyle: "sans"
+  },
+  {
+    id: "eco-arosco",
+    name: "Arosco Ventures",
+    relationshipLabel: "Client",
+    category: "client",
+    wordmarkStyle: "sans"
+  },
+  {
+    id: "eco-mei-cosmetics",
+    name: "MEI Cosmetics",
+    relationshipLabel: "Client",
+    category: "client",
+    wordmarkStyle: "serif"
+  },
+  {
+    id: "eco-krutika-cosmetics",
+    name: "Krutika Cosmetics",
+    relationshipLabel: "Client",
+    category: "client",
+    wordmarkStyle: "serif"
+  },
+  {
+    id: "eco-nyika-traders",
+    name: "Nyika Traders",
+    relationshipLabel: "Client",
+    category: "client",
+    wordmarkStyle: "sans"
+  },
+  {
+    id: "eco-ns-traders",
+    name: "NS Traders",
+    relationshipLabel: "Client",
+    category: "client",
     wordmarkStyle: "sans"
   }
 ];
-var ECOSYSTEM_CLIENT = {
-  id: "eco-autoclub",
-  name: "AutoClub",
-  relationshipLabel: "Client",
-  category: "client",
-  wordmarkStyle: "sans"
-};
 var ECOSYSTEM_PLATFORMS_TICKER = [
   {
     id: "eco-amazon",
@@ -274,41 +400,42 @@ var ECOSYSTEM_PLATFORMS_TICKER = [
     externalUrl: "https://www.shopify.com"
   },
   {
-    id: "eco-instagram",
-    name: "Instagram",
-    relationshipLabel: "Social media channel",
-    category: "platform",
-    iconKey: "instagram",
-    externalUrl: "https://www.instagram.com/akyinmarketing/"
-  },
-  {
     id: "eco-facebook",
     name: "Facebook",
-    relationshipLabel: "Social media channel",
+    relationshipLabel: "Follow AKYIN",
     category: "platform",
     iconKey: "facebook",
-    externalUrl: "https://www.facebook.com/akyinmarketing/"
-  },
-  {
-    id: "eco-x",
-    name: "X",
-    relationshipLabel: "Social media channel",
-    category: "platform",
-    iconKey: "x",
-    externalUrl: "https://x.com/akyinmarketing"
+    externalUrl: "https://www.facebook.com/profile.php?id=61595204474890"
   },
   {
     id: "eco-youtube",
     name: "YouTube",
-    relationshipLabel: "Video publishing and social media channel",
+    relationshipLabel: "Subscribe to AKYIN Marketing",
     category: "platform",
     iconKey: "youtube",
-    externalUrl: "https://www.youtube.com/@akyinmarketing"
+    externalUrl: "https://youtube.com/@akyinmarketing?si=hgB_tEfczt79H7wW"
+  },
+  {
+    id: "eco-instagram",
+    name: "Instagram",
+    relationshipLabel: "Follow AKYIN Ventures",
+    category: "platform",
+    iconKey: "instagram",
+    externalUrl: "https://www.instagram.com/akyinventures/"
+  },
+  {
+    id: "eco-whatsapp-channel",
+    name: "WhatsApp Channel",
+    relationshipLabel: "Join AKYIN Updates",
+    category: "platform",
+    iconKey: "whatsapp",
+    externalUrl: "https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U"
   }
 ];
+var ECOSYSTEM_CLIENT = ECOSYSTEM_CLIENTS_TICKER[4];
 var FULL_ECOSYSTEM_TICKER = [
   ...ECOSYSTEM_VENTURES_TICKER,
-  ECOSYSTEM_CLIENT,
+  ...ECOSYSTEM_CLIENTS_TICKER,
   ...ECOSYSTEM_PLATFORMS_TICKER
 ];
 var PRICING_PACKAGES = [
@@ -550,9 +677,11 @@ function buildMarkdownForRoute(pathname) {
 ---
 ## Official Contact & Links
 - **Website**: ${OFFICIAL_CONTACT.domain}
+- **Contact Lead**: ${OFFICIAL_CONTACT.contactName}
 - **Email**: [${OFFICIAL_CONTACT.email}](mailto:${OFFICIAL_CONTACT.email})
-- **Phone / WhatsApp**: [${OFFICIAL_CONTACT.phoneDisplay}](tel:+${OFFICIAL_CONTACT.whatsappNumber})
-- **Social Channels (${OFFICIAL_CONTACT.marketingSocialHandle})**: [Instagram](${OFFICIAL_CONTACT.marketingSocials[0].url}) | [Facebook](${OFFICIAL_CONTACT.marketingSocials[1].url}) | [X](${OFFICIAL_CONTACT.marketingSocials[2].url}) | [YouTube](${OFFICIAL_CONTACT.marketingSocials[3].url})
+- **Phone**: [${OFFICIAL_CONTACT.phoneDisplay}](${OFFICIAL_CONTACT.phoneHref})
+- **Service Availability**: ${OFFICIAL_CONTACT.regionIndicator} \u2014 ${OFFICIAL_CONTACT.internationalSupportLine}
+- **Follow AKYIN**: [Facebook \u2013 Follow AKYIN](${OFFICIAL_CONTACT.marketingSocials[0].url}) | [YouTube \u2013 Subscribe to AKYIN Marketing](${OFFICIAL_CONTACT.marketingSocials[1].url}) | [Instagram \u2013 Follow AKYIN Ventures](${OFFICIAL_CONTACT.marketingSocials[2].url}) | [WhatsApp \u2013 Join AKYIN Updates](${OFFICIAL_CONTACT.marketingSocials[3].url})
 - **Key Pages**: [About](/about) | [Ventures](/ventures) | [Pricing](/pricing) | [Advisory](/advisory) | [Contact](/contact) | [Terms](/terms) | [Privacy](/privacy) | [Sitemap](/sitemap)
 - **Agent Endpoints**: [/llms.txt](/llms.txt) | [/.well-known/mcp/server-card.json](/.well-known/mcp/server-card.json) | [/robots.txt](/robots.txt)
 `;
@@ -595,9 +724,32 @@ ${commonFooter}`;
 - **Transparent Retainers**: Package A (\u20B939,999 setup + \u20B949,999/mo), Package B (\u20B914,999 setup + \u20B919,999/mo), Sales Training (\u20B925,000/session). [Full Pricing](/pricing).
 ${commonFooter}`;
   }
+  if (cleaned === "/ventures/publishing") {
+    const bookLines = PUBLISHING_BOOKS.map(
+      (b) => `- **${b.number}. ${b.title}** \u2014 *${b.subtitle}* by ${b.author} ([View on Amazon](${b.amazonUrl}))`
+    ).join("\n");
+    const digitalLines = GUMROAD_DIGITAL_PRODUCTS.map(
+      (p) => `- **${p.number}. ${p.shortTitle}** \u2014 ${p.description} ([Get This Product](${p.gumroadUrl}))`
+    ).join("\n");
+    return `# AKYIN Publishing \u2014 Ideas That Inspire. Knowledge That Empowers.
+
+> Explore books, practical guides and digital resources published by AKYIN.
+
+## Explore Our Books on Amazon
+${bookLines}
+
+## Digital Guides & Productivity Tools
+${digitalLines}
+
+## Explore More & Storefronts
+- [Explore AKYIN on Pinterest](${PUBLISHING_LINKS.pinterest})
+- [Amazon Author Store](${PUBLISHING_LINKS.amazonAuthorStore})
+- [Google Play Books \u2014 THE DISCIPLINE CODE](${PUBLISHING_LINKS.googlePlayDisciplineCode})
+${commonFooter}`;
+  }
   if (cleaned === "/ventures/marketing") {
     return `# AKYIN MARKETINGS \u2014 Full-Service Marketing Agency
-
+    
 > Drive qualified demand and strengthen commercial sales execution across retail, B2B, services, and automotive dealerships.
 
 - **18 Specialized Agency Services** across Lead Gen & Filtering, AI-Assisted Calling, Creative & Video Production, Local Growth, and Commercial Sales Training.
@@ -616,7 +768,7 @@ ${commonFooter}`;
 ## Privacy Policy
 - Visitor enquiries are validated client-side and transmitted directly to AKYIN Ventures' authorized workspace desk or user-selected WhatsApp/Email apps.
 - AKYIN Ventures never sells or brokers contact data to third parties.
-- Contact [connect@akyin.com](mailto:connect@akyin.com) or [+91-6305694011](tel:+916305694011) for data requests.
+- Contact [connect@akyin.com](mailto:connect@akyin.com) or [+91 63956 94011](tel:+916395694011) for data requests.
 ${commonFooter}`;
   }
   if (cleaned === "/about") {
@@ -645,7 +797,7 @@ ${commonFooter}`;
 Reach our corporate desk or any of the seven operating verticals directly:
 
 - **Corporate Email**: [connect@akyin.com](mailto:connect@akyin.com)
-- **Phone / WhatsApp**: [+91-6305694011](tel:+916305694011)
+- **Phone**: [+91 63956 94011](tel:+916395694011)
 - **Booking Desk**: [Schedule Business Advisory](/advisory)
 ${commonFooter}`;
   }
@@ -745,15 +897,19 @@ var ROUTE_SEO_META = {
     title: "Our Businesses \u2014 AKYIN Ventures Portfolio",
     description: "Explore Akyin Publishing, Akyin Marketing Agency, Akyin Store, AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar."
   },
+  "/ventures/publishing": {
+    title: "AKYIN Publishing \u2014 Ideas That Inspire. Knowledge That Empowers. | akyin.com",
+    description: "Explore eight books on Amazon and three digital guides & productivity tools published by AKYIN."
+  },
   "/ventures/marketing": {
     title: "AKYIN MARKETINGS \u2014 Full-Service Marketing Agency & Growth Solutions",
     description: "Full-service digital marketing agency delivering Meta lead generation, brand campaigns, AI-assisted lead qualification, and commercial sales training."
   },
   "/marketing/automotive": {
-    title: "AKYIN Automotive Marketing \u2014 Qualified Leads & Test Drives",
-    description: "Turn ad clicks into showroom test drives. Meta & Google auto ads, lead filtering, and sales coaching built for dealerships. Request your growth plan today.",
-    ogTitle: "Scale Dealership Test Drives & Showroom Sales | AKYIN Automotive",
-    ogDescription: "Stop wasting showroom hours on cold enquiries. Get targeted vehicle ads, automated lead qualification, and floor sales coaching built for auto dealers."
+    title: "Car Dealership Marketing & Test-Drive Leads | AKYIN",
+    description: "Book qualified showroom test drives, not cold clicks. Targeted Meta & Google auto ads, lead vetting, and floor sales coaching. Get a quote.",
+    ogTitle: "More Showroom Test Drives. Zero Cold Leads. | AKYIN",
+    ogDescription: "High-intent Meta & Google auto ads, automated lead vetting, and dealer sales coaching built to fill your showroom floor faster."
   },
   "/pricing": {
     title: "Pricing & Rate Card \u2014 AKYIN Ventures & Marketing Agency",
@@ -780,18 +936,77 @@ function escapeHtmlAttr(value) {
   return value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 function createGeminiClient() {
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
-  if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-    return null;
+  let apiKey = (process.env.GEMINI_API_KEY ?? "").trim().replace(/^(['"])(.*)\1$/, "$2").trim().replace(/^Bearer\s+/i, "").trim();
+  if (!apiKey || apiKey === "MY_GEMINI_API_KEY" || /^(your_|replace_|test_|changeme|<.*>)/i.test(apiKey)) {
+    return { client: null, reason: "API_KEY_MISSING" };
   }
-  return new GoogleGenAI({
-    apiKey,
-    httpOptions: {
-      headers: {
-        "User-Agent": "aistudio-build"
+  if (/\s/.test(apiKey) || apiKey.startsWith("ya29.")) {
+    return { client: null, reason: "API_KEY_INVALID_FORMAT" };
+  }
+  return {
+    client: new GoogleGenAI({
+      apiKey,
+      httpOptions: {
+        headers: {
+          "User-Agent": "aistudio-build"
+        }
       }
-    }
-  });
+    }),
+    reason: null
+  };
+}
+function classifyGeminiError(err) {
+  const rawMessage = err instanceof Error ? err.message : String(err ?? "");
+  const statusProp = typeof err === "object" && err !== null && "status" in err ? Number(err.status) : NaN;
+  const isAuthError = statusProp === 401 || statusProp === 403 || /"code"\s*:\s*(401|403)/.test(rawMessage) || /API_KEY_INVALID|ACCESS_TOKEN_TYPE_UNSUPPORTED|API key not valid|UNAUTHENTICATED|PERMISSION_DENIED/i.test(
+    rawMessage
+  );
+  if (isAuthError) {
+    return {
+      httpStatus: 401,
+      code: "API_KEY_INVALID",
+      clientMessage: "Live Google Search headlines require a valid Gemini API key in Settings > Secrets.",
+      retryable: false,
+      isAuthError: true
+    };
+  }
+  const isQuotaError = statusProp === 429 || /"code"\s*:\s*429/.test(rawMessage) || /RESOURCE_EXHAUSTED/i.test(rawMessage);
+  if (isQuotaError) {
+    return {
+      httpStatus: 429,
+      code: "QUOTA_EXCEEDED",
+      clientMessage: "Live Google Search headline quota is temporarily exhausted. Please check your Gemini API plan or retry shortly.",
+      retryable: true,
+      isAuthError: false
+    };
+  }
+  const isModelNotFound = statusProp === 404 || /"code"\s*:\s*404/.test(rawMessage) || /NOT_FOUND/i.test(rawMessage);
+  if (isModelNotFound) {
+    return {
+      httpStatus: 502,
+      code: "MODEL_NOT_FOUND",
+      clientMessage: "The configured headline search model is currently unavailable.",
+      retryable: false,
+      isAuthError: false
+    };
+  }
+  const isClientBadRequest = statusProp === 400 || /"code"\s*:\s*400/.test(rawMessage);
+  if (isClientBadRequest) {
+    return {
+      httpStatus: 502,
+      code: "INVALID_UPSTREAM_REQUEST",
+      clientMessage: "Unable to complete live Google Search headline lookup right now.",
+      retryable: false,
+      isAuthError: false
+    };
+  }
+  return {
+    httpStatus: 502,
+    code: "UPSTREAM_ERROR",
+    clientMessage: "Live Google Search headlines are temporarily unavailable. Please try again shortly.",
+    retryable: true,
+    isAuthError: false
+  };
 }
 function getRazorpayCredentials() {
   const keyId = process.env.RAZORPAY_KEY_ID?.trim();
@@ -823,6 +1038,23 @@ var verifyPaymentBodySchema = z.object({
     "package-b-setup",
     "sales-training"
   ]).optional()
+}).strict();
+function stripDangerousControls(value) {
+  return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim();
+}
+var leadSubmissionBodySchema = z.object({
+  fullName: z.string().trim().min(2, "Full name is required.").max(100),
+  businessName: z.string().trim().min(2, "Business name is required.").max(120),
+  mobileNumber: z.string().trim().min(7, "Please provide a valid mobile number.").max(28).refine((val) => /^[+\d\s\-()]{7,28}$/.test(val), "Enter a valid mobile number with country or area code."),
+  email: z.string().trim().email("Enter a valid email address.").max(160),
+  city: z.string().trim().min(2, "City is required.").max(80),
+  country: z.string().trim().min(2, "Country is required.").max(80),
+  requiredService: z.string().trim().min(2, "Please select a required service.").max(140),
+  monthlyMarketingBudget: z.string().trim().min(2, "Please select a monthly marketing budget range.").max(80),
+  message: z.string().trim().min(8, "Please enter a brief requirement summary (at least 8 characters).").max(1500),
+  consentAccepted: z.boolean().refine((val) => val === true, "Please accept the privacy consent before submitting."),
+  honeypot: z.string().max(60).optional().default(""),
+  source: z.string().trim().max(80).optional().default("Interactive Lead Enquiry Widget")
 }).strict();
 function extractJsonArray(rawText) {
   const cleaned = rawText.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
@@ -857,7 +1089,7 @@ function wantsMarkdown(req) {
   if (req.method !== "GET" && req.method !== "HEAD") return false;
   const accept = (req.headers.accept || "").toLowerCase();
   if (!accept.includes("text/markdown")) return false;
-  if (req.path.startsWith("/api/") || req.path.startsWith("/assets/") || req.path.startsWith("/.well-known/")) {
+  if (req.path.startsWith("/api/") || req.path.startsWith("/assets/") || req.path.startsWith("/downloads/") || req.path.startsWith("/.well-known/")) {
     return false;
   }
   if (/\.[a-z0-9]{2,6}$/i.test(req.path)) return false;
@@ -947,6 +1179,12 @@ async function startServer() {
     code: "NEWS_RATE_LIMITED",
     message: "Too many headline sync requests. Please wait a minute before refreshing."
   });
+  const leadRateLimiter = createRateLimiter({
+    windowMs: 6e4,
+    max: 12,
+    code: "LEAD_RATE_LIMITED",
+    message: "Too many enquiry submissions. Please wait a minute before trying again."
+  });
   app.get("/robots.txt", (_req, res) => {
     const file = resolvePublicOrDistFile("robots.txt");
     if (file) {
@@ -979,6 +1217,20 @@ async function startServer() {
       return;
     }
     res.status(404).json({ error: "MCP server card not found." });
+  });
+  app.get("/downloads/:filename", (req, res, next) => {
+    const rawFilename = req.params.filename;
+    const sanitizedFilename = path.basename(rawFilename);
+    const resolvedPath = resolvePublicOrDistFile(path.join("downloads", sanitizedFilename));
+    if (resolvedPath && fs.existsSync(resolvedPath)) {
+      if (sanitizedFilename.toLowerCase().endsWith(".pdf")) {
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `inline; filename="${sanitizedFilename}"`);
+      }
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      return res.sendFile(resolvedPath);
+    }
+    next();
   });
   app.use((req, res, next) => {
     if (wantsMarkdown(req)) {
@@ -1319,6 +1571,85 @@ async function startServer() {
       verifiedAt: (/* @__PURE__ */ new Date()).toISOString()
     });
   });
+  app.post("/api/leads", leadRateLimiter, (req, res) => {
+    const parsed = leadSubmissionBodySchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        ok: false,
+        error: parsed.error.issues[0]?.message || "Invalid lead enquiry submission.",
+        code: "INVALID_LEAD_PAYLOAD",
+        issues: parsed.error.issues.map((issue) => issue.message)
+      });
+      return;
+    }
+    const data = parsed.data;
+    if (data.honeypot && data.honeypot.trim().length > 0) {
+      res.status(400).json({
+        ok: false,
+        error: "Submission rejected.",
+        code: "INVALID_LEAD_PAYLOAD"
+      });
+      return;
+    }
+    const leadId = `AKY-LEAD-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+    const receivedAt = (/* @__PURE__ */ new Date()).toISOString();
+    const record = {
+      leadId,
+      receivedAt,
+      fullName: stripDangerousControls(data.fullName),
+      businessName: stripDangerousControls(data.businessName),
+      mobileNumber: stripDangerousControls(data.mobileNumber),
+      email: stripDangerousControls(data.email),
+      city: stripDangerousControls(data.city),
+      country: stripDangerousControls(data.country),
+      requiredService: stripDangerousControls(data.requiredService),
+      monthlyMarketingBudget: stripDangerousControls(data.monthlyMarketingBudget),
+      message: stripDangerousControls(data.message),
+      consentAccepted: true,
+      source: stripDangerousControls(data.source || "Interactive Lead Enquiry Widget")
+    };
+    try {
+      const dataDir = path.resolve(__dirname, ".akyin-data");
+      const leadsFile = path.join(dataDir, "leads.json");
+      fs.mkdirSync(dataDir, { recursive: true });
+      let existing = [];
+      if (fs.existsSync(leadsFile)) {
+        try {
+          const raw = fs.readFileSync(leadsFile, "utf8");
+          const parsedFile = JSON.parse(raw);
+          if (Array.isArray(parsedFile)) {
+            existing = parsedFile;
+          }
+        } catch {
+          existing = [];
+        }
+      }
+      existing.unshift(record);
+      const tempFile = path.join(dataDir, `leads.${process.pid}.${Date.now()}.tmp`);
+      fs.writeFileSync(tempFile, JSON.stringify(existing.slice(0, 1e3), null, 2), "utf8");
+      fs.renameSync(tempFile, leadsFile);
+      res.status(201).json({
+        ok: true,
+        leadId,
+        receivedAt
+      });
+    } catch (err) {
+      console.error("[/api/leads] Failed to persist submission:", err instanceof Error ? err.message : err);
+      res.status(500).json({
+        ok: false,
+        error: "Unable to record enquiry right now. Please contact connect@akyin.com directly.",
+        code: "LEAD_STORAGE_ERROR"
+      });
+    }
+  });
+  app.get("/api/leads", (_req, res) => {
+    res.setHeader("Allow", "POST");
+    res.status(405).json({
+      ok: false,
+      error: "Method not allowed. Lead enquiries must be submitted via POST.",
+      code: "METHOD_NOT_ALLOWED"
+    });
+  });
   app.get("/api/automotive-news", newsRateLimiter, async (req, res) => {
     const topicKey = typeof req.query.topic === "string" && req.query.topic in TOPIC_PROMPTS ? req.query.topic : "all";
     const cached = automotiveNewsCache.get(topicKey);
@@ -1326,17 +1657,17 @@ async function startServer() {
       res.json(cached.payload);
       return;
     }
-    const ai = createGeminiClient();
+    const { client: ai, reason } = createGeminiClient();
     if (!ai) {
       res.status(503).json({
-        error: "Live Google Search headlines require GEMINI_API_KEY to be configured in Settings > Secrets.",
-        code: "API_KEY_MISSING"
+        error: reason === "API_KEY_INVALID_FORMAT" ? "Configured GEMINI_API_KEY is not a valid API key format. Please update GEMINI_API_KEY in Settings > Secrets." : "Live Google Search headlines require GEMINI_API_KEY to be configured in Settings > Secrets.",
+        code: reason
       });
       return;
     }
     const topicFocus = TOPIC_PROMPTS[topicKey];
     try {
-      const response = await ai.models.generateContent({
+      const requestParams = {
         model: "gemini-4-hydrogen",
         contents: `Use Google Search to find 4 to 6 current, real-world industry news headlines and trends about ${topicFocus}.
 
@@ -1351,7 +1682,25 @@ Return ONLY a valid JSON array (no extra commentary) where each object contains:
           tools: [{ googleSearch: {} }],
           thinkingConfig: { thinkingLevel: ThinkingLevel.LOW }
         }
-      });
+      };
+      let response;
+      const maxAttempts = 3;
+      for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        try {
+          response = await ai.models.generateContent(requestParams);
+          break;
+        } catch (attemptErr) {
+          const classified = classifyGeminiError(attemptErr);
+          if (!classified.retryable || attempt === maxAttempts) {
+            throw attemptErr;
+          }
+          const delayMs = 300 * 2 ** (attempt - 1);
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+        }
+      }
+      if (!response) {
+        throw new Error("Empty response from Gemini API.");
+      }
       const rawText = response.text ?? "";
       const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks ?? [];
       const groundingSources = [];
@@ -1401,11 +1750,18 @@ Return ONLY a valid JSON array (no extra commentary) where each object contains:
       });
       res.json(payload);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unable to fetch grounded automotive headlines.";
-      console.error("[/api/automotive-news] Error:", message);
-      res.status(502).json({
-        error: "Live Google Search headlines are temporarily unavailable. Please try again shortly.",
-        code: "UPSTREAM_ERROR"
+      const classified = classifyGeminiError(err);
+      if (classified.isAuthError) {
+        console.warn(
+          "[/api/automotive-news] Gemini API key rejected by upstream (401/403). Check GEMINI_API_KEY in Settings > Secrets."
+        );
+      } else {
+        const message = err instanceof Error ? err.message : "Unable to fetch grounded automotive headlines.";
+        console.warn(`[/api/automotive-news] ${classified.code}:`, message);
+      }
+      res.status(classified.httpStatus).json({
+        error: classified.clientMessage,
+        code: classified.code
       });
     }
   });

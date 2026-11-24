@@ -232,13 +232,9 @@ export function ContactDispatcher({
 
   const displayEmail = settings.contactEmail || OFFICIAL_CONTACT.email;
   const displayPhone = settings.contactPhone || OFFICIAL_CONTACT.phoneDisplay;
-  const displayWhatsappNum = settings.whatsappNumber || OFFICIAL_CONTACT.whatsappNumber;
+  const cleanPhoneHref = `tel:+${displayPhone.replace(/[^0-9]/g, '') || OFFICIAL_CONTACT.whatsappNumber}`;
   const whatsappHref = buildWhatsAppDispatchUrl(payload);
   const emailHref = buildEmailDispatchUrl(payload);
-  const safeOfficialWhatsapp = sanitizeHref(
-    `https://wa.me/${displayWhatsappNum}`,
-    OFFICIAL_CONTACT.whatsappUrl
-  );
   const safeOfficialMailto = sanitizeHref(`mailto:${displayEmail}`, '#', true);
 
   const getFieldClass = (field: ValidatedFieldKey, value: string) => {
@@ -288,28 +284,22 @@ export function ContactDispatcher({
               </div>
               <div className="h-px bg-[#1D1D1F]/10" />
               <div>
-                <p className="text-xs font-medium text-[#6E6E73]">Official Phone &amp; WhatsApp</p>
+                <p className="text-xs font-medium text-[#6E6E73]">
+                  Direct Contact ({OFFICIAL_CONTACT.contactName})
+                </p>
                 <div className="mt-1 flex flex-wrap items-center gap-3">
                   <a
-                    href={`tel:+${displayWhatsappNum}`}
-                    className="inline-flex items-center gap-2 font-mono-num text-base font-semibold text-[#1D1D1F] hover:underline transition-colors"
+                    href={cleanPhoneHref}
+                    className="inline-flex items-center gap-2 font-mono-num text-base font-semibold text-[#1D1D1F] hover:text-[#0071E3] hover:underline transition-colors"
                   >
                     {displayPhone}
-                  </a>
-                  <a
-                    href={safeOfficialWhatsapp}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs font-semibold text-[#6E6E73] hover:text-[#1D1D1F] underline"
-                  >
-                    Message on WhatsApp
                   </a>
                 </div>
               </div>
               <div className="h-px bg-[#1D1D1F]/10" />
               <div className="space-y-3">
                 <p className="text-xs font-medium text-[#6E6E73]">
-                  Official Social Channels ({OFFICIAL_CONTACT.marketingSocialHandle})
+                  Follow AKYIN
                 </p>
                 <SocialLinks variant="inline" />
               </div>
@@ -664,52 +654,63 @@ export function ContactDispatcher({
               </div>
 
               {dispatchReady && (
-                <div className="liquid-glass-card rounded-2xl text-[#1D1D1F] p-5 space-y-4">
+                <div className="liquid-glass-card rounded-3xl bg-[#FFFFFF] border-2 border-[#0071E3]/30 text-[#1D1D1F] p-6 sm:p-7 space-y-5 shadow-lg">
                   <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-bold text-[#1D1D1F]">
+                    <div className="space-y-2">
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold">
+                        <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
+                        <span>Guaranteed 24-Hour Turnaround Commitment</span>
+                      </div>
+                      <h3 className="font-display text-xl font-bold text-[#1D1D1F]">
                         {recordedEnquiryId
-                          ? `Enquiry Recorded (${recordedEnquiryId})`
-                          : 'Structured Enquiry Ready'}
-                      </p>
-                      <p className="text-xs text-[#6E6E73] mt-1">
+                          ? `Enquiry Successfully Logged (${recordedEnquiryId})`
+                          : 'Enquiry Validated & Prepared'}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
                         {savedToLiveSheet
-                          ? 'Your enquiry has been saved to the AKYIN Enquiries desk. You can also open a pre-filled WhatsApp or Email draft below.'
-                          : 'Choose WhatsApp or Email below to open your pre-filled message draft.'}
+                          ? 'Your submission has been securely recorded on the AKYIN client desk. Our growth advisory team reviews all briefs with a strict 24-hour turnaround commitment.'
+                          : 'Your enquiry brief has been successfully validated. Our growth advisory team reviews all submissions within 24 hours.'}
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={handleCopy}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FFFFFF] border border-[#E8E8ED] hover:border-[#1D1D1F] text-xs font-semibold text-[#1D1D1F] transition-colors cursor-pointer shrink-0"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#F5F5F7] border border-[#E8E8ED] hover:border-[#1D1D1F] text-xs font-semibold text-[#1D1D1F] transition-colors cursor-pointer shrink-0"
                     >
                       {copied ? (
                         <>
                           <Check className="w-3.5 h-3.5 text-[#1D1D1F]" aria-hidden="true" />
-                          Copied
+                          <span>Copied</span>
                         </>
                       ) : (
                         <>
                           <Copy className="w-3.5 h-3.5 text-[#6E6E73]" aria-hidden="true" />
-                          Copy
+                          <span>Copy Brief</span>
                         </>
                       )}
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="rounded-2xl bg-[#F5F5F7] p-4 border border-[#E8E8ED] space-y-1.5 text-xs text-[#1D1D1F]">
+                    <p className="font-semibold text-[#1D1D1F]">Next Step &amp; Response SLA:</p>
+                    <p className="text-[#6E6E73] leading-relaxed">
+                      You can instantly transmit your pre-filled brief directly via WhatsApp or Email below. Our senior strategists guarantee a formal response and tailored proposal within 24 hours.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                     <a
                       href={whatsappHref}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="liquid-glass-pill-dark inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full text-white text-xs sm:text-sm font-semibold transition-all whitespace-nowrap"
+                      className="liquid-glass-pill-dark inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shadow-xs hover:opacity-95"
                     >
                       <MessageCircle className="w-4 h-4" aria-hidden="true" />
                       Open WhatsApp ({displayPhone})
                     </a>
                     <a
                       href={emailHref}
-                      className="liquid-glass-cta inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full text-[#1D1D1F] hover:border-[#1D1D1F]/35 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap"
+                      className="liquid-glass-cta inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[#1D1D1F] hover:border-[#1D1D1F]/35 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shadow-xs"
                     >
                       <Mail className="w-4 h-4 text-[#1D1D1F]" aria-hidden="true" />
                       Open Email Draft ({displayEmail})

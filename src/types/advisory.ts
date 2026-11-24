@@ -221,19 +221,19 @@ export const DEFAULT_WEBSITE_SETTINGS: WebsiteSettingsMap = {
   advisoryMaxBookings: '2',
   notificationEmail: 'connect@akyin.com',
   contactEmail: 'connect@akyin.com',
-  contactPhone: '+91-6305694011',
-  whatsappNumber: '916305694011',
+  contactPhone: '+91 63956 94011',
+  whatsappNumber: '916395694011',
   heroHeadline: 'Building Ideas Into Businesses.',
   heroSubheadline:
     'AKYIN Ventures brings together diverse business initiatives across publishing, marketing, retail, digital technology, B2B commerce and business consulting.',
   footerTagline:
-    'Parent corporate group bringing together operating ventures across publishing, automotive marketing, value retail, AI utility software, B2B stock commerce, and business consulting.',
+    'A diversified business group working across marketing, publishing, technology, commerce and business solutions.',
   brandWordmark: 'AKYIN',
   logoUrl: '',
-  instagramUrl: 'https://www.instagram.com/akyinmarketing/',
-  facebookUrl: 'https://www.facebook.com/akyinmarketing/',
-  xUrl: 'https://x.com/akyinmarketing',
-  youtubeUrl: 'https://www.youtube.com/@akyinmarketing',
+  instagramUrl: 'https://www.instagram.com/akyinventures/',
+  facebookUrl: 'https://www.facebook.com/profile.php?id=61595204474890',
+  xUrl: '',
+  youtubeUrl: 'https://youtube.com/@akyinmarketing?si=hgB_tEfczt79H7wW',
   amazonUrl:
     'https://www.amazon.com/stores/Akyin-S/author/B0H6SY7N3T?_encoding=UTF8&pd_rd_w=r7GRE&content-id=amzn1.sym.7e190e19-9f6f-4df8-807a-5a7608594741&pd_rd_wg=EdC74&pd_rd_r=d01ba7b6-b1c7-4bd2-87fb-cbd0fc9deddb&ref=ap_rdr&shoppingPortalEnabled=true&ccs_id=98bb1963-9c8a-4dab-9f1b-d21a6f908208',
   googlePlayBooksUrl:

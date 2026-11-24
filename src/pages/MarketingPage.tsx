@@ -9,6 +9,7 @@ import {
 import { motion, useReducedMotion } from 'motion/react';
 import {
   ABOUT_PILLARS,
+  AppRoute,
   EXPERIENCE_MILESTONES,
   IMAGES,
   MARKETING_SERVICES,
@@ -19,8 +20,15 @@ import {
   ServiceCategory,
   TRAINING_CURRICULUM,
 } from '../data/akyinData';
+import { ClientSuccessCarousel } from '../components/ClientSuccessCarousel';
 import { ContactDispatcher } from '../components/ContactDispatcher';
 import { EditorialReveal } from '../components/EditorialReveal';
+import { EthicalGrowthProofSection } from '../components/EthicalGrowthProofSection';
+import { VerifiedClientPartners } from '../components/VerifiedClientPartners';
+import {
+  BusinessWidgetTabId,
+  InteractiveBusinessWidgets,
+} from '../components/InteractiveBusinessWidgets';
 import {
   GlassButton,
   GlassCard,
@@ -32,13 +40,35 @@ import { ResilientImage } from '../components/ResilientImage';
 import { SocialLinks } from '../components/SocialLinks';
 import { ALL_BUSINESSES_DECK, AUTOMOTIVE_DECK } from '../data/presentationDecks';
 
-export function MarketingPage() {
+interface MarketingPageProps {
+  onNavigate?: (route: AppRoute) => void;
+}
+
+export function MarketingPage({ onNavigate }: MarketingPageProps) {
   const shouldReduceMotion = useReducedMotion();
   const [activeCategory, setActiveCategory] = useState<ServiceCategory>('all');
   const [rateSearch, setRateSearch] = useState('');
+  const [widgetTab, setWidgetTab] = useState<BusinessWidgetTabId>('roi');
   const [selectedEnquiryType, setSelectedEnquiryType] = useState(
     'Package A — Full-Service Growth Marketing & Lead Management'
   );
+
+  const safeNavigate = (route: AppRoute) => {
+    if (onNavigate) {
+      onNavigate(route);
+      return;
+    }
+    window.history.pushState({}, '', route);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
+
+  const jumpToMarketingWidgetTab = (tab: BusinessWidgetTabId) => {
+    setWidgetTab(tab);
+    document.getElementById('marketing-growth-tools')?.scrollIntoView({
+      behavior: shouldReduceMotion ? 'auto' : 'smooth',
+      block: 'start',
+    });
+  };
 
   const filteredServices = useMemo(() => {
     if (activeCategory === 'all') return MARKETING_SERVICES;
@@ -123,6 +153,9 @@ export function MarketingPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Verified Client Partners Section */}
+      <VerifiedClientPartners />
 
       {/* Automotive Marketing Dedicated Division Banner */}
       <section className="py-10 bg-white border-b border-[#E8E8ED]">
@@ -667,6 +700,31 @@ export function MarketingPage() {
         initialDeckId="all-businesses"
         backgroundClass="bg-[#F5F5F7]"
       />
+
+      {/* 6C. Ethical FOMO & Interactive Business Toolkit */}
+      <EthicalGrowthProofSection
+        onNavigate={safeNavigate}
+        onJumpToConsultationWidget={() => jumpToMarketingWidgetTab('booking')}
+        onJumpToLeadWidget={() => jumpToMarketingWidgetTab('enquiry')}
+        backgroundClass="bg-[#FFFFFF]"
+      />
+
+      <InteractiveBusinessWidgets
+        sectionId="marketing-growth-tools"
+        onNavigate={safeNavigate}
+        activeTab={widgetTab}
+        onTabChange={setWidgetTab}
+        backgroundClass="surface-silver-gradient"
+      />
+
+      {/* 6D. Client Success Testimonial Carousel (Automotive & Business Clients) */}
+      <EditorialReveal>
+        <ClientSuccessCarousel
+          onNavigate={onNavigate}
+          defaultSegment="all"
+          backgroundClass="bg-[#FFFFFF]"
+        />
+      </EditorialReveal>
 
       {/* 7. Marketing Enquiry Dispatcher */}
       <EditorialReveal>

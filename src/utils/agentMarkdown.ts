@@ -1,5 +1,6 @@
 import {
   EXTERNAL_VERTICAL_URLS,
+  GUMROAD_DIGITAL_PRODUCTS,
   OFFICIAL_CONTACT,
   PRICING_PACKAGES,
   PUBLISHING_BOOKS,
@@ -15,9 +16,11 @@ export function buildMarkdownForRoute(pathname: string): string {
 ---
 ## Official Contact & Links
 - **Website**: ${OFFICIAL_CONTACT.domain}
+- **Contact Lead**: ${OFFICIAL_CONTACT.contactName}
 - **Email**: [${OFFICIAL_CONTACT.email}](mailto:${OFFICIAL_CONTACT.email})
-- **Phone / WhatsApp**: [${OFFICIAL_CONTACT.phoneDisplay}](tel:+${OFFICIAL_CONTACT.whatsappNumber})
-- **Social Channels (${OFFICIAL_CONTACT.marketingSocialHandle})**: [Instagram](${OFFICIAL_CONTACT.marketingSocials[0].url}) | [Facebook](${OFFICIAL_CONTACT.marketingSocials[1].url}) | [X](${OFFICIAL_CONTACT.marketingSocials[2].url}) | [YouTube](${OFFICIAL_CONTACT.marketingSocials[3].url})
+- **Phone**: [${OFFICIAL_CONTACT.phoneDisplay}](${OFFICIAL_CONTACT.phoneHref})
+- **Service Availability**: ${OFFICIAL_CONTACT.regionIndicator} — ${OFFICIAL_CONTACT.internationalSupportLine}
+- **Follow AKYIN**: [Facebook – Follow AKYIN](${OFFICIAL_CONTACT.marketingSocials[0].url}) | [YouTube – Subscribe to AKYIN Marketing](${OFFICIAL_CONTACT.marketingSocials[1].url}) | [Instagram – Follow AKYIN Ventures](${OFFICIAL_CONTACT.marketingSocials[2].url}) | [WhatsApp – Join AKYIN Updates](${OFFICIAL_CONTACT.marketingSocials[3].url})
 - **Key Pages**: [About](/about) | [Ventures](/ventures) | [Pricing](/pricing) | [Advisory](/advisory) | [Contact](/contact) | [Terms](/terms) | [Privacy](/privacy) | [Sitemap](/sitemap)
 - **Agent Endpoints**: [/llms.txt](/llms.txt) | [/.well-known/mcp/server-card.json](/.well-known/mcp/server-card.json) | [/robots.txt](/robots.txt)
 `;
@@ -68,14 +71,23 @@ ${commonFooter}`;
         `- **${b.number}. ${b.title}** — *${b.subtitle}* by ${b.author} ([View on Amazon](${b.amazonUrl}))`
     ).join('\n');
 
-    return `# AKYIN Publishing — Stories, Knowledge & Ideas Worth Sharing
+    const digitalLines = GUMROAD_DIGITAL_PRODUCTS.map(
+      (p) =>
+        `- **${p.number}. ${p.shortTitle}** — ${p.description} ([Get This Product](${p.gumroadUrl}))`
+    ).join('\n');
 
-> Discover books published by AKYIN, created to inspire learning, personal development and new perspectives.
+    return `# AKYIN Publishing — Ideas That Inspire. Knowledge That Empowers.
 
-## Published Books on Amazon
+> Explore books, practical guides and digital resources published by AKYIN.
+
+## Explore Our Books on Amazon
 ${bookLines}
 
-## Storefronts
+## Digital Guides & Productivity Tools
+${digitalLines}
+
+## Explore More & Storefronts
+- [Explore AKYIN on Pinterest](${PUBLISHING_LINKS.pinterest})
 - [Amazon Author Store](${PUBLISHING_LINKS.amazonAuthorStore})
 - [Google Play Books — THE DISCIPLINE CODE](${PUBLISHING_LINKS.googlePlayDisciplineCode})
 ${commonFooter}`;
@@ -103,7 +115,7 @@ ${commonFooter}`;
 ## Privacy Policy
 - Visitor enquiries are validated client-side and transmitted directly to AKYIN Ventures' authorized workspace desk or user-selected WhatsApp/Email apps.
 - AKYIN Ventures never sells or brokers contact data to third parties.
-- Contact [connect@akyin.com](mailto:connect@akyin.com) or [+91-6305694011](tel:+916305694011) for data requests.
+- Contact [connect@akyin.com](mailto:connect@akyin.com) or [+91 63956 94011](tel:+916395694011) for data requests.
 ${commonFooter}`;
   }
 
@@ -135,7 +147,7 @@ ${commonFooter}`;
 Reach our corporate desk or any of the seven operating verticals directly:
 
 - **Corporate Email**: [connect@akyin.com](mailto:connect@akyin.com)
-- **Phone / WhatsApp**: [+91-6305694011](tel:+916305694011)
+- **Phone**: [+91 63956 94011](tel:+916395694011)
 - **Booking Desk**: [Schedule Business Advisory](/advisory)
 ${commonFooter}`;
   }

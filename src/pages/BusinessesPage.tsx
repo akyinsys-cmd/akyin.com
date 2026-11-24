@@ -4,6 +4,7 @@ import { useSiteConfig } from '../context/SiteConfigContext';
 import { EditorialReveal } from '../components/EditorialReveal';
 import { GlassButton } from '../components/liquid-glass';
 import { ResilientImage } from '../components/ResilientImage';
+import { OurClientsSection } from '../components/OurClientsSection';
 
 interface BusinessesPageProps {
   onNavigate: (route: AppRoute) => void;
@@ -39,7 +40,7 @@ export function BusinessesPage({ onNavigate, onStartEnquiry }: BusinessesPagePro
             Our Businesses &amp; Operating Verticals.
           </h1>
           <p className="text-base sm:text-lg text-[#6E6E73] max-w-2xl leading-relaxed">
-            Explore each dedicated venture under AKYIN Ventures—including publishing, our full-service marketing agency, fashion &amp; value retail, AI tools, B2B supply, and consulting.
+            Explore the three core operating ventures under AKYIN Ventures—including publishing, our full-service marketing agency (with dedicated automotive growth), and fashion retail.
           </p>
         </EditorialReveal>
       </section>
@@ -103,29 +104,13 @@ export function BusinessesPage({ onNavigate, onStartEnquiry }: BusinessesPagePro
                               ? 'Publishing Enquiry'
                               : venture.id === 'marketing'
                                 ? 'Marketing Services Enquiry'
-                                : venture.id === 'store'
-                                  ? 'Retail and Store Enquiry'
-                                  : venture.id === 'aicalc'
-                                    ? 'AICalc Enquiry'
-                                    : venture.id === 'kartigo'
-                                      ? 'Kartigo Business Enquiry'
-                                      : venture.id === 'biznxt'
-                                        ? 'BizNXT Consulting Enquiry'
-                                        : 'Budget Bazaar Enquiry',
+                                : 'Retail and Store Enquiry',
                           vertical:
                             venture.id === 'publishing'
                               ? 'Akyin Publishing'
                               : venture.id === 'marketing'
                                 ? 'Akyin Marketing'
-                                : venture.id === 'store'
-                                  ? 'Akyin Store / AKYIN THRIFT'
-                                  : venture.id === 'aicalc'
-                                    ? 'AICalc (aicalc.in)'
-                                    : venture.id === 'kartigo'
-                                      ? 'Kartigo (kartigo.online)'
-                                      : venture.id === 'biznxt'
-                                        ? 'BizNXT (biznxt.online)'
-                                        : 'Budget Bazaar (budgetbazaar.org)',
+                                : 'Akyin Store / AKYIN THRIFT',
                         })
                       }
                     >
@@ -150,6 +135,9 @@ export function BusinessesPage({ onNavigate, onStartEnquiry }: BusinessesPagePro
           ))}
         </div>
       </section>
+
+      {/* Dedicated Client Ecosystem Section */}
+      <OurClientsSection onNavigate={onNavigate} backgroundClass="bg-[#FFFFFF]" />
     </div>
   );
 }

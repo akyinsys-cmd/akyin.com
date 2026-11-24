@@ -23,6 +23,7 @@ import {
   VehicleSegmentKey,
 } from '../components/AutomotiveResultsSection';
 import { AutomotiveSuccessStories } from '../components/AutomotiveSuccessStories';
+import { ClientSuccessCarousel } from '../components/ClientSuccessCarousel';
 import { ContactDispatcher } from '../components/ContactDispatcher';
 import { DealershipGrowthCalculator } from '../components/DealershipGrowthCalculator';
 import {
@@ -342,7 +343,7 @@ const AUTOMOTIVE_FAQS = [
   },
 ];
 
-export function AutomotiveMarketingPage({}: AutomotiveMarketingPageProps) {
+export function AutomotiveMarketingPage({ onNavigate }: AutomotiveMarketingPageProps) {
   const shouldReduceMotion = useReducedMotion();
   const [enquiryMessage, setEnquiryMessage] = useState('');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -726,6 +727,13 @@ export function AutomotiveMarketingPage({}: AutomotiveMarketingPageProps) {
 
       {/* Auto-Playing Dealership Manager Video Success Stories */}
       <VideoSuccessStories />
+
+      {/* Client Success Testimonial Carousel */}
+      <ClientSuccessCarousel
+        onNavigate={onNavigate}
+        defaultSegment="automotive"
+        backgroundClass="surface-silver-gradient"
+      />
 
       {/* 5. Company Presentation Viewer Section */}
       <PresentationDeckViewer

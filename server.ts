@@ -69,9 +69,9 @@ const ROUTE_SEO_META: Record<
       'Explore Akyin Publishing, Akyin Marketing Agency, Akyin Store, AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar.',
   },
   '/ventures/publishing': {
-    title: 'AKYIN Publishing — Stories, Knowledge & Ideas Worth Sharing | akyin.com',
+    title: 'AKYIN Publishing — Ideas That Inspire. Knowledge That Empowers. | akyin.com',
     description:
-      'Discover five books published by AKYIN on Amazon, created to inspire learning, personal development, and new perspectives.',
+      'Explore eight books on Amazon and three digital guides & productivity tools published by AKYIN.',
   },
   '/ventures/marketing': {
     title: 'AKYIN MARKETINGS — Full-Service Marketing Agency & Growth Solutions',
@@ -121,19 +121,127 @@ function escapeHtmlAttr(value: string): string {
     .replace(/>/g, '&gt;');
 }
 
-function createGeminiClient(): GoogleGenAI | null {
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
-  if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
-    return null;
+type GeminiClientResult =
+  | { client: GoogleGenAI; reason: null }
+  | { client: null; reason: 'API_KEY_MISSING' | 'API_KEY_INVALID_FORMAT' };
+
+function createGeminiClient(): GeminiClientResult {
+  let apiKey = (process.env.GEMINI_API_KEY ?? '')
+    .trim()
+    .replace(/^(['"])(.*)\1$/, '$2')
+    .trim()
+    .replace(/^Bearer\s+/i, '')
+    .trim();
+
+  if (
+    !apiKey ||
+    apiKey === 'MY_GEMINI_API_KEY' ||
+    /^(your_|replace_|test_|changeme|<.*>)/i.test(apiKey)
+  ) {
+    return { client: null, reason: 'API_KEY_MISSING' };
   }
-  return new GoogleGenAI({
-    apiKey,
-    httpOptions: {
-      headers: {
-        'User-Agent': 'aistudio-build',
+
+  // OAuth access tokens (ya29.*) or tokens with whitespace are rejected by x-goog-api-key
+  if (/\s/.test(apiKey) || apiKey.startsWith('ya29.')) {
+    return { client: null, reason: 'API_KEY_INVALID_FORMAT' };
+  }
+
+  return {
+    client: new GoogleGenAI({
+      apiKey,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        },
       },
-    },
-  });
+    }),
+    reason: null,
+  };
+}
+
+interface ClassifiedGeminiError {
+  httpStatus: number;
+  code: string;
+  clientMessage: string;
+  retryable: boolean;
+  isAuthError: boolean;
+}
+
+function classifyGeminiError(err: unknown): ClassifiedGeminiError {
+  const rawMessage = err instanceof Error ? err.message : String(err ?? '');
+  const statusProp =
+    typeof err === 'object' && err !== null && 'status' in err
+      ? Number((err as { status?: unknown }).status)
+      : NaN;
+
+  const isAuthError =
+    statusProp === 401 ||
+    statusProp === 403 ||
+    /"code"\s*:\s*(401|403)/.test(rawMessage) ||
+    /API_KEY_INVALID|ACCESS_TOKEN_TYPE_UNSUPPORTED|API key not valid|UNAUTHENTICATED|PERMISSION_DENIED/i.test(
+      rawMessage
+    );
+
+  if (isAuthError) {
+    return {
+      httpStatus: 401,
+      code: 'API_KEY_INVALID',
+      clientMessage:
+        'Live Google Search headlines require a valid Gemini API key in Settings > Secrets.',
+      retryable: false,
+      isAuthError: true,
+    };
+  }
+
+  const isQuotaError =
+    statusProp === 429 ||
+    /"code"\s*:\s*429/.test(rawMessage) ||
+    /RESOURCE_EXHAUSTED/i.test(rawMessage);
+
+  if (isQuotaError) {
+    return {
+      httpStatus: 429,
+      code: 'QUOTA_EXCEEDED',
+      clientMessage:
+        'Live Google Search headline quota is temporarily exhausted. Please check your Gemini API plan or retry shortly.',
+      retryable: true,
+      isAuthError: false,
+    };
+  }
+
+  const isModelNotFound =
+    statusProp === 404 ||
+    /"code"\s*:\s*404/.test(rawMessage) ||
+    /NOT_FOUND/i.test(rawMessage);
+
+  if (isModelNotFound) {
+    return {
+      httpStatus: 502,
+      code: 'MODEL_NOT_FOUND',
+      clientMessage: 'The configured headline search model is currently unavailable.',
+      retryable: false,
+      isAuthError: false,
+    };
+  }
+
+  const isClientBadRequest = statusProp === 400 || /"code"\s*:\s*400/.test(rawMessage);
+  if (isClientBadRequest) {
+    return {
+      httpStatus: 502,
+      code: 'INVALID_UPSTREAM_REQUEST',
+      clientMessage: 'Unable to complete live Google Search headline lookup right now.',
+      retryable: false,
+      isAuthError: false,
+    };
+  }
+
+  return {
+    httpStatus: 502,
+    code: 'UPSTREAM_ERROR',
+    clientMessage: 'Live Google Search headlines are temporarily unavailable. Please try again shortly.',
+    retryable: true,
+    isAuthError: false,
+  };
 }
 
 function getRazorpayCredentials(): { keyId: string; keySecret: string } | null {
@@ -193,6 +301,38 @@ const verifyPaymentBodySchema = z
   })
   .strict();
 
+function stripDangerousControls(value: string): string {
+  return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '').trim();
+}
+
+const leadSubmissionBodySchema = z
+  .object({
+    fullName: z.string().trim().min(2, 'Full name is required.').max(100),
+    businessName: z.string().trim().min(2, 'Business name is required.').max(120),
+    mobileNumber: z
+      .string()
+      .trim()
+      .min(7, 'Please provide a valid mobile number.')
+      .max(28)
+      .refine((val) => /^[+\d\s\-()]{7,28}$/.test(val), 'Enter a valid mobile number with country or area code.'),
+    email: z.string().trim().email('Enter a valid email address.').max(160),
+    city: z.string().trim().min(2, 'City is required.').max(80),
+    country: z.string().trim().min(2, 'Country is required.').max(80),
+    requiredService: z.string().trim().min(2, 'Please select a required service.').max(140),
+    monthlyMarketingBudget: z
+      .string()
+      .trim()
+      .min(2, 'Please select a monthly marketing budget range.')
+      .max(80),
+    message: z.string().trim().min(8, 'Please enter a brief requirement summary (at least 8 characters).').max(1500),
+    consentAccepted: z
+      .boolean()
+      .refine((val) => val === true, 'Please accept the privacy consent before submitting.'),
+    honeypot: z.string().max(60).optional().default(''),
+    source: z.string().trim().max(80).optional().default('Interactive Lead Enquiry Widget'),
+  })
+  .strict();
+
 function extractJsonArray(rawText: string): NewsArticle[] {
   const cleaned = rawText
     .replace(/```json\s*/gi, '')
@@ -238,7 +378,12 @@ function wantsMarkdown(req: Request): boolean {
   if (req.method !== 'GET' && req.method !== 'HEAD') return false;
   const accept = (req.headers.accept || '').toLowerCase();
   if (!accept.includes('text/markdown')) return false;
-  if (req.path.startsWith('/api/') || req.path.startsWith('/assets/') || req.path.startsWith('/.well-known/')) {
+  if (
+    req.path.startsWith('/api/') ||
+    req.path.startsWith('/assets/') ||
+    req.path.startsWith('/downloads/') ||
+    req.path.startsWith('/.well-known/')
+  ) {
     return false;
   }
   if (/\.[a-z0-9]{2,6}$/i.test(req.path)) return false;
@@ -366,6 +511,13 @@ async function startServer() {
     message: 'Too many headline sync requests. Please wait a minute before refreshing.',
   });
 
+  const leadRateLimiter = createRateLimiter({
+    windowMs: 60_000,
+    max: 12,
+    code: 'LEAD_RATE_LIMITED',
+    message: 'Too many enquiry submissions. Please wait a minute before trying again.',
+  });
+
   // Explicit agent discovery endpoints (works identically in dev and prod)
   app.get('/robots.txt', (_req: Request, res: Response) => {
     const file = resolvePublicOrDistFile('robots.txt');
@@ -404,6 +556,22 @@ async function startServer() {
       return;
     }
     res.status(404).json({ error: 'MCP server card not found.' });
+  });
+
+  // Explicit route for downloadable business presentations & pricing documents (PDFs)
+  app.get('/downloads/:filename', (req: Request, res: Response, next: NextFunction) => {
+    const rawFilename = req.params.filename;
+    const sanitizedFilename = path.basename(rawFilename);
+    const resolvedPath = resolvePublicOrDistFile(path.join('downloads', sanitizedFilename));
+    if (resolvedPath && fs.existsSync(resolvedPath)) {
+      if (sanitizedFilename.toLowerCase().endsWith('.pdf')) {
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename="${sanitizedFilename}"`);
+      }
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      return res.sendFile(resolvedPath);
+    }
+    next();
   });
 
   // Markdown content negotiation for AI agents requesting Accept: text/markdown
@@ -806,6 +974,95 @@ async function startServer() {
     });
   });
 
+  // Server-Validated Lead Enquiry Submission (stored outside public/ and dist/; never exposed via GET)
+  app.post('/api/leads', leadRateLimiter, (req: Request, res: Response) => {
+    const parsed = leadSubmissionBodySchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        ok: false,
+        error: parsed.error.issues[0]?.message || 'Invalid lead enquiry submission.',
+        code: 'INVALID_LEAD_PAYLOAD',
+        issues: parsed.error.issues.map((issue) => issue.message),
+      });
+      return;
+    }
+
+    const data = parsed.data;
+    if (data.honeypot && data.honeypot.trim().length > 0) {
+      res.status(400).json({
+        ok: false,
+        error: 'Submission rejected.',
+        code: 'INVALID_LEAD_PAYLOAD',
+      });
+      return;
+    }
+
+    const leadId = `AKY-LEAD-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+    const receivedAt = new Date().toISOString();
+
+    const record = {
+      leadId,
+      receivedAt,
+      fullName: stripDangerousControls(data.fullName),
+      businessName: stripDangerousControls(data.businessName),
+      mobileNumber: stripDangerousControls(data.mobileNumber),
+      email: stripDangerousControls(data.email),
+      city: stripDangerousControls(data.city),
+      country: stripDangerousControls(data.country),
+      requiredService: stripDangerousControls(data.requiredService),
+      monthlyMarketingBudget: stripDangerousControls(data.monthlyMarketingBudget),
+      message: stripDangerousControls(data.message),
+      consentAccepted: true,
+      source: stripDangerousControls(data.source || 'Interactive Lead Enquiry Widget'),
+    };
+
+    try {
+      const dataDir = path.resolve(__dirname, '.akyin-data');
+      const leadsFile = path.join(dataDir, 'leads.json');
+      fs.mkdirSync(dataDir, { recursive: true });
+
+      let existing: unknown[] = [];
+      if (fs.existsSync(leadsFile)) {
+        try {
+          const raw = fs.readFileSync(leadsFile, 'utf8');
+          const parsedFile = JSON.parse(raw) as unknown;
+          if (Array.isArray(parsedFile)) {
+            existing = parsedFile;
+          }
+        } catch {
+          existing = [];
+        }
+      }
+
+      existing.unshift(record);
+      const tempFile = path.join(dataDir, `leads.${process.pid}.${Date.now()}.tmp`);
+      fs.writeFileSync(tempFile, JSON.stringify(existing.slice(0, 1000), null, 2), 'utf8');
+      fs.renameSync(tempFile, leadsFile);
+
+      res.status(201).json({
+        ok: true,
+        leadId,
+        receivedAt,
+      });
+    } catch (err: unknown) {
+      console.error('[/api/leads] Failed to persist submission:', err instanceof Error ? err.message : err);
+      res.status(500).json({
+        ok: false,
+        error: 'Unable to record enquiry right now. Please contact connect@akyin.com directly.',
+        code: 'LEAD_STORAGE_ERROR',
+      });
+    }
+  });
+
+  app.get('/api/leads', (_req: Request, res: Response) => {
+    res.setHeader('Allow', 'POST');
+    res.status(405).json({
+      ok: false,
+      error: 'Method not allowed. Lead enquiries must be submitted via POST.',
+      code: 'METHOD_NOT_ALLOWED',
+    });
+  });
+
   app.get('/api/automotive-news', newsRateLimiter, async (req: Request, res: Response) => {
     const topicKey =
       typeof req.query.topic === 'string' && req.query.topic in TOPIC_PROMPTS
@@ -818,12 +1075,14 @@ async function startServer() {
       return;
     }
 
-    const ai = createGeminiClient();
+    const { client: ai, reason } = createGeminiClient();
     if (!ai) {
       res.status(503).json({
         error:
-          'Live Google Search headlines require GEMINI_API_KEY to be configured in Settings > Secrets.',
-        code: 'API_KEY_MISSING',
+          reason === 'API_KEY_INVALID_FORMAT'
+            ? 'Configured GEMINI_API_KEY is not a valid API key format. Please update GEMINI_API_KEY in Settings > Secrets.'
+            : 'Live Google Search headlines require GEMINI_API_KEY to be configured in Settings > Secrets.',
+        code: reason,
       });
       return;
     }
@@ -831,7 +1090,7 @@ async function startServer() {
     const topicFocus = TOPIC_PROMPTS[topicKey];
 
     try {
-      const response = await ai.models.generateContent({
+      const requestParams = {
         model: 'gemini-4-hydrogen',
         contents: `Use Google Search to find 4 to 6 current, real-world industry news headlines and trends about ${topicFocus}.
 
@@ -846,7 +1105,27 @@ Return ONLY a valid JSON array (no extra commentary) where each object contains:
           tools: [{ googleSearch: {} }],
           thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
         },
-      });
+      };
+
+      let response;
+      const maxAttempts = 3;
+      for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        try {
+          response = await ai.models.generateContent(requestParams);
+          break;
+        } catch (attemptErr: unknown) {
+          const classified = classifyGeminiError(attemptErr);
+          if (!classified.retryable || attempt === maxAttempts) {
+            throw attemptErr;
+          }
+          const delayMs = 300 * 2 ** (attempt - 1);
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+        }
+      }
+
+      if (!response) {
+        throw new Error('Empty response from Gemini API.');
+      }
 
       const rawText = response.text ?? '';
       const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks ?? [];
@@ -905,12 +1184,19 @@ Return ONLY a valid JSON array (no extra commentary) where each object contains:
       });
       res.json(payload);
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Unable to fetch grounded automotive headlines.';
-      console.error('[/api/automotive-news] Error:', message);
-      res.status(502).json({
-        error: 'Live Google Search headlines are temporarily unavailable. Please try again shortly.',
-        code: 'UPSTREAM_ERROR',
+      const classified = classifyGeminiError(err);
+      if (classified.isAuthError) {
+        console.warn(
+          '[/api/automotive-news] Gemini API key rejected by upstream (401/403). Check GEMINI_API_KEY in Settings > Secrets.'
+        );
+      } else {
+        const message =
+          err instanceof Error ? err.message : 'Unable to fetch grounded automotive headlines.';
+        console.warn(`[/api/automotive-news] ${classified.code}:`, message);
+      }
+      res.status(classified.httpStatus).json({
+        error: classified.clientMessage,
+        code: classified.code,
       });
     }
   });

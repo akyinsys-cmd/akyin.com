@@ -1,443 +1,368 @@
-import { ArrowRight, ArrowUpRight, Check, Link2, Mail, Phone } from 'lucide-react';
-import {
-  AppRoute,
-  EXTERNAL_VERTICAL_URLS,
-  OFFICIAL_CONTACT,
-  PUBLISHING_LINKS,
-} from '../data/akyinData';
+import { ArrowUp, ArrowUpRight, Globe, Mail, Phone } from 'lucide-react';
+import { AppRoute, OFFICIAL_CONTACT } from '../data/akyinData';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { sanitizeHref } from '../utils/security';
 import { AkyinLogo } from './AkyinLogo';
 import { EditorialReveal } from './EditorialReveal';
-import { GlassButton, GlassPanel } from './liquid-glass';
-import { NewsletterSignup } from './NewsletterSignup';
+import { GlassPanel } from './liquid-glass';
 import { SocialLinks } from './SocialLinks';
 
 interface FooterProps {
   onNavigate: (route: AppRoute) => void;
-  onStartEnquiry: (options: {
+  onStartEnquiry?: (options: {
     category: string;
     vertical: string;
     enquiryType?: string;
   }) => void;
-  onCopyLink: () => void;
-  copied: boolean;
+  onCopyLink?: () => void;
+  copied?: boolean;
 }
 
-export function Footer({ onNavigate, onStartEnquiry, onCopyLink, copied }: FooterProps) {
+export function Footer({ onNavigate }: FooterProps) {
   const { settings } = useSiteConfig();
   const displayEmail = settings.contactEmail || OFFICIAL_CONTACT.email;
   const displayPhone = settings.contactPhone || OFFICIAL_CONTACT.phoneDisplay;
-  const whatsappUrl = sanitizeHref(
-    `https://wa.me/${settings.whatsappNumber || OFFICIAL_CONTACT.whatsappNumber}`,
-    OFFICIAL_CONTACT.whatsappUrl
-  );
-  const footerTagline =
+  const cleanPhoneHref = `tel:+${displayPhone.replace(/[^0-9]/g, '') || OFFICIAL_CONTACT.whatsappNumber}`;
+  const safeEmailHref = sanitizeHref(`mailto:${displayEmail}`, `mailto:${OFFICIAL_CONTACT.email}`, true);
+  const footerDescription =
     settings.footerTagline ||
-    'Parent corporate group bringing together operating ventures across publishing, full-service marketing agency growth, value retail, AI utility software, B2B stock commerce, and business consulting.';
+    'A diversified business group working across marketing, publishing, technology, commerce and business solutions.';
 
   const handleLink = (e: React.MouseEvent, route: AppRoute) => {
     e.preventDefault();
     onNavigate(route);
   };
 
+  const handleEcosystemScroll = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (window.location.pathname !== '/') {
+      onNavigate('/');
+      window.setTimeout(() => {
+        document.getElementById('our-ecosystem')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 260);
+    } else {
+      document.getElementById('our-ecosystem')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleBackToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <footer className="surface-silver-gradient text-[#1D1D1F] border-t border-[#E8E8ED]">
-      <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
-        {/* Highlighted Liquid Glass Final Enquiry CTA */}
-        <GlassPanel className="mb-14 p-7 sm:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6 print:hidden">
-          <div className="space-y-1.5">
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-              Direct Corporate &amp; Vertical Desk
-            </p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-[-0.02em] text-[#1D1D1F]">
-              Have a Business Enquiry?
-            </h2>
-          </div>
-          <GlassButton
-            variant="primary"
-            size="lg"
-            onClick={() => onNavigate('/contact')}
-          >
-            <span>Let&apos;s Talk</span>
-            <ArrowRight
-              className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
-              aria-hidden="true"
-            />
-          </GlassButton>
-        </GlassPanel>
-
-        {/* 4-Column Corporate Footer Layout */}
-        <div className="pb-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 print:hidden">
-          {/* COLUMN 1 – AKYIN VENTURES */}
-          <div className="space-y-4">
-            <AkyinLogo wordmark="AKYIN" size="sm" showSubtext />
-            <p className="text-sm font-semibold text-[#1D1D1F]">
-              Building Ideas Into Businesses.
-            </p>
-            <p className="text-sm text-[#6E6E73] leading-relaxed">
-              {footerTagline}
-            </p>
-            <div className="pt-2 space-y-2 text-xs">
-              <a
-                href={`mailto:${displayEmail}`}
-                className="flex items-center gap-2 text-[#1D1D1F] hover:text-[#6E6E73] transition-colors font-medium"
-              >
-                <Mail className="w-3.5 h-3.5 text-[#1D1D1F]" aria-hidden="true" />
-                <span>{displayEmail}</span>
-              </a>
-              <div className="flex flex-wrap items-center gap-3">
-                <a
-                  href={`tel:+${settings.whatsappNumber || OFFICIAL_CONTACT.whatsappNumber}`}
-                  className="flex items-center gap-2 font-mono-num text-[#1D1D1F] hover:text-[#6E6E73] transition-colors font-medium"
-                >
-                  <Phone className="w-3.5 h-3.5 text-[#1D1D1F]" aria-hidden="true" />
-                  <span>{displayPhone}</span>
-                </a>
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[11px] font-semibold text-[#6E6E73] hover:text-[#1D1D1F] underline"
-                >
-                  WhatsApp
-                </a>
-              </div>
+      <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-10 lg:pt-18 lg:pb-12">
+        {/* Sophisticated 4-Column Apple-Inspired Liquid Glass Footer */}
+        <GlassPanel className="p-7 sm:p-10 mb-10 print:hidden">
+          {/* Brand & International Availability Bar */}
+          <div className="pb-8 mb-8 border-b border-[#E8E8ED] flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <AkyinLogo wordmark={settings.brandWordmark || 'AKYIN'} size="sm" showSubtext />
+              <p className="text-sm font-semibold text-[#1D1D1F]">
+                Building Businesses. Creating Opportunities.
+              </p>
+              <p className="text-xs text-[#6E6E73]">
+                {footerDescription}
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs bg-white/70 backdrop-blur-sm border border-[#E8E8ED] rounded-2xl px-4 py-3 shrink-0">
+              <span className="font-semibold text-[#1D1D1F]">
+                {OFFICIAL_CONTACT.regionIndicator}
+              </span>
+              <span className="hidden sm:inline text-[#A1A1A6]" aria-hidden="true">|</span>
+              <span className="text-[#6E6E73]">
+                {OFFICIAL_CONTACT.internationalSupportLine}
+              </span>
             </div>
           </div>
 
-          {/* COLUMN 2 – OUR VENTURES */}
-          <div className="space-y-4">
-            <h3 className="font-display text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-              Our Ventures
-            </h3>
-            <ul className="space-y-2.5 text-sm text-[#1D1D1F]">
-              <li>
-                <a
-                  href="/ventures/publishing"
-                  onClick={(e) => handleLink(e, '/ventures/publishing')}
-                  className="hover:text-[#6E6E73] transition-colors"
-                >
-                  AKYIN Publishing
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/ventures/marketing"
-                  onClick={(e) => handleLink(e, '/ventures/marketing')}
-                  className="hover:text-[#6E6E73] transition-colors"
-                >
-                  Marketing Agency
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/ventures/store"
-                  onClick={(e) => handleLink(e, '/ventures/store')}
-                  className="hover:text-[#6E6E73] transition-colors"
-                >
-                  Store
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/ventures/aicalc"
-                  onClick={(e) => handleLink(e, '/ventures/aicalc')}
-                  className="hover:text-[#6E6E73] transition-colors"
-                >
-                  AICalc
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/ventures/kartigo"
-                  onClick={(e) => handleLink(e, '/ventures/kartigo')}
-                  className="hover:text-[#6E6E73] transition-colors"
-                >
-                  Kartigo
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/ventures/biznxt"
-                  onClick={(e) => handleLink(e, '/ventures/biznxt')}
-                  className="hover:text-[#6E6E73] transition-colors"
-                >
-                  BizNXT
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/ventures/budget-bazaar"
-                  onClick={(e) => handleLink(e, '/ventures/budget-bazaar')}
-                  className="hover:text-[#6E6E73] transition-colors"
-                >
-                  Budget Bazaar
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* COLUMN 3 – OUR ECOSYSTEM */}
-          <div className="space-y-4">
-            <h3 className="font-display text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-              Our Ecosystem
-            </h3>
-            <ul className="space-y-3 text-sm text-[#6E6E73]">
-              <li>
-                <div className="flex flex-col">
-                  <span className="font-semibold text-[#1D1D1F]">AutoClub</span>
-                  <span className="text-xs text-[#6E6E73]">Client</span>
-                </div>
-              </li>
-              <li>
-                <a
-                  href={PUBLISHING_LINKS.amazonAuthorStore}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex flex-col hover:text-[#1D1D1F] transition-colors"
-                >
-                  <span className="inline-flex items-center gap-1 font-semibold text-[#1D1D1F]">
-                    <span>Amazon</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-[#A1A1A6]" aria-hidden="true" />
-                  </span>
-                  <span className="text-xs text-[#6E6E73]">Publishing marketplace</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href={PUBLISHING_LINKS.googlePlayDisciplineCode}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex flex-col hover:text-[#1D1D1F] transition-colors"
-                >
-                  <span className="inline-flex items-center gap-1 font-semibold text-[#1D1D1F]">
-                    <span>Google Play Books</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-[#A1A1A6]" aria-hidden="true" />
-                  </span>
-                  <span className="text-xs text-[#6E6E73]">Digital publishing platform</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.shopify.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex flex-col hover:text-[#1D1D1F] transition-colors"
-                >
-                  <span className="inline-flex items-center gap-1 font-semibold text-[#1D1D1F]">
-                    <span>Shopify</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-[#A1A1A6]" aria-hidden="true" />
-                  </span>
-                  <span className="text-xs text-[#6E6E73]">Commerce platform</span>
-                </a>
-              </li>
-              <li className="pt-2 border-t border-[#1D1D1F]/10 flex flex-wrap gap-x-3 gap-y-1 text-xs">
-                <a
-                  href={EXTERNAL_VERTICAL_URLS.biznxt}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-[#1D1D1F] transition-colors"
-                >
-                  biznxt.online
-                </a>
-                <a
-                  href={EXTERNAL_VERTICAL_URLS.budgetBazaar}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-[#1D1D1F] transition-colors"
-                >
-                  budgetbazaar.org
-                </a>
-                <a
-                  href={EXTERNAL_VERTICAL_URLS.aicalc}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-[#1D1D1F] transition-colors"
-                >
-                  aicalc.in
-                </a>
-                <a
-                  href={EXTERNAL_VERTICAL_URLS.kartigo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-[#1D1D1F] transition-colors"
-                >
-                  kartigo.online
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* COLUMN 4 – CONNECT */}
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            {/* COLUMN 1 – AKYIN VENTURES */}
             <div className="space-y-4">
               <h3 className="font-display text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-                Connect
+                AKYIN Ventures
               </h3>
-              <ul className="space-y-2.5 text-sm text-[#6E6E73]">
+              <ul className="space-y-2.5 text-sm text-[#1D1D1F]">
                 <li>
                   <a
-                    href="/pricing"
-                    onClick={(e) => handleLink(e, '/pricing')}
-                    className="hover:text-[#1D1D1F] transition-colors font-semibold text-[#1D1D1F]"
+                    href="/ventures/publishing"
+                    onClick={(e) => handleLink(e, '/ventures/publishing')}
+                    className="hover:text-[#0071E3] transition-colors"
                   >
-                    Pricing &amp; Rate Card
+                    AKYIN Publishing
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/ventures/marketing"
+                    onClick={(e) => handleLink(e, '/ventures/marketing')}
+                    className="hover:text-[#0071E3] transition-colors"
+                  >
+                    AKYIN Marketing
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/marketing/automotive"
+                    onClick={(e) => handleLink(e, '/marketing/automotive')}
+                    className="hover:text-[#0071E3] transition-colors text-xs text-[#6E6E73] hover:text-[#0071E3]"
+                  >
+                    ↳ Automotive Marketing Division
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/ventures/store"
+                    onClick={(e) => handleLink(e, '/ventures/store')}
+                    className="hover:text-[#0071E3] transition-colors"
+                  >
+                    AKYIN Store (AKYIN Thrift)
+                  </a>
+                </li>
+                <li className="pt-2 border-t border-[#E8E8ED]">
+                  <a
+                    href="/ventures"
+                    onClick={(e) => handleLink(e, '/ventures')}
+                    className="text-xs font-semibold text-[#0071E3] hover:underline"
+                  >
+                    All Ventures Portfolio →
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/about"
+                    onClick={(e) => handleLink(e, '/about')}
+                    className="text-xs text-[#6E6E73] hover:text-[#1D1D1F] transition-colors"
+                  >
+                    About AKYIN Ventures
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* COLUMN 2 – OUR CLIENTS */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-display text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
+                  Our Clients
+                </h3>
+                <span className="text-[10px] font-semibold text-[#0071E3] bg-[#0071E3]/10 px-2 py-0.5 rounded-full">
+                  58 Clients
+                </span>
+              </div>
+              <ul className="space-y-2.5 text-sm text-[#1D1D1F]">
+                <li>
+                  <a
+                    href="https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/aicalc"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 hover:text-[#0071E3] transition-colors"
+                  >
+                    <span>AICalc</span>
+                    <span className="text-[10px] text-[#6E6E73]">(AI &amp; Tech)</span>
+                    <ArrowUpRight className="w-3 h-3 text-[#A1A1A6]" />
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/kartigo"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 hover:text-[#0071E3] transition-colors"
+                  >
+                    <span>Kartigo</span>
+                    <span className="text-[10px] text-[#6E6E73]">(B2B Stock)</span>
+                    <ArrowUpRight className="w-3 h-3 text-[#A1A1A6]" />
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/biznxt"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 hover:text-[#0071E3] transition-colors"
+                  >
+                    <span>BizNXT</span>
+                    <span className="text-[10px] text-[#6E6E73]">(Consulting)</span>
+                    <ArrowUpRight className="w-3 h-3 text-[#A1A1A6]" />
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/budget-bazaar"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 hover:text-[#0071E3] transition-colors"
+                  >
+                    <span>Budget Bazaar</span>
+                    <span className="text-[10px] text-[#6E6E73]">(E-commerce)</span>
+                    <ArrowUpRight className="w-3 h-3 text-[#A1A1A6]" />
+                  </a>
+                </li>
+                <li>
+                  <span className="text-xs text-[#6E6E73]">
+                    AutoClub · Arosco Ventures · MEI Cosmetics
+                  </span>
+                </li>
+                <li className="pt-2 border-t border-[#E8E8ED]">
+                  <a
+                    href="/#our-clients"
+                    onClick={handleEcosystemScroll}
+                    className="text-xs font-semibold text-[#0071E3] hover:underline"
+                  >
+                    View All 58 Clients Directory →
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* COLUMN 3 – SERVICES */}
+            <div className="space-y-4">
+              <h3 className="font-display text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
+                Services
+              </h3>
+              <ul className="space-y-2.5 text-sm text-[#1D1D1F]">
+                <li>
+                  <a
+                    href="/ventures/marketing"
+                    onClick={(e) => handleLink(e, '/ventures/marketing')}
+                    className="hover:text-[#0071E3] transition-colors"
+                  >
+                    Growth Marketing Packages
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/marketing/automotive"
+                    onClick={(e) => handleLink(e, '/marketing/automotive')}
+                    className="hover:text-[#0071E3] transition-colors"
+                  >
+                    Automotive Dealership Growth
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/ventures/marketing"
+                    onClick={(e) => handleLink(e, '/ventures/marketing')}
+                    className="hover:text-[#0071E3] transition-colors"
+                  >
+                    Lead Generation &amp; Vetting
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/ventures/marketing"
+                    onClick={(e) => handleLink(e, '/ventures/marketing')}
+                    className="hover:text-[#0071E3] transition-colors"
+                  >
+                    Creative &amp; Brand Collateral
                   </a>
                 </li>
                 <li>
                   <a
                     href="/advisory"
                     onClick={(e) => handleLink(e, '/advisory')}
-                    className="hover:text-[#1D1D1F] transition-colors font-semibold text-[#1D1D1F]"
+                    className="hover:text-[#0071E3] transition-colors"
                   >
-                    Business Advisory Booking
+                    1-on-1 Business Advisory
                   </a>
                 </li>
-                <li>
+                <li className="pt-2 border-t border-[#E8E8ED]">
                   <a
-                    href="/contact"
-                    onClick={(e) => handleLink(e, '/contact')}
-                    className="hover:text-[#6E6E73] transition-colors text-[#1D1D1F]"
+                    href="/pricing"
+                    onClick={(e) => handleLink(e, '/pricing')}
+                    className="text-xs font-semibold text-[#0071E3] hover:underline"
                   >
-                    Contact Us
+                    Pricing &amp; Rate Card →
                   </a>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      onStartEnquiry({
-                        category: 'General Business Enquiry',
-                        vertical: 'AKYIN Ventures (Corporate Group)',
-                      })
-                    }
-                    className="hover:text-[#1D1D1F] transition-colors cursor-pointer text-left"
-                  >
-                    General Enquiries
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      onStartEnquiry({
-                        category: 'BizNXT Consulting Enquiry',
-                        vertical: 'BizNXT (biznxt.online)',
-                        enquiryType: 'BizNXT Business Guidance & Consulting Enquiry',
-                      })
-                    }
-                    className="hover:text-[#1D1D1F] transition-colors cursor-pointer text-left"
-                  >
-                    Business Enquiries
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      onStartEnquiry({
-                        category: 'Partnership Enquiry',
-                        vertical: 'AKYIN Ventures (Corporate Group)',
-                        enquiryType: 'Strategic Business Partnership',
-                      })
-                    }
-                    className="hover:text-[#1D1D1F] transition-colors cursor-pointer text-left"
-                  >
-                    Partnership Enquiries
-                  </button>
                 </li>
               </ul>
             </div>
 
-            <div className="space-y-3 pt-4 border-t border-[#1D1D1F]/10">
-              <h4 className="font-display text-xs font-semibold text-[#1D1D1F]">
-                Social Media ({OFFICIAL_CONTACT.marketingSocialHandle})
-              </h4>
-              <SocialLinks variant="compact" />
+            {/* COLUMN 4 – CONTACT & SOCIAL MEDIA */}
+            <div className="space-y-5">
+              <div className="space-y-3">
+                <h3 className="font-display text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
+                  Contact &amp; Social Media
+                </h3>
+                <ul className="space-y-2.5 text-sm">
+                  <li>
+                    <a
+                      href={cleanPhoneHref}
+                      className="inline-flex items-center gap-2 font-mono-num text-[#1D1D1F] hover:text-[#0071E3] transition-colors font-medium"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-[#0071E3] shrink-0" aria-hidden="true" />
+                      <span>{displayPhone}</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href={safeEmailHref}
+                      className="inline-flex items-center gap-2 text-[#1D1D1F] hover:text-[#0071E3] transition-colors font-medium break-all"
+                    >
+                      <Mail className="w-3.5 h-3.5 text-[#0071E3] shrink-0" aria-hidden="true" />
+                      <span>{displayEmail}</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="/contact"
+                      onClick={(e) => handleLink(e, '/contact')}
+                      className="inline-flex items-center gap-2 text-[#1D1D1F] hover:text-[#0071E3] transition-colors font-medium"
+                    >
+                      <Globe className="w-3.5 h-3.5 text-[#0071E3] shrink-0" aria-hidden="true" />
+                      <span>Enquiry &amp; Office Desk</span>
+                      <ArrowUpRight className="w-3.5 h-3.5 text-[#A1A1A6]" aria-hidden="true" />
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="pt-4 border-t border-[#E8E8ED] space-y-3">
+                <h4 className="font-display text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
+                  Follow AKYIN
+                </h4>
+                <SocialLinks variant="compact" />
+              </div>
             </div>
           </div>
-        </div>
+        </GlassPanel>
 
-        {/* Compact Newsletter Sign-Up */}
-        <div className="print:hidden">
-          <NewsletterSignup />
-        </div>
-
-        {/* Bottom Copyright & Copy Link */}
-        <div className="pt-6 border-t border-[#1D1D1F]/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#6E6E73]">
-          <p>© 2026 AKYIN VENTURES. All Rights Reserved.</p>
-          <p className="hidden print:block text-[#1D1D1F]">
-            https://akyin.com · {OFFICIAL_CONTACT.email} · {OFFICIAL_CONTACT.phoneDisplay}
+        {/* Bottom Copyright Bar */}
+        <div className="pt-4 border-t border-[#E8E8ED] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#6E6E73]">
+          <p className="text-[#1D1D1F] font-medium">
+            © 2026 AKYIN. All Rights Reserved.
           </p>
-          <div className="flex flex-wrap items-center gap-2.5 print:hidden">
-            <span>Official Group Portal</span>
-            <span aria-hidden="true">·</span>
-            <a
-              href="https://akyin.com"
-              onClick={(e) => handleLink(e, '/')}
-              className="text-[#1D1D1F] font-semibold hover:opacity-75 transition-opacity"
-            >
-              AKYIN.com
-            </a>
-            <span aria-hidden="true">·</span>
-            <a
-              href="/about"
-              onClick={(e) => handleLink(e, '/about')}
-              className="hover:text-[#1D1D1F] transition-colors"
-            >
-              About
-            </a>
-            <span aria-hidden="true">·</span>
-            <a
-              href="/pricing"
-              onClick={(e) => handleLink(e, '/pricing')}
-              className="hover:text-[#1D1D1F] transition-colors"
-            >
-              Pricing
-            </a>
-            <span aria-hidden="true">·</span>
-            <a
-              href="/terms"
-              onClick={(e) => handleLink(e, '/terms')}
-              className="hover:text-[#1D1D1F] transition-colors"
-            >
-              Terms
-            </a>
-            <span aria-hidden="true">·</span>
+
+          <p className="hidden print:block text-[#1D1D1F]">
+            https://akyin.com · {displayEmail} · {displayPhone}
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 print:hidden">
             <a
               href="/privacy"
               onClick={(e) => handleLink(e, '/privacy')}
               className="hover:text-[#1D1D1F] transition-colors"
             >
-              Privacy
+              Privacy Policy
             </a>
-            <span aria-hidden="true">·</span>
+            <span aria-hidden="true" className="text-[#A1A1A6]">·</span>
             <a
-              href="/sitemap"
-              onClick={(e) => handleLink(e, '/sitemap')}
+              href="/terms"
+              onClick={(e) => handleLink(e, '/terms')}
               className="hover:text-[#1D1D1F] transition-colors"
             >
-              Sitemap
+              Terms &amp; Conditions
             </a>
-            <span aria-hidden="true">·</span>
+            <span aria-hidden="true" className="text-[#A1A1A6]">·</span>
             <button
               type="button"
-              onClick={onCopyLink}
-              aria-label="Copy current page link to clipboard"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full liquid-glass-cta text-[11px] font-semibold text-[#1D1D1F] transition-all cursor-pointer"
+              onClick={handleBackToTop}
+              aria-label="Scroll back to top of page"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full liquid-glass-cta text-[11px] font-semibold text-[#1D1D1F] hover:text-[#0071E3] hover:border-[#0071E3]/35 transition-all cursor-pointer"
             >
-              {copied ? (
-                <>
-                  <Check className="w-3 h-3 text-[#1D1D1F]" aria-hidden="true" />
-                  <span className="text-[#1D1D1F]">Copied</span>
-                </>
-              ) : (
-                <>
-                  <Link2 className="w-3 h-3 text-[#1D1D1F]" aria-hidden="true" />
-                  <span>Copy Link</span>
-                </>
-              )}
+              <span>Back to Top</span>
+              <ArrowUp className="w-3 h-3" aria-hidden="true" />
             </button>
           </div>
         </div>

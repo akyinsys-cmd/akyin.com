@@ -45,14 +45,15 @@ export function AICalcPage() {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-6 space-y-6"
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-              AKYIN AI CALCULATOR · aicalc.in
-            </p>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 border border-[#1D1D1F]/10 text-xs font-semibold text-[#1D1D1F] shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-[#0071E3]" />
+              <span className="uppercase tracking-[0.08em] text-[#6E6E73]">AKYIN Client Showcase · AI &amp; Technology</span>
+            </div>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-[54px] font-bold tracking-[-0.025em] leading-[1.06] text-[#1D1D1F] text-balance">
               Smart Calculations. Powered by AI.
             </h1>
             <p className="text-base sm:text-lg text-[#6E6E73] leading-relaxed">
-              AICalc is an AI-powered calculator platform that allows users to solve mathematical and practical calculation problems using natural-language text queries alongside traditional calculator functions.
+              AICalc is an independent client business supported by AKYIN for digital growth and solutions. It allows users to solve mathematical, commercial, and practical calculation problems using natural-language text queries alongside traditional calculator functions.
             </p>
             <div className="flex flex-wrap items-center gap-3.5 pt-2">
               <GlassButton

@@ -1,31 +1,35 @@
-import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, ArrowUpRight, Briefcase } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowRight, ArrowUpRight, Briefcase, Building2, Layers } from 'lucide-react';
 import {
   AppRoute,
-  ECOSYSTEM_CLIENT,
+  ECOSYSTEM_CLIENTS_TICKER,
   ECOSYSTEM_PLATFORMS_TICKER,
   ECOSYSTEM_VENTURES_TICKER,
   EcosystemBrandEntry,
-  FULL_ECOSYSTEM_TICKER,
 } from '../data/akyinData';
+import {
+  CLIENT_ECOSYSTEM_RECORDS,
+  ClientEcosystemRecord,
+  ECOSYSTEM_INDUSTRY_CATEGORIES,
+  ECOSYSTEM_STATS,
+  EcosystemRelationshipType,
+} from '../data/ecosystemConfig';
 import { sanitizeHref } from '../utils/security';
 import { EditorialReveal } from './EditorialReveal';
+import { GlassPanel } from './liquid-glass';
 
 interface EcosystemSectionProps {
   onNavigate: (route: AppRoute) => void;
 }
+
+type RelationshipFilter = 'all' | EcosystemRelationshipType;
 
 function ThirdPartyMark({ iconKey }: { iconKey?: EcosystemBrandEntry['iconKey'] }) {
   switch (iconKey) {
     case 'amazon':
       return (
         <svg className="w-5 h-5 shrink-0 text-[#1D1D1F]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path
-            d="M4.5 16.5c4.2 2.9 10.6 3.1 15 0.4"
-            stroke="#1D1D1F"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
+          <path d="M4.5 16.5c4.2 2.9 10.6 3.1 15 0.4" stroke="#1D1D1F" strokeWidth="2" strokeLinecap="round" />
           <path
             d="M17.5 15.6l2.4 1.1-.8 2.5"
             stroke="#1D1D1F"
@@ -42,23 +46,10 @@ function ThirdPartyMark({ iconKey }: { iconKey?: EcosystemBrandEntry['iconKey'] 
     case 'google-play':
       return (
         <svg className="w-5 h-5 shrink-0 text-[#1D1D1F]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path
-            d="M4.5 3.6c-.3.3-.5.8-.5 1.4v14c0 .6.2 1.1.5 1.4l.1.1 7.8-7.8v-.2L4.6 3.5l-.1.1z"
-            fill="#6E6E73"
-          />
-          <path
-            d="M15 15.1l-2.6-2.6v-.2l2.6-2.6.1.1 3.1 1.8c.9.5.9 1.3 0 1.8l-3.1 1.7-.1 0z"
-            fill="#3A3A3F"
-          />
-          <path
-            d="M15.1 15l-2.7-2.7L4.5 20.2c.3.3.9.3 1.5 0l9.1-5.2z"
-            fill="#1D1D1F"
-            opacity="0.85"
-          />
-          <path
-            d="M15.1 9L6 3.8c-.6-.3-1.2-.3-1.5 0l7.9 7.9L15.1 9z"
-            fill="#A1A1A6"
-          />
+          <path d="M4.5 3.6c-.3.3-.5.8-.5 1.4v14c0 .6.2 1.1.5 1.4l.1.1 7.8-7.8v-.2L4.6 3.5l-.1.1z" fill="#6E6E73" />
+          <path d="M15 15.1l-2.6-2.6v-.2l2.6-2.6.1.1 3.1 1.8c.9.5.9 1.3 0 1.8l-3.1 1.7-.1 0z" fill="#3A3A3F" />
+          <path d="M15.1 15l-2.7-2.7L4.5 20.2c.3.3.9.3 1.5 0l9.1-5.2z" fill="#1D1D1F" opacity="0.85" />
+          <path d="M15.1 9L6 3.8c-.6-.3-1.2-.3-1.5 0l7.9 7.9L15.1 9z" fill="#A1A1A6" />
         </svg>
       );
     case 'shopify':
@@ -83,12 +74,6 @@ function ThirdPartyMark({ iconKey }: { iconKey?: EcosystemBrandEntry['iconKey'] 
           <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
         </svg>
       );
-    case 'x':
-      return (
-        <svg className="w-4 h-4 shrink-0 text-[#1D1D1F]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-        </svg>
-      );
     case 'youtube':
       return (
         <svg className="w-4 h-4 shrink-0 text-[#1D1D1F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -96,17 +81,109 @@ function ThirdPartyMark({ iconKey }: { iconKey?: EcosystemBrandEntry['iconKey'] 
           <polygon points="10 15 15 12 10 9 10 15" fill="currentColor" stroke="none" />
         </svg>
       );
+    case 'whatsapp':
+      return (
+        <svg className="w-4 h-4 shrink-0 text-[#1D1D1F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+          <path d="M9.5 9.2c.2-.4.4-.4.6-.4h.5c.2 0 .4.1.5.4l.7 1.6c.1.2 0 .4-.1.6l-.4.5c-.1.1-.1.3 0 .4.4.7 1 1.3 1.7 1.7.1.1.3.1.4 0l.5-.4c.2-.1.4-.2.6-.1l1.6.7c.3.1.4.3.4.5v.5c0 .2 0 .4-.4.6-.6.3-1.6.4-2.8-.1-1.7-.7-3.3-2.3-4-4-.5-1.2-.4-2.2-.1-2.8z" fill="currentColor" stroke="none" />
+        </svg>
+      );
     default:
       return null;
   }
 }
 
-function TickerItemCard({
+function ClientBrandTickerCard({
+  record,
+  onNavigate,
+}: {
+  record: ClientEcosystemRecord;
+  onNavigate: (route: AppRoute) => void;
+}) {
+  const wordmarkClass =
+    record.wordmarkStyle === 'serif'
+      ? 'font-editorial font-bold tracking-tight'
+      : record.wordmarkStyle === 'mono'
+        ? 'font-mono-num font-bold tracking-tight'
+        : 'font-display font-semibold tracking-tight';
+
+  const relationshipColor =
+    record.relationshipType === 'Client'
+      ? 'text-[#0071E3]'
+      : record.relationshipType === 'AKYIN Venture'
+        ? 'text-[#1D1D1F]'
+        : 'text-[#6E6E73]';
+
+  const cardBody = (
+    <div className="liquid-glass-card rounded-2xl px-5 py-3.5 min-w-[238px] sm:min-w-[264px] border border-[#E8E8ED] transition-transform duration-200 hover:-translate-y-0.5">
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <p className={`text-sm sm:text-[15px] text-[#1D1D1F] whitespace-nowrap ${wordmarkClass}`}>
+            {record.name}
+          </p>
+          <p className="text-[11px] font-medium text-[#6E6E73] truncate max-w-[196px]">
+            <span className={`font-semibold ${relationshipColor}`}>
+              {record.relationshipType}
+            </span>{' '}
+            <span aria-hidden="true">·</span> {record.industryCategory}
+          </p>
+        </div>
+        {(record.externalUrl || record.internalRoute) && (
+          <ArrowUpRight
+            className="w-3.5 h-3.5 text-[#A1A1A6] group-hover:text-[#1D1D1F] transition-colors shrink-0"
+            aria-hidden="true"
+          />
+        )}
+      </div>
+    </div>
+  );
+
+  if (record.internalRoute) {
+    return (
+      <button
+        type="button"
+        onClick={() => onNavigate(record.internalRoute!)}
+        aria-label={`${record.name} — ${record.relationshipType} (${record.industryCategory})`}
+        className="group shrink-0 pr-4 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071E3] rounded-2xl"
+      >
+        {cardBody}
+      </button>
+    );
+  }
+
+  if (record.externalUrl) {
+    const safeUrl = sanitizeHref(record.externalUrl);
+    if (safeUrl !== '#') {
+      return (
+        <a
+          href={safeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${record.name} — ${record.relationshipType}`}
+          className="group shrink-0 pr-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071E3] rounded-2xl"
+        >
+          {cardBody}
+        </a>
+      );
+    }
+  }
+
+  return (
+    <div
+      className="group shrink-0 pr-4"
+      aria-label={`${record.name} — ${record.relationshipType}`}
+    >
+      {cardBody}
+    </div>
+  );
+}
+
+function GenericBrandTickerCard({
   entry,
   onNavigate,
 }: {
   entry: EcosystemBrandEntry;
-  onNavigate: (route: AppRoute) => void;
+  onNavigate?: (route: AppRoute) => void;
 }) {
   const wordmarkClass =
     entry.wordmarkStyle === 'serif'
@@ -115,98 +192,107 @@ function TickerItemCard({
         ? 'font-mono-num font-bold tracking-tight'
         : 'font-display font-semibold tracking-tight';
 
-  const relationshipTone =
+  const badgeColor =
     entry.category === 'client'
-      ? 'text-[#1D1D1F] font-semibold'
+      ? 'text-[#0071E3] bg-[#0071E3]/10'
       : entry.category === 'venture'
-        ? 'text-[#1D1D1F]'
-        : 'text-[#6E6E73]';
+        ? 'text-[#1D1D1F] bg-[#1D1D1F]/8'
+        : 'text-[#6E6E73] bg-[#F5F5F7]';
 
-  const innerContent = (
-    <div className="liquid-glass-card rounded-2xl px-5 py-3.5 min-w-[220px] sm:min-w-[248px] transition-transform duration-200 hover:-translate-y-0.5">
+  const cardBody = (
+    <div className="liquid-glass-card rounded-2xl px-5 py-3.5 min-w-[240px] sm:min-w-[264px] border border-[#E8E8ED] transition-transform duration-200 hover:-translate-y-0.5 bg-white/90 backdrop-blur-md">
       <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0">
-          {entry.iconKey && <ThirdPartyMark iconKey={entry.iconKey} />}
-          <div className="min-w-0">
-            <p className={`text-sm sm:text-[15px] text-[#1D1D1F] whitespace-nowrap ${wordmarkClass}`}>
-              {entry.name}
-            </p>
-            <p className={`text-[11px] font-medium truncate max-w-[175px] ${relationshipTone}`}>
+        <div className="min-w-0">
+          <p className={`text-sm sm:text-[15px] text-[#1D1D1F] whitespace-nowrap ${wordmarkClass}`}>
+            {entry.name}
+          </p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${badgeColor}`}>
+              {entry.category === 'venture'
+                ? 'AKYIN Venture'
+                : entry.category === 'client'
+                  ? 'Client'
+                  : 'Platform'}
+            </span>
+            <span className="text-[11px] text-[#6E6E73] truncate max-w-[140px]">
               {entry.relationshipLabel}
-            </p>
+            </span>
           </div>
         </div>
-
         {(entry.externalUrl || entry.internalRoute) && (
-          <ArrowUpRight
-            className="w-3.5 h-3.5 text-[#A1A1A6] group-hover:text-[#1D1D1F] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform shrink-0"
-            aria-hidden="true"
-          />
+          <ArrowUpRight className="w-3.5 h-3.5 text-[#A1A1A6] group-hover:text-[#1D1D1F] transition-colors shrink-0" />
         )}
       </div>
     </div>
   );
 
   if (entry.externalUrl) {
-    const safeUrl = sanitizeHref(entry.externalUrl);
-    if (safeUrl !== '#') {
-      return (
-        <a
-          href={safeUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group shrink-0 pr-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F]/35 rounded-2xl"
-          aria-label={`${entry.name} — ${entry.relationshipLabel}`}
-        >
-          {innerContent}
-        </a>
-      );
-    }
+    return (
+      <a
+        href={sanitizeHref(entry.externalUrl)}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${entry.name} — ${entry.relationshipLabel}`}
+        className="group shrink-0 pr-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071E3] rounded-2xl"
+      >
+        {cardBody}
+      </a>
+    );
   }
 
-  if (entry.internalRoute) {
+  if (entry.internalRoute && onNavigate) {
     return (
       <button
         type="button"
         onClick={() => onNavigate(entry.internalRoute!)}
-        className="group shrink-0 pr-4 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F]/35 rounded-2xl"
         aria-label={`${entry.name} — ${entry.relationshipLabel}`}
+        className="group shrink-0 pr-4 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071E3] rounded-2xl"
       >
-        {innerContent}
+        {cardBody}
       </button>
     );
   }
 
+  return <div className="group shrink-0 pr-4">{cardBody}</div>;
+}
+
+function PlatformTickerCard({ entry }: { entry: EcosystemBrandEntry }) {
+  const safeUrl = entry.externalUrl ? sanitizeHref(entry.externalUrl) : '#';
   return (
-    <div
-      className="group shrink-0 pr-4"
+    <a
+      href={safeUrl}
+      target="_blank"
+      rel="noopener noreferrer"
       aria-label={`${entry.name} — ${entry.relationshipLabel}`}
+      className="group shrink-0 pr-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071E3] rounded-2xl"
     >
-      {innerContent}
-    </div>
+      <div className="liquid-glass-card rounded-2xl px-5 py-3.5 min-w-[220px] sm:min-w-[244px] border border-[#E8E8ED] transition-transform duration-200 hover:-translate-y-0.5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            {entry.iconKey && <ThirdPartyMark iconKey={entry.iconKey} />}
+            <div className="min-w-0">
+              <p className="font-display font-semibold text-sm text-[#1D1D1F] whitespace-nowrap">
+                {entry.name}
+              </p>
+              <p className="text-[11px] text-[#6E6E73] truncate max-w-[165px]">
+                {entry.relationshipLabel}
+              </p>
+            </div>
+          </div>
+          <ArrowUpRight className="w-3.5 h-3.5 text-[#A1A1A6] group-hover:text-[#1D1D1F] shrink-0" aria-hidden="true" />
+        </div>
+      </div>
+    </a>
   );
 }
 
-function InfiniteTickerRow({
-  items,
-  direction = 'left',
-  label,
-  onNavigate,
-}: {
-  items: EcosystemBrandEntry[];
-  direction?: 'left' | 'right';
-  label: string;
-  onNavigate: (route: AppRoute) => void;
-}) {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const [hasIntersected, setHasIntersected] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+function useIntersectionVisible(ref: React.RefObject<HTMLDivElement | null>) {
+  const [hasIntersected, setHasIntersected] = useState(true);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    const node = rowRef.current;
+    const node = ref.current;
     if (!node || typeof window === 'undefined' || !('IntersectionObserver' in window)) {
-      setHasIntersected(true);
-      setIsVisible(true);
       return;
     }
 
@@ -219,211 +305,403 @@ function InfiniteTickerRow({
           setIsVisible(entry.isIntersecting);
         }
       },
-      { rootMargin: '220px 0px', threshold: 0.01 }
+      { rootMargin: '200px 0px', threshold: 0.01 }
     );
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [ref]);
 
-  const trackClass =
-    direction === 'left' ? 'akyin-marquee-track-left' : 'akyin-marquee-track-right';
-
-  return (
-    <div
-      ref={rowRef}
-      aria-label={label}
-      className="akyin-marquee-container relative overflow-hidden py-2 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]"
-    >
-      {!hasIntersected ? (
-        <div className="flex items-center gap-4 overflow-hidden" aria-hidden="true">
-          {[0, 1, 2, 3, 4].map((slot) => (
-            <div
-              key={slot}
-              className="min-w-[220px] sm:min-w-[248px] h-[68px] shrink-0 rounded-2xl bg-white/75 border border-white animate-pulse"
-            />
-          ))}
-        </div>
-      ) : (
-        <div
-          className={trackClass}
-          style={isVisible ? undefined : { animationPlayState: 'paused' }}
-        >
-          <div className="flex items-center motion-reduce:flex-wrap motion-reduce:gap-y-3">
-            {items.map((entry) => (
-              <TickerItemCard
-                key={`a-${entry.id}`}
-                entry={entry}
-                onNavigate={onNavigate}
-              />
-            ))}
-          </div>
-          <div className="flex items-center motion-reduce:hidden" aria-hidden="true">
-            {items.map((entry) => (
-              <TickerItemCard
-                key={`b-${entry.id}`}
-                entry={entry}
-                onNavigate={onNavigate}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  return { hasIntersected, isVisible };
 }
 
 export function EcosystemSection({ onNavigate }: EcosystemSectionProps) {
+  const [activeFilter, setActiveFilter] = useState<RelationshipFilter>('all');
+  const brandRowRef = useRef<HTMLDivElement>(null);
+  const categoryRowRef = useRef<HTMLDivElement>(null);
+  const platformRowRef = useRef<HTMLDivElement>(null);
+
+  const brandVis = useIntersectionVisible(brandRowRef);
+  const categoryVis = useIntersectionVisible(categoryRowRef);
+  const platformVis = useIntersectionVisible(platformRowRef);
+
+  const filteredRecords = useMemo(() => {
+    if (activeFilter === 'all') return CLIENT_ECOSYSTEM_RECORDS;
+    return CLIENT_ECOSYSTEM_RECORDS.filter((r) => r.relationshipType === activeFilter);
+  }, [activeFilter]);
+
+  const counts = useMemo(
+    () => ({
+      all: CLIENT_ECOSYSTEM_RECORDS.length,
+      ventures: CLIENT_ECOSYSTEM_RECORDS.filter((r) => r.relationshipType === 'AKYIN Venture').length,
+      clients: CLIENT_ECOSYSTEM_RECORDS.filter((r) => r.relationshipType === 'Client').length,
+      ecosystem: CLIENT_ECOSYSTEM_RECORDS.filter((r) => r.relationshipType === 'Business Ecosystem').length,
+    }),
+    []
+  );
+
   return (
     <section
       id="our-ecosystem"
       className="py-20 lg:py-28 surface-silver-gradient border-t border-[#E8E8ED]"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
-        {/* Ecosystem Heading */}
+        {/* 1. CLIENT ECOSYSTEM HEADER & 58+ STATISTIC */}
         <EditorialReveal>
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-            <div className="max-w-2xl space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+            <div className="lg:col-span-8 space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-                Our Business Ecosystem
+                {ECOSYSTEM_STATS.tickerHeading}
               </p>
               <h2 className="font-display text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-[-0.025em] text-[#1D1D1F] text-balance">
-                A Growing Business Ecosystem.
+                {ECOSYSTEM_STATS.heading}
               </h2>
-              <p className="text-base text-[#6E6E73] leading-relaxed">
-                A collection of ventures, brands, clients and platforms connected through business, marketing, commerce, publishing and digital innovation.
+              <p className="text-base text-[#6E6E73] leading-relaxed max-w-2xl">
+                {ECOSYSTEM_STATS.subheading}
               </p>
             </div>
-            <p className="text-xs font-medium text-[#6E6E73] shrink-0">
-              <span className="font-mono-num font-bold text-[#1D1D1F]">
-                {FULL_ECOSYSTEM_TICKER.length}
-              </span>{' '}
-              Connected Entries · Clear Ownership &amp; Relationship Labels
-            </p>
-          </div>
-        </EditorialReveal>
 
-        {/* Full 16-Item Continuous Network Strip */}
-        <EditorialReveal delay={0.05}>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between gap-4 text-xs text-[#6E6E73]">
-              <span className="font-semibold text-[#1D1D1F]">
-                Combined Brand, Client &amp; Platform Network
-              </span>
-              <span className="hidden sm:inline">Hover or focus to pause</span>
+            <div className="lg:col-span-4">
+              <GlassPanel className="rounded-3xl p-5 sm:p-6 border border-[#E8E8ED] space-y-1.5">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="font-mono-num text-3xl sm:text-4xl font-bold tracking-tight text-[#1D1D1F]">
+                    {ECOSYSTEM_STATS.clientsHandledCount}
+                  </span>
+                  <span className="text-xs font-semibold text-[#0071E3]">
+                    Verified Portfolio &amp; Client Metric
+                  </span>
+                </div>
+                <p className="font-display text-sm font-bold text-[#1D1D1F]">
+                  {ECOSYSTEM_STATS.clientsHandledLabel}
+                </p>
+                <p className="text-[11px] text-[#6E6E73] leading-relaxed">
+                  {ECOSYSTEM_STATS.clientsHandledFootnote}
+                </p>
+              </GlassPanel>
             </div>
-            <InfiniteTickerRow
-              items={FULL_ECOSYSTEM_TICKER}
-              direction="left"
-              label="AKYIN Ventures 16-item business ecosystem ticker"
-              onNavigate={onNavigate}
-            />
           </div>
         </EditorialReveal>
 
-        {/* Subsection A: OUR VENTURES */}
+        {/* 2. THREE-TIER SEPARATED TICKER (Ventures vs Clients vs Platforms) */}
+        <EditorialReveal delay={0.05}>
+          <div className="space-y-8">
+            {/* Ticker Section Intro */}
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#6E6E73]">
+              <span className="font-semibold uppercase tracking-[0.06em] text-[#1D1D1F]">
+                {ECOSYSTEM_STATS.tickerHeading} · 3 Distinct Categories
+              </span>
+              <span>Hover or focus any card to pause</span>
+            </div>
+
+            {/* CATEGORY A: OUR VENTURES */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs text-[#6E6E73] px-1">
+                <span className="font-semibold uppercase tracking-[0.06em] text-[#1D1D1F] flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#1D1D1F]" />
+                  Category A · OUR VENTURES (Genuinely Owned &amp; Operated by AKYIN)
+                </span>
+                <span className="text-[11px] font-medium text-[#1D1D1F]">
+                  Core Group Operating Verticals
+                </span>
+              </div>
+
+              <div
+                ref={brandRowRef}
+                aria-label="Category A — AKYIN Owned Ventures Ticker"
+                className="akyin-marquee-container relative overflow-x-auto sm:overflow-hidden py-1.5 [mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent)]"
+              >
+                {brandVis.hasIntersected && (
+                  <div
+                    className="akyin-marquee-track-left"
+                    style={brandVis.isVisible ? undefined : { animationPlayState: 'paused' }}
+                  >
+                    <div className="flex items-center motion-reduce:flex-wrap motion-reduce:gap-y-3">
+                      {ECOSYSTEM_VENTURES_TICKER.map((entry) => (
+                        <GenericBrandTickerCard
+                          key={`ven-a-${entry.id}`}
+                          entry={entry}
+                          onNavigate={onNavigate}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex items-center motion-reduce:hidden" aria-hidden="true">
+                      {ECOSYSTEM_VENTURES_TICKER.map((entry) => (
+                        <GenericBrandTickerCard
+                          key={`ven-b-${entry.id}`}
+                          entry={entry}
+                          onNavigate={onNavigate}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* CATEGORY B: OUR CLIENTS */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs text-[#6E6E73] px-1">
+                <span className="font-semibold uppercase tracking-[0.06em] text-[#0071E3] flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#0071E3]" />
+                  Category B · OUR CLIENTS (Independent Businesses Supported for Growth)
+                </span>
+                <span className="text-[11px] font-semibold text-[#0071E3]">
+                  58 Clients Portfolio
+                </span>
+              </div>
+
+              <div
+                aria-label="Category B — AKYIN Client Relationships Ticker"
+                className="akyin-marquee-container relative overflow-x-auto sm:overflow-hidden py-1.5 [mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent)]"
+              >
+                {brandVis.hasIntersected && (
+                  <div
+                    className="akyin-marquee-track-right"
+                    style={brandVis.isVisible ? undefined : { animationPlayState: 'paused' }}
+                  >
+                    <div className="flex items-center motion-reduce:flex-wrap motion-reduce:gap-y-3">
+                      {ECOSYSTEM_CLIENTS_TICKER.map((entry) => (
+                        <GenericBrandTickerCard
+                          key={`cli-a-${entry.id}`}
+                          entry={entry}
+                          onNavigate={onNavigate}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex items-center motion-reduce:hidden" aria-hidden="true">
+                      {ECOSYSTEM_CLIENTS_TICKER.map((entry) => (
+                        <GenericBrandTickerCard
+                          key={`cli-b-${entry.id}`}
+                          entry={entry}
+                          onNavigate={onNavigate}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* CATEGORY C: OUR PLATFORMS & ECOSYSTEM */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs text-[#6E6E73] px-1">
+                <span className="font-semibold uppercase tracking-[0.06em] text-[#6E6E73] flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#6E6E73]" />
+                  Category C · OUR PLATFORMS &amp; ECOSYSTEM (Marketplaces &amp; Official Channels)
+                </span>
+                <span className="text-[11px] text-[#6E6E73]">
+                  Independent Marketplaces &amp; Media
+                </span>
+              </div>
+
+              <div
+                aria-label="Category C — Distribution Marketplaces & Official Channels Ticker"
+                className="akyin-marquee-container relative overflow-x-auto sm:overflow-hidden py-1.5 [mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent)]"
+              >
+                {brandVis.hasIntersected && (
+                  <div
+                    className="akyin-marquee-track-left"
+                    style={brandVis.isVisible ? undefined : { animationPlayState: 'paused' }}
+                  >
+                    <div className="flex items-center motion-reduce:flex-wrap motion-reduce:gap-y-3">
+                      {ECOSYSTEM_PLATFORMS_TICKER.map((entry) => (
+                        <PlatformTickerCard key={`plat-tier-a-${entry.id}`} entry={entry} />
+                      ))}
+                    </div>
+                    <div className="flex items-center motion-reduce:hidden" aria-hidden="true">
+                      {ECOSYSTEM_PLATFORMS_TICKER.map((entry) => (
+                        <PlatformTickerCard key={`plat-tier-b-${entry.id}`} entry={entry} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Distinct Industry Categories Strip (Never mislabeled as client names) */}
+            <div className="space-y-2.5 pt-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[#6E6E73]">
+                <span className="font-semibold text-[#1D1D1F]">
+                  Industry Categories We Serve
+                </span>
+                <span>Cross-sector coverage across India &amp; UAE</span>
+              </div>
+
+              <div
+                ref={categoryRowRef}
+                aria-label="Industry categories served across AKYIN Ventures"
+                className="akyin-marquee-container relative overflow-x-auto sm:overflow-hidden py-1.5 [mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent)]"
+              >
+                {categoryVis.hasIntersected && (
+                  <div
+                    className="akyin-marquee-track-right"
+                    style={categoryVis.isVisible ? undefined : { animationPlayState: 'paused' }}
+                  >
+                    <div className="flex items-center motion-reduce:flex-wrap motion-reduce:gap-2">
+                      {ECOSYSTEM_INDUSTRY_CATEGORIES.map((categoryName) => (
+                        <div
+                          key={`cat-a-${categoryName}`}
+                          className="shrink-0 pr-3"
+                        >
+                          <div className="bg-white/85 backdrop-blur-md border border-[#E8E8ED] rounded-xl px-4 py-2 text-xs font-medium text-[#1D1D1F] whitespace-nowrap shadow-[0_2px_8px_rgba(0,0,0,0.025)]">
+                            {categoryName}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center motion-reduce:hidden" aria-hidden="true">
+                      {ECOSYSTEM_INDUSTRY_CATEGORIES.map((categoryName) => (
+                        <div
+                          key={`cat-b-${categoryName}`}
+                          className="shrink-0 pr-3"
+                        >
+                          <div className="bg-white/85 backdrop-blur-md border border-[#E8E8ED] rounded-xl px-4 py-2 text-xs font-medium text-[#1D1D1F] whitespace-nowrap shadow-[0_2px_8px_rgba(0,0,0,0.025)]">
+                            {categoryName}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </EditorialReveal>
+
+        {/* 3. CLIENT RELATIONSHIP DIRECTORY GRID (Separate AKYIN Ventures vs Client vs Ecosystem) */}
         <EditorialReveal delay={0.08}>
-          <div className="pt-8 border-t border-[#1D1D1F]/10 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div className="pt-8 border-t border-[#1D1D1F]/10 space-y-6">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
               <div className="space-y-1.5">
                 <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-                  01 · Our Ventures
+                  Verified Ownership &amp; Relationship Clarity
                 </p>
-                <h3 className="font-display text-2xl font-bold tracking-[-0.015em] text-[#1D1D1F]">
-                  AKYIN-Owned Brands &amp; Operating Businesses
+                <h3 className="font-display text-2xl sm:text-3xl font-bold tracking-[-0.02em] text-[#1D1D1F]">
+                  Ventures, Client Relationships &amp; Business Ecosystem.
                 </h3>
-                <p className="text-sm text-[#6E6E73]">
-                  Seven operating ventures managed under the AKYIN Ventures parent umbrella.
+                <p className="text-sm text-[#6E6E73] max-w-2xl">
+                  AKYIN-owned ventures are explicitly distinguished from independent external client engagements and commercial ecosystem partners.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => onNavigate('/ventures')}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1D1D1F] hover:underline transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+
+              <div
+                role="tablist"
+                aria-label="Filter businesses by relationship type"
+                className="flex flex-wrap gap-1.5 p-1.5 liquid-glass-nav rounded-2xl w-fit"
               >
-                Explore Visual Venture Grid
-                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-              </button>
-            </div>
-
-            <InfiniteTickerRow
-              items={ECOSYSTEM_VENTURES_TICKER}
-              direction="left"
-              label="AKYIN Ventures owned brands ticker"
-              onNavigate={onNavigate}
-            />
-          </div>
-        </EditorialReveal>
-
-        {/* Subsection B: OUR CLIENTS */}
-        <EditorialReveal delay={0.1}>
-          <div className="pt-8 border-t border-[#1D1D1F]/10 space-y-5">
-            <div className="space-y-1.5">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-                02 · Our Clients
-              </p>
-              <h3 className="font-display text-2xl font-bold tracking-[-0.015em] text-[#1D1D1F]">
-                Client Relationships
-              </h3>
-              <p className="text-sm text-[#6E6E73]">
-                External client engagements presented distinctly from owned AKYIN ventures.
-              </p>
-            </div>
-
-            <div className="liquid-glass-panel rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-              <div className="flex items-start sm:items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-[#FFFFFF] border border-[#E8E8ED] flex items-center justify-center shrink-0">
-                  <Briefcase className="w-5 h-5 text-[#1D1D1F]" aria-hidden="true" />
-                </div>
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-[#6E6E73]">
-                    <span className="font-semibold text-[#1D1D1F]">
-                      {ECOSYSTEM_CLIENT.relationshipLabel}
-                    </span>
-                    <span aria-hidden="true">·</span>
-                    <span>External Client Relationship (Not an AKYIN-owned brand)</span>
-                  </div>
-                  <p className="font-display text-2xl sm:text-3xl font-bold tracking-[-0.02em] text-[#1D1D1F]">
-                    {ECOSYSTEM_CLIENT.name}
-                  </p>
-                </div>
+                {[
+                  { id: 'all' as const, label: `All (${counts.all})` },
+                  { id: 'AKYIN Venture' as const, label: `AKYIN Ventures (${counts.ventures})` },
+                  { id: 'Client' as const, label: `Client Relationships (${counts.clients})` },
+                  { id: 'Business Ecosystem' as const, label: `Business Ecosystem (${counts.ecosystem})` },
+                ].map((tab) => {
+                  const active = activeFilter === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setActiveFilter(tab.id)}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                        active
+                          ? 'bg-[#1D1D1F] text-white shadow-xs'
+                          : 'text-[#1D1D1F] hover:bg-white/80'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
               </div>
+            </div>
 
-              <button
-                type="button"
-                onClick={() => onNavigate('/ventures/marketing')}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full liquid-glass-cta text-xs font-semibold text-[#1D1D1F] transition-all whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                Explore Marketing Agency
-                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-              </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filteredRecords.map((record) => {
+                const wordmarkCls =
+                  record.wordmarkStyle === 'serif'
+                    ? 'font-editorial font-bold'
+                    : record.wordmarkStyle === 'mono'
+                      ? 'font-mono-num font-bold'
+                      : 'font-display font-bold';
+
+                return (
+                  <article
+                    key={record.id}
+                    className="liquid-glass-card rounded-2xl p-6 border border-[#E8E8ED] flex flex-col justify-between space-y-4"
+                  >
+                    <div className="space-y-2.5">
+                      <div className="flex items-center justify-between gap-2 text-xs text-[#6E6E73]">
+                        <span
+                          className={`font-semibold ${
+                            record.relationshipType === 'Client'
+                              ? 'text-[#0071E3]'
+                              : 'text-[#1D1D1F]'
+                          }`}
+                        >
+                          {record.relationshipType}
+                        </span>
+                        <span aria-hidden="true">·</span>
+                        <span className="truncate font-medium">{record.industryCategory}</span>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-white border border-[#E8E8ED] flex items-center justify-center shrink-0 text-[#1D1D1F]">
+                          {record.relationshipType === 'AKYIN Venture' ? (
+                            <Layers className="w-4 h-4" aria-hidden="true" />
+                          ) : record.relationshipType === 'Client' ? (
+                            <Briefcase className="w-4 h-4 text-[#0071E3]" aria-hidden="true" />
+                          ) : (
+                            <Building2 className="w-4 h-4" aria-hidden="true" />
+                          )}
+                        </div>
+                        <h4 className={`text-lg sm:text-xl text-[#1D1D1F] tracking-tight ${wordmarkCls}`}>
+                          {record.name}
+                        </h4>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
+                        {record.summary}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-[#1D1D1F]/8 flex flex-wrap items-center justify-between gap-3 text-xs">
+                      {record.internalRoute ? (
+                        <button
+                          type="button"
+                          onClick={() => onNavigate(record.internalRoute!)}
+                          className="inline-flex items-center gap-1.5 font-semibold text-[#1D1D1F] hover:underline cursor-pointer"
+                        >
+                          <span>Explore Venture</span>
+                          <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                        </button>
+                      ) : (
+                        <span className="text-[#6E6E73] font-medium">
+                          {record.relationshipType === 'Client'
+                            ? 'Client Engagement'
+                            : 'Ecosystem Relationship'}
+                        </span>
+                      )}
+
+                      {record.externalUrl && (
+                        <a
+                          href={sanitizeHref(record.externalUrl)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 font-semibold text-[#0071E3] hover:underline"
+                        >
+                          <span>{record.externalLabel || 'Visit Website'}</span>
+                          <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
+                        </a>
+                      )}
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </EditorialReveal>
 
-        {/* Subsection C: OUR PLATFORMS & ECOSYSTEM */}
-        <EditorialReveal delay={0.12}>
-          <div className="pt-8 border-t border-[#1D1D1F]/10 space-y-5">
-            <div className="space-y-1.5">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-                03 · Our Platforms &amp; Ecosystem
-              </p>
-              <h3 className="font-display text-2xl font-bold tracking-[-0.015em] text-[#1D1D1F]">
-                Distribution Marketplaces, Commerce Infrastructure &amp; Social Channels
-              </h3>
-              <p className="text-sm text-[#6E6E73]">
-                Independent platforms and social media channels used across publishing, commerce, and marketing distribution.
-              </p>
-            </div>
-
-            <InfiniteTickerRow
-              items={ECOSYSTEM_PLATFORMS_TICKER}
-              direction="right"
-              label="Third-party publishing, commerce and social platforms ticker"
-              onNavigate={onNavigate}
-            />
-          </div>
-        </EditorialReveal>
       </div>
     </section>
   );

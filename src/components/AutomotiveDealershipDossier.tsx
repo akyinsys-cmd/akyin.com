@@ -151,6 +151,7 @@ export function AutomotiveDealershipDossier({
 }: AutomotiveDealershipDossierProps) {
   const [activePage, setActivePage] = useState<number>(1);
   const [fullPreviewOpen, setFullPreviewOpen] = useState(false);
+  const [isFullScreenMode, setIsFullScreenMode] = useState(false);
   const [printInitiatedNotice, setPrintInitiatedNotice] = useState(false);
   const [isExportingPng, setIsExportingPng] = useState(false);
   const [pngNotice, setPngNotice] = useState<string | null>(null);
@@ -683,12 +684,26 @@ export function AutomotiveDealershipDossier({
       {/* Expanded PDF-Style Modal Reader */}
       <GlassModal
         open={fullPreviewOpen}
-        onClose={() => setFullPreviewOpen(false)}
+        onClose={() => {
+          setFullPreviewOpen(false);
+          setIsFullScreenMode(false);
+        }}
         subtitle="AKYIN Marketing · Automotive Brief"
         title="Dealership Growth Dossier Preview"
-        maxWidthClass="max-w-3xl"
+        maxWidthClass={isFullScreenMode ? 'max-w-5xl' : 'max-w-3xl'}
       >
         <div className="space-y-5">
+          <div className="flex items-center justify-end pb-1">
+            <button
+              type="button"
+              onClick={() => setIsFullScreenMode(!isFullScreenMode)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#E8E8ED] text-xs font-semibold text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors cursor-pointer shadow-xs"
+            >
+              <Maximize2 className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>{isFullScreenMode ? 'Standard View' : 'Full Screen Preview'}</span>
+            </button>
+          </div>
+
           {renderDocumentSheet(false, modalSheetRef)}
 
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2">

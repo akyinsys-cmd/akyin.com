@@ -63,14 +63,14 @@ export function TermsPage({ onNavigate, section = 'terms' }: TermsPageProps) {
               <span>1. Terms of Service &amp; Corporate Scope</span>
             </div>
             <h2 className="font-display text-2xl font-bold text-[#1D1D1F]">
-              Website Use &amp; Independent Operating Verticals
+              Website Use, Operating Verticals &amp; Client Engagements
             </h2>
             <div className="space-y-3 text-sm text-[#6E6E73] leading-relaxed">
               <p>
-                <strong className="text-[#1D1D1F]">akyin.com</strong> serves as the parent corporate hub for <strong className="text-[#1D1D1F]">AKYIN Ventures</strong>, unifying seven operating verticals: AKYIN Publishing, AKYIN MARKETINGS, AKYIN Store (AKYIN THRIFT), AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar (budgetbazaar.org).
+                <strong className="text-[#1D1D1F]">akyin.com</strong> serves as the parent corporate hub for <strong className="text-[#1D1D1F]">AKYIN Ventures</strong>, uniting three core operating ventures (AKYIN Publishing, AKYIN Marketing Agency, and AKYIN Store / AKYIN Thrift) alongside our client advisory and digital growth engagements supporting 58+ client businesses.
               </p>
               <p>
-                External marketplaces and third-party platforms (such as Amazon, Google Play Books, Shopify, Instagram, Facebook, X, and YouTube) as well as client names (such as AutoClub) remain the property of their respective owners and are presented with clear attribution.
+                Client companies (including AICalc, Kartigo, BizNXT, Budget Bazaar, AutoClub, Arosco Ventures, MEI Cosmetics, Krutika Cosmetics, Nyika Traders, and NS Traders) are independent commercial entities supported by AKYIN; they are not owned subsidiaries, internal brands, or corporate divisions of AKYIN Ventures. External platforms and distribution channels (such as Amazon, Google Play Books, Shopify, Instagram, Facebook, and YouTube) remain the property of their respective owners.
               </p>
             </div>
           </GlassPanel>

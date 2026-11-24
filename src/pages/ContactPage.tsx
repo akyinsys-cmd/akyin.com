@@ -1,6 +1,7 @@
-import { ENQUIRY_CATEGORIES, OFFICIAL_CONTACT } from '../data/akyinData';
+import { AppRoute, ENQUIRY_CATEGORIES, OFFICIAL_CONTACT } from '../data/akyinData';
 import { BusinessFAQs } from '../components/BusinessFAQs';
 import { ContactDispatcher } from '../components/ContactDispatcher';
+import { DirectContactSection } from '../components/DirectContactSection';
 import { EditorialReveal } from '../components/EditorialReveal';
 import { SocialLinks } from '../components/SocialLinks';
 
@@ -8,20 +9,30 @@ interface ContactPageProps {
   defaultCategory: string;
   defaultVertical: string;
   defaultEnquiryType: string;
+  onNavigate?: (route: AppRoute) => void;
 }
 
 export function ContactPage({
   defaultCategory,
   defaultVertical,
   defaultEnquiryType,
+  onNavigate,
 }: ContactPageProps) {
+  const handleNavigate = (route: AppRoute) => {
+    if (onNavigate) {
+      onNavigate(route);
+    } else {
+      window.location.href = route;
+    }
+  };
+
   return (
     <div>
       <section className="surface-silver-gradient text-[#1D1D1F] pt-12 pb-16 lg:pt-16 lg:pb-20 border-b border-[#E8E8ED]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           <div className="space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-              AKYIN Ventures · Central Enquiry Desk
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#0071E3]">
+              AKYIN Ventures · {OFFICIAL_CONTACT.regionIndicator} · {OFFICIAL_CONTACT.internationalSupportLine}
             </p>
             <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-[-0.025em] text-balance">
               Let&apos;s Start a Conversation.
@@ -46,12 +57,14 @@ export function ContactPage({
 
           <div className="pt-2">
             <p className="text-xs font-semibold text-[#1D1D1F] mb-3">
-              Official Social Media Channels ({OFFICIAL_CONTACT.marketingSocialHandle})
+              Follow AKYIN
             </p>
-            <SocialLinks variant="card" className="max-w-2xl" />
+            <SocialLinks variant="card" className="max-w-3xl" />
           </div>
         </div>
       </section>
+
+      <DirectContactSection onNavigate={handleNavigate} />
 
       <EditorialReveal>
         <ContactDispatcher
