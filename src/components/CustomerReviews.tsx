@@ -458,10 +458,9 @@ export function CustomerReviews({ onNavigate }: CustomerReviewsProps) {
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1 text-amber-500">
-                      {Array.from({ length: rev.rating }).map((_, i) => (
-                        <Star key={i} className="w-3 h-3 fill-amber-500 text-amber-500" aria-hidden="true" />
-                      ))}
+                    <div className="inline-flex items-center gap-1 text-amber-600 font-mono-num text-xs font-bold">
+                      <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" aria-hidden="true" />
+                      <span>{rev.rating}.0</span>
                     </div>
                     <span className="text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full frosted-glass-pill text-[#6E6E73]">
                       {rev.verticalLabel}

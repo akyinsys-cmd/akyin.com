@@ -86,15 +86,23 @@ export function Footer({ onNavigate, onStartEnquiry, onCopyLink, copied }: Foote
                 <Mail className="w-3.5 h-3.5 text-[#1D1D1F]" aria-hidden="true" />
                 <span>{displayEmail}</span>
               </a>
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 font-mono-num text-[#1D1D1F] hover:text-[#6E6E73] transition-colors font-medium"
-              >
-                <Phone className="w-3.5 h-3.5 text-[#1D1D1F]" aria-hidden="true" />
-                <span>{displayPhone}</span>
-              </a>
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href={`tel:+${settings.whatsappNumber || OFFICIAL_CONTACT.whatsappNumber}`}
+                  className="flex items-center gap-2 font-mono-num text-[#1D1D1F] hover:text-[#6E6E73] transition-colors font-medium"
+                >
+                  <Phone className="w-3.5 h-3.5 text-[#1D1D1F]" aria-hidden="true" />
+                  <span>{displayPhone}</span>
+                </a>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] font-semibold text-[#6E6E73] hover:text-[#1D1D1F] underline"
+                >
+                  WhatsApp
+                </a>
+              </div>
             </div>
           </div>
 
@@ -110,7 +118,7 @@ export function Footer({ onNavigate, onStartEnquiry, onCopyLink, copied }: Foote
                   onClick={(e) => handleLink(e, '/ventures/publishing')}
                   className="hover:text-[#6E6E73] transition-colors"
                 >
-                  Publishing
+                  AKYIN Publishing
                 </a>
               </li>
               <li>
@@ -270,6 +278,15 @@ export function Footer({ onNavigate, onStartEnquiry, onCopyLink, copied }: Foote
               <ul className="space-y-2.5 text-sm text-[#6E6E73]">
                 <li>
                   <a
+                    href="/pricing"
+                    onClick={(e) => handleLink(e, '/pricing')}
+                    className="hover:text-[#1D1D1F] transition-colors font-semibold text-[#1D1D1F]"
+                  >
+                    Pricing &amp; Rate Card
+                  </a>
+                </li>
+                <li>
+                  <a
                     href="/advisory"
                     onClick={(e) => handleLink(e, '/advisory')}
                     className="hover:text-[#1D1D1F] transition-colors font-semibold text-[#1D1D1F]"
@@ -370,6 +387,30 @@ export function Footer({ onNavigate, onStartEnquiry, onCopyLink, copied }: Foote
               className="hover:text-[#1D1D1F] transition-colors"
             >
               About
+            </a>
+            <span aria-hidden="true">·</span>
+            <a
+              href="/pricing"
+              onClick={(e) => handleLink(e, '/pricing')}
+              className="hover:text-[#1D1D1F] transition-colors"
+            >
+              Pricing
+            </a>
+            <span aria-hidden="true">·</span>
+            <a
+              href="/terms"
+              onClick={(e) => handleLink(e, '/terms')}
+              className="hover:text-[#1D1D1F] transition-colors"
+            >
+              Terms
+            </a>
+            <span aria-hidden="true">·</span>
+            <a
+              href="/privacy"
+              onClick={(e) => handleLink(e, '/privacy')}
+              className="hover:text-[#1D1D1F] transition-colors"
+            >
+              Privacy
             </a>
             <span aria-hidden="true">·</span>
             <a

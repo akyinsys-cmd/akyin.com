@@ -1,0 +1,74 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schemas/server-card/v1.json",
+  "serverInfo": {
+    "name": "akyin-ventures",
+    "title": "AKYIN Ventures Corporate & Marketing MCP Server",
+    "version": "1.0.0",
+    "description": "Official corporate directory, transparent INR pricing rate card, automotive dealership marketing intelligence, and structured enquiry gateway for AKYIN Ventures (akyin.com)."
+  },
+  "name": "akyin-ventures",
+  "version": "1.0.0",
+  "protocolVersion": "2025-06-18",
+  "endpoint": "https://akyin.com/api/mcp",
+  "transport": {
+    "type": "streamable-http",
+    "endpoint": "https://akyin.com/api/mcp"
+  },
+  "documentationUrl": "https://akyin.com/llms.txt",
+  "websiteUrl": "https://akyin.com",
+  "contact": {
+    "email": "connect@akyin.com",
+    "telephone": "+91-6305694011"
+  },
+  "capabilities": {
+    "tools": {
+      "listChanged": false
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    }
+  },
+  "tools": [
+    {
+      "name": "get_ventures",
+      "description": "Retrieve all 7 AKYIN Ventures operating businesses, categories, positioning, and official URLs.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "get_marketing_pricing",
+      "description": "Retrieve AKYIN MARKETINGS retainer packages (Package A & Package B), sales training fee, and the 21-item rate card in INR.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Optional rate card category filter."
+          }
+        }
+      }
+    },
+    {
+      "name": "get_contact_channels",
+      "description": "Retrieve verified corporate email, telephone, WhatsApp, legal links, and social profiles for AKYIN Ventures.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  ],
+  "resources": [
+    {
+      "uri": "https://akyin.com/llms.txt",
+      "name": "AKYIN Ventures LLMs Summary",
+      "description": "Markdown directory of AKYIN Ventures pages, pricing, and operating divisions.",
+      "mimeType": "text/markdown"
+    }
+  ]
+}

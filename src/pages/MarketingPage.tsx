@@ -27,8 +27,10 @@ import {
   GlassImageFrame,
   GlassPanel,
 } from '../components/liquid-glass';
+import { PresentationDeckViewer } from '../components/PresentationDeckViewer';
 import { ResilientImage } from '../components/ResilientImage';
 import { SocialLinks } from '../components/SocialLinks';
+import { ALL_BUSINESSES_DECK, AUTOMOTIVE_DECK } from '../data/presentationDecks';
 
 export function MarketingPage() {
   const shouldReduceMotion = useReducedMotion();
@@ -137,20 +139,24 @@ export function MarketingPage() {
                 Explore our dedicated automotive division featuring 16 specialised dealership services and an interactive 19-slide company presentation viewer.
               </p>
             </div>
-            <GlassButton
-              href="/marketing/automotive"
-              variant="primary"
-              size="lg"
-              className="shrink-0"
-              onClick={(e: React.MouseEvent) => {
-                e.preventDefault();
-                window.history.pushState({}, '', '/marketing/automotive');
-                window.dispatchEvent(new PopStateEvent('popstate'));
-              }}
-            >
-              <span>Visit Automotive Marketing</span>
-              <ArrowRight className="w-4 h-4" />
-            </GlassButton>
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
+              <GlassButton href="#marketing-presentations" variant="glass" size="lg">
+                <span>View Presentations (PDF)</span>
+              </GlassButton>
+              <GlassButton
+                href="/marketing/automotive"
+                variant="primary"
+                size="lg"
+                onClick={(e: React.MouseEvent) => {
+                  e.preventDefault();
+                  window.history.pushState({}, '', '/marketing/automotive');
+                  window.dispatchEvent(new PopStateEvent('popstate'));
+                }}
+              >
+                <span>Visit Automotive Marketing</span>
+                <ArrowRight className="w-4 h-4" />
+              </GlassButton>
+            </div>
           </GlassPanel>
         </div>
       </section>
@@ -650,6 +656,17 @@ export function MarketingPage() {
           </GlassPanel>
         </EditorialReveal>
       </section>
+
+      {/* 6B. Official 19-Slide Company Presentations Viewer & PDF Downloads */}
+      <PresentationDeckViewer
+        sectionId="marketing-presentations"
+        eyebrow="Official Company Decks · 19 Slides Each"
+        heading="Explore Our Company Presentations."
+        subheading="View or download the full 19-slide AKYIN Marketing deck for all businesses and our dedicated automotive dealership presentation."
+        decks={[ALL_BUSINESSES_DECK, AUTOMOTIVE_DECK]}
+        initialDeckId="all-businesses"
+        backgroundClass="bg-[#F5F5F7]"
+      />
 
       {/* 7. Marketing Enquiry Dispatcher */}
       <EditorialReveal>

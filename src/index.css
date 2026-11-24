@@ -49,199 +49,215 @@
 .liquid-glass-nav {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.68) 0%,
-    rgba(245, 245, 247, 0.48) 100%
+    rgba(255, 255, 255, 0.72) 0%,
+    rgba(245, 245, 247, 0.50) 100%
   );
-  backdrop-filter: saturate(210%) blur(32px) brightness(1.03);
-  -webkit-backdrop-filter: saturate(210%) blur(32px) brightness(1.03);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.90);
+  backdrop-filter: saturate(220%) blur(34px) brightness(1.03);
+  -webkit-backdrop-filter: saturate(220%) blur(34px) brightness(1.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.92);
   box-shadow:
-    0 1px 0 rgba(29, 29, 31, 0.05),
-    0 12px 36px rgba(0, 0, 0, 0.04),
+    0 1px 0 rgba(29, 29, 31, 0.055),
+    0 14px 38px rgba(0, 0, 0, 0.045),
     inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.50);
+    inset 0 -1px 0 rgba(255, 255, 255, 0.52);
 }
 
 .liquid-glass-nav-scrolled {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.78) 0%,
-    rgba(255, 255, 255, 0.60) 100%
+    rgba(255, 255, 255, 0.82) 0%,
+    rgba(255, 255, 255, 0.62) 100%
   );
-  backdrop-filter: saturate(220%) blur(38px) brightness(1.04);
-  -webkit-backdrop-filter: saturate(220%) blur(38px) brightness(1.04);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.94);
+  backdrop-filter: saturate(230%) blur(40px) brightness(1.04);
+  -webkit-backdrop-filter: saturate(230%) blur(40px) brightness(1.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.96);
   box-shadow:
-    0 1px 0 rgba(29, 29, 31, 0.06),
-    0 16px 44px rgba(0, 0, 0, 0.06),
+    0 1px 0 rgba(29, 29, 31, 0.065),
+    0 18px 46px rgba(0, 0, 0, 0.065),
     inset 0 1.5px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.60);
+    inset 0 -1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .liquid-glass-panel,
 .frosted-glass-panel {
+  position: relative;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.72) 0%,
-    rgba(255, 255, 255, 0.42) 52%,
-    rgba(242, 242, 247, 0.58) 100%
+    rgba(255, 255, 255, 0.78) 0%,
+    rgba(255, 255, 255, 0.44) 48%,
+    rgba(242, 242, 247, 0.62) 100%
   );
-  backdrop-filter: saturate(200%) blur(32px) brightness(1.02);
-  -webkit-backdrop-filter: saturate(200%) blur(32px) brightness(1.02);
-  border: 1px solid rgba(255, 255, 255, 0.90);
+  backdrop-filter: saturate(215%) blur(36px) brightness(1.025);
+  -webkit-backdrop-filter: saturate(215%) blur(36px) brightness(1.025);
+  border: 1px solid rgba(255, 255, 255, 0.94);
   box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.06),
-    0 2px 10px rgba(0, 0, 0, 0.025),
-    0 0 0 0.5px rgba(29, 29, 31, 0.045),
-    inset 0 2px 2px rgba(255, 255, 255, 0.98),
-    inset 0 -1.5px 2px rgba(255, 255, 255, 0.45),
-    inset 1.5px 0 1.5px rgba(255, 255, 255, 0.65);
+    0 26px 64px rgba(0, 0, 0, 0.065),
+    0 3px 12px rgba(0, 0, 0, 0.025),
+    0 0 0 0.5px rgba(29, 29, 31, 0.05),
+    inset 0 2px 2.5px rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px rgba(255, 255, 255, 0.48),
+    inset 1.5px 0 1.5px rgba(255, 255, 255, 0.72),
+    inset -1px 0 1px rgba(255, 255, 255, 0.35);
 }
 
 .liquid-glass-card,
 .frosted-glass-card {
+  position: relative;
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.70) 0%,
-    rgba(255, 255, 255, 0.40) 55%,
-    rgba(245, 245, 247, 0.56) 100%
+    rgba(255, 255, 255, 0.76) 0%,
+    rgba(255, 255, 255, 0.42) 52%,
+    rgba(244, 244, 248, 0.60) 100%
   );
-  backdrop-filter: saturate(195%) blur(28px) brightness(1.02);
-  -webkit-backdrop-filter: saturate(195%) blur(28px) brightness(1.02);
-  border: 1px solid rgba(255, 255, 255, 0.88);
+  backdrop-filter: saturate(210%) blur(32px) brightness(1.025);
+  -webkit-backdrop-filter: saturate(210%) blur(32px) brightness(1.025);
+  border: 1px solid rgba(255, 255, 255, 0.92);
   box-shadow:
-    0 18px 46px rgba(0, 0, 0, 0.05),
-    0 2px 8px rgba(0, 0, 0, 0.02),
-    0 0 0 0.5px rgba(29, 29, 31, 0.04),
-    inset 0 1.5px 1.5px rgba(255, 255, 255, 0.98),
-    inset 0 -1px 1.5px rgba(255, 255, 255, 0.42),
-    inset 1px 0 1px rgba(255, 255, 255, 0.58);
+    0 20px 50px rgba(0, 0, 0, 0.055),
+    0 2px 10px rgba(0, 0, 0, 0.022),
+    0 0 0 0.5px rgba(29, 29, 31, 0.045),
+    inset 0 2px 2px rgba(255, 255, 255, 1),
+    inset 0 -1px 1.5px rgba(255, 255, 255, 0.45),
+    inset 1.5px 0 1.5px rgba(255, 255, 255, 0.66);
 }
 
 .frosted-glass {
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.74) 0%,
-    rgba(255, 255, 255, 0.46) 100%
+    rgba(255, 255, 255, 0.78) 0%,
+    rgba(255, 255, 255, 0.48) 100%
   );
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.92);
   box-shadow:
-    0 16px 40px -8px rgba(0, 0, 0, 0.04),
-    inset 0 1.5px 1.5px rgba(255, 255, 255, 0.98),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.38);
+    0 18px 42px -8px rgba(0, 0, 0, 0.048),
+    inset 0 1.5px 1.5px rgba(255, 255, 255, 1),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.42);
 }
 
 .frosted-glass-pill {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.80) 0%,
-    rgba(245, 245, 247, 0.60) 100%
+    rgba(255, 255, 255, 0.86) 0%,
+    rgba(245, 245, 247, 0.62) 100%
   );
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(24px) saturate(195%);
+  -webkit-backdrop-filter: blur(24px) saturate(195%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
   box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.035),
-    inset 0 1px 1px rgba(255, 255, 255, 0.95);
+    0 6px 16px rgba(0, 0, 0, 0.04),
+    0 0 0 0.5px rgba(29, 29, 31, 0.04),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.98);
 }
 
 .liquid-glass-dropdown {
   background: linear-gradient(
     155deg,
-    rgba(255, 255, 255, 0.84) 0%,
-    rgba(245, 245, 247, 0.70) 100%
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(245, 245, 247, 0.72) 100%
   );
-  backdrop-filter: saturate(210%) blur(34px);
-  -webkit-backdrop-filter: saturate(210%) blur(34px);
-  border: 1px solid rgba(255, 255, 255, 0.94);
+  backdrop-filter: saturate(220%) blur(36px);
+  -webkit-backdrop-filter: saturate(220%) blur(36px);
+  border: 1px solid rgba(255, 255, 255, 0.96);
   box-shadow:
-    0 28px 68px rgba(0, 0, 0, 0.12),
-    0 4px 16px rgba(0, 0, 0, 0.04),
-    0 0 0 0.5px rgba(29, 29, 31, 0.05),
+    0 30px 72px rgba(0, 0, 0, 0.13),
+    0 4px 16px rgba(0, 0, 0, 0.045),
+    0 0 0 0.5px rgba(29, 29, 31, 0.055),
     inset 0 2px 2px rgba(255, 255, 255, 1),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.5);
+    inset 0 -1px 1px rgba(255, 255, 255, 0.55);
 }
 
 .liquid-glass-modal {
   background: linear-gradient(
     160deg,
-    rgba(255, 255, 255, 0.88) 0%,
-    rgba(245, 245, 247, 0.74) 100%
+    rgba(255, 255, 255, 0.90) 0%,
+    rgba(245, 245, 247, 0.76) 100%
   );
-  backdrop-filter: saturate(210%) blur(36px);
-  -webkit-backdrop-filter: saturate(210%) blur(36px);
-  border: 1px solid rgba(255, 255, 255, 0.94);
+  backdrop-filter: saturate(220%) blur(40px);
+  -webkit-backdrop-filter: saturate(220%) blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.96);
   box-shadow:
-    0 36px 88px rgba(0, 0, 0, 0.16),
-    0 6px 20px rgba(0, 0, 0, 0.05),
-    0 0 0 0.5px rgba(29, 29, 31, 0.05),
+    0 38px 92px rgba(0, 0, 0, 0.17),
+    0 6px 22px rgba(0, 0, 0, 0.055),
+    0 0 0 0.5px rgba(29, 29, 31, 0.055),
     inset 0 2px 2px rgba(255, 255, 255, 1),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.55);
+    inset 0 -1px 1px rgba(255, 255, 255, 0.6);
 }
 
 .liquid-glass-cta {
   background: linear-gradient(
     165deg,
-    rgba(255, 255, 255, 0.78) 0%,
-    rgba(255, 255, 255, 0.50) 100%
+    rgba(255, 255, 255, 0.84) 0%,
+    rgba(255, 255, 255, 0.54) 100%
   );
-  backdrop-filter: saturate(200%) blur(24px);
-  -webkit-backdrop-filter: saturate(200%) blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.92);
+  backdrop-filter: saturate(210%) blur(28px);
+  -webkit-backdrop-filter: saturate(210%) blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.95);
   box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.06),
-    0 0 0 0.5px rgba(29, 29, 31, 0.045),
-    inset 0 1.5px 1px rgba(255, 255, 255, 0.98),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.44);
+    0 12px 30px rgba(0, 0, 0, 0.065),
+    0 0 0 0.5px rgba(29, 29, 31, 0.05),
+    inset 0 1.5px 1.5px rgba(255, 255, 255, 1),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.48);
+}
+
+.liquid-glass-cta:hover {
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.94) 0%,
+    rgba(255, 255, 255, 0.72) 100%
+  );
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, 0.085),
+    0 0 0 0.5px rgba(29, 29, 31, 0.065),
+    inset 0 1.5px 1.5px rgba(255, 255, 255, 1);
 }
 
 .liquid-glass-pill-dark {
   background: linear-gradient(
     180deg,
-    rgba(38, 38, 42, 0.88) 0%,
-    rgba(20, 20, 22, 0.92) 100%
+    rgba(42, 42, 46, 0.90) 0%,
+    rgba(20, 20, 22, 0.94) 100%
   );
-  backdrop-filter: saturate(180%) blur(24px);
-  -webkit-backdrop-filter: saturate(180%) blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: saturate(190%) blur(26px);
+  -webkit-backdrop-filter: saturate(190%) blur(26px);
+  border: 1px solid rgba(255, 255, 255, 0.30);
   box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.15),
+    0 14px 32px rgba(0, 0, 0, 0.16),
     0 2px 6px rgba(0, 0, 0, 0.06),
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.38),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.38);
 }
 
 .liquid-glass-pill-dark:hover {
   background: linear-gradient(
     180deg,
-    rgba(50, 50, 54, 0.92) 0%,
-    rgba(24, 24, 26, 0.95) 100%
+    rgba(52, 52, 56, 0.94) 0%,
+    rgba(24, 24, 26, 0.96) 100%
   );
   box-shadow:
-    0 16px 34px rgba(0, 0, 0, 0.18),
+    0 18px 38px rgba(0, 0, 0, 0.20),
     0 3px 8px rgba(0, 0, 0, 0.08),
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.45);
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.48);
 }
 
 .liquid-glass-frame {
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.74) 0%,
-    rgba(255, 255, 255, 0.42) 55%,
-    rgba(236, 236, 240, 0.60) 100%
+    rgba(255, 255, 255, 0.80) 0%,
+    rgba(255, 255, 255, 0.44) 55%,
+    rgba(236, 236, 240, 0.64) 100%
   );
-  backdrop-filter: saturate(200%) blur(28px);
-  -webkit-backdrop-filter: saturate(200%) blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.92);
+  backdrop-filter: saturate(215%) blur(32px);
+  -webkit-backdrop-filter: saturate(215%) blur(32px);
+  border: 1px solid rgba(255, 255, 255, 0.95);
   box-shadow:
-    0 28px 72px rgba(0, 0, 0, 0.075),
-    0 4px 14px rgba(0, 0, 0, 0.03),
-    0 0 0 0.5px rgba(29, 29, 31, 0.045),
-    inset 0 2px 2px rgba(255, 255, 255, 1),
-    inset 0 -1.5px 2px rgba(255, 255, 255, 0.50),
-    inset 1.5px 0 1.5px rgba(255, 255, 255, 0.68);
+    0 30px 76px rgba(0, 0, 0, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.03),
+    0 0 0 0.5px rgba(29, 29, 31, 0.05),
+    inset 0 2px 2.5px rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px rgba(255, 255, 255, 0.54),
+    inset 1.5px 0 1.5px rgba(255, 255, 255, 0.72);
 }
 
 /* Browser fallback when backdrop-filter is unsupported */
@@ -328,7 +344,8 @@
 /* Print-Friendly Corporate & Venture Dossier Layout */
 @media print {
   @page {
-    margin: 1.5cm;
+    size: A4 portrait;
+    margin: 11mm 12mm;
   }
 
   html,
@@ -414,5 +431,494 @@
   footer > div {
     padding-top: 0.5rem !important;
     padding-bottom: 0.5rem !important;
+  }
+
+  /* Targeted Single-Page A4 Layout for Download Dealership Dossier */
+  body.printing-dealership-dossier footer,
+  body.printing-dealership-dossier [role='dialog'],
+  body.printing-dealership-dossier main section:not(#dealership-dossier),
+  body.printing-dealership-dossier #dealership-dossier .dossier-screen-only {
+    display: none !important;
+  }
+
+  body.printing-dealership-dossier main,
+  body.printing-dealership-dossier main > div,
+  body.printing-dealership-dossier main > div > div {
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+  }
+
+  body.printing-dealership-dossier #dealership-dossier {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: #ffffff !important;
+  }
+
+  body.printing-dealership-dossier #dealership-dossier .dealership-dossier-print-sheet {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 256mm;
+    max-height: 268mm;
+    overflow: hidden;
+    padding: 0;
+    background: #ffffff !important;
+    color: #1D1D1F !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-header-banner {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: #1D1D1F !important;
+    color: #FFFFFF !important;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-bottom: 6px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-header-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-header-banner-badge {
+    background: #6D28D9 !important;
+    color: #FFFFFF !important;
+    font-size: 6.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 6px;
+    border-radius: 3px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-header-banner-title {
+    font-family: var(--font-display);
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #FFFFFF !important;
+    margin: 0;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-header-banner-right {
+    font-family: var(--font-mono);
+    font-size: 6.5pt;
+    color: #D1D1D6 !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-masthead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1.5px solid #1D1D1F;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-logo {
+    height: 24px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-kicker {
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #6D28D9;
+    margin: 0;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-subkicker {
+    font-size: 7.5pt;
+    color: #6E6E73;
+    margin: 1px 0 0;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 7.5pt;
+    font-weight: 600;
+    color: #6E6E73;
+    white-space: nowrap;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-hero {
+    padding: 8px 0 6px;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-title {
+    font-family: var(--font-display);
+    font-size: 18pt;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #1D1D1F;
+    margin: 0 0 4px;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-lead {
+    font-size: 8.8pt;
+    line-height: 1.4;
+    color: #4A4A4F;
+    margin: 0;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    padding: 8px 10px;
+    border-top: 1px solid #E2E2E8;
+    border-bottom: 1px solid #E2E2E8;
+    background: #F8F8FB !important;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-kpi {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-kpi-label {
+    font-size: 7pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6E6E73;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-kpi-value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 13.5pt;
+    font-weight: 700;
+    color: #1D1D1F;
+    line-height: 1.15;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-kpi-note {
+    font-size: 7pt;
+    font-weight: 600;
+    color: #6D28D9;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-section {
+    padding-top: 6px;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #E2E2E8;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-section-head h2 {
+    font-family: var(--font-display);
+    font-size: 9.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #1D1D1F;
+    margin: 0;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-section-head span {
+    font-size: 7pt;
+    color: #6E6E73;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-services-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px 14px;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-service-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding-bottom: 4px;
+    border-bottom: 0.5px solid #EFEFF4;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-service-num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 8pt;
+    font-weight: 700;
+    color: #6D28D9;
+    min-width: 18px;
+    line-height: 1.3;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-service-name {
+    font-size: 8pt;
+    font-weight: 700;
+    color: #1D1D1F;
+    line-height: 1.25;
+    margin: 0;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-service-desc {
+    font-size: 7pt;
+    color: #5C5C62;
+    line-height: 1.25;
+    margin: 1px 0 0;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-roadmap-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-roadmap-col {
+    padding: 6px 8px;
+    border: 0.75px solid #E2E2E8;
+    border-radius: 6px;
+    background: #FAFAFC !important;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-phase-tag {
+    font-family: var(--font-mono);
+    font-size: 7pt;
+    font-weight: 700;
+    color: #6D28D9;
+    display: block;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-phase-title {
+    font-size: 8pt;
+    font-weight: 700;
+    color: #1D1D1F;
+    margin: 2px 0;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-phase-desc {
+    font-size: 7pt;
+    line-height: 1.3;
+    color: #5C5C62;
+    margin: 0;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-footer {
+    margin-top: 8px;
+    padding-top: 7px;
+    border-top: 1.5px solid #1D1D1F;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 7.5pt;
+    color: #4A4A4F;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-footer strong {
+    display: block;
+    font-size: 8pt;
+    color: #1D1D1F;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-footer-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-size: 7pt;
+    color: #6E6E73;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-footer-meta-qr {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-qr-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    border: 0.75px solid #E2E2E8;
+    border-radius: 5px;
+    background: #FFFFFF !important;
+    flex-shrink: 0;
+  }
+
+  .dealership-dossier-print-sheet .dossier-print-qr-label {
+    font-family: var(--font-mono);
+    font-size: 5.5pt;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #6E6E73;
+    line-height: 1;
+  }
+
+  /* Subtle Corporate Watermark for Dossier & Performance Radar Print Layouts */
+  body.printing-dealership-dossier .dealership-dossier-print-sheet .print-confidential-watermark,
+  body.printing-performance-radar #performance-radar-panel .print-confidential-watermark {
+    display: flex !important;
+    position: absolute !important;
+    inset: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    pointer-events: none !important;
+    z-index: 25 !important;
+    font-family: var(--font-display);
+    font-size: 44pt;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: rgba(29, 29, 31, 0.055) !important;
+    transform: rotate(-30deg) !important;
+    user-select: none;
+  }
+
+  /* Targeted Single-Slide Print Layout for Performance Radar Chart */
+  body.printing-performance-radar footer,
+  body.printing-performance-radar [role='dialog'],
+  body.printing-performance-radar main section:not(#automotive-results),
+  body.printing-performance-radar #automotive-results > div > *:not(#performance-radar-panel),
+  body.printing-performance-radar #performance-radar-panel .radar-print-hide {
+    display: none !important;
+  }
+
+  body.printing-performance-radar main,
+  body.printing-performance-radar main > div,
+  body.printing-performance-radar main > div > div,
+  body.printing-performance-radar #automotive-results,
+  body.printing-performance-radar #automotive-results > div {
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: #ffffff !important;
+  }
+
+  body.printing-performance-radar #performance-radar-panel {
+    position: relative !important;
+    display: block !important;
+    padding: 14px 16px !important;
+    margin: 0 !important;
+    border: 1px solid #E2E2E8 !important;
+    border-radius: 14px !important;
+    background: #ffffff !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    overflow: hidden;
+  }
+
+  body.printing-performance-radar #performance-radar-panel > div {
+    position: relative !important;
+  }
+
+  body.printing-performance-radar #performance-radar-panel .radar-print-masthead {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1.5px solid #1D1D1F;
+  }
+
+  body.printing-performance-radar #performance-radar-panel .radar-print-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  body.printing-performance-radar #performance-radar-panel .radar-print-logo {
+    height: 22px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  body.printing-performance-radar #performance-radar-panel .radar-print-kicker {
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #6D28D9;
+    margin: 0;
+  }
+
+  body.printing-performance-radar #performance-radar-panel .radar-print-subkicker {
+    font-size: 8pt;
+    color: #6E6E73;
+    margin: 1px 0 0;
+  }
+
+  body.printing-performance-radar #performance-radar-panel .radar-print-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 7.5pt;
+    font-weight: 600;
+    color: #6E6E73;
+    white-space: nowrap;
+  }
+
+  body.printing-performance-radar #performance-radar-panel .radar-print-grid {
+    display: grid !important;
+    grid-template-columns: 1.15fr 0.85fr !important;
+    gap: 16px !important;
+    align-items: center !important;
+  }
+
+  body.printing-performance-radar #performance-radar-panel .radar-print-chart-wrap {
+    height: 310px !important;
+  }
+
+  body.printing-performance-radar #performance-radar-panel .radar-print-footer {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid #E2E2E8;
+    font-size: 7.5pt;
+    color: #6E6E73;
   }
 }

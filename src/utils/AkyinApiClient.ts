@@ -81,13 +81,29 @@ export class AkyinApiClient {
     this.defaultEndpointUrl = (defaultEndpointUrl ?? envUrl).trim();
   }
 
+  private isValidAppsScriptEndpoint(url: string): boolean {
+    if (!isSafeExternalUrl(url, false)) return false;
+    try {
+      const parsed = new URL(url.trim());
+      if (parsed.hostname === 'script.google.com') {
+        return parsed.pathname.startsWith('/macros/');
+      }
+      if (parsed.hostname === 'script.googleusercontent.com') {
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
   public getEndpointUrl(): string {
     const localUrl =
       typeof window !== 'undefined'
         ? String(window.localStorage.getItem(ENDPOINT_STORAGE_KEY) || '').trim()
         : '';
     const candidate = localUrl || this.defaultEndpointUrl;
-    return candidate && isSafeExternalUrl(candidate, false) ? candidate : '';
+    return candidate && this.isValidAppsScriptEndpoint(candidate) ? candidate : '';
   }
 
   public setEndpointUrl(url: string): void {
@@ -98,8 +114,10 @@ export class AkyinApiClient {
       this.clearSession();
       return;
     }
-    if (!isSafeExternalUrl(clean, false)) {
-      throw new Error('Apps Script Web App URL must be a valid https:// address.');
+    if (!this.isValidAppsScriptEndpoint(clean)) {
+      throw new Error(
+        'Apps Script Web App URL must be a valid https://script.google.com/macros/... address.'
+      );
     }
     window.localStorage.setItem(ENDPOINT_STORAGE_KEY, clean);
     this.clearSession();
@@ -112,7 +130,9 @@ export class AkyinApiClient {
   public getStoredSession(): AdminSessionState | null {
     if (typeof window === 'undefined') return null;
     try {
-      const raw = window.localStorage.getItem(ADMIN_SESSION_STORAGE_KEY);
+      // Purge any legacy token from localStorage
+      window.localStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
+      const raw = window.sessionStorage.getItem(ADMIN_SESSION_STORAGE_KEY);
       if (!raw) return null;
       const parsed = JSON.parse(raw) as Partial<AdminSessionState>;
       if (
@@ -138,7 +158,8 @@ export class AkyinApiClient {
   public saveSession(session: AdminSessionState): void {
     if (typeof window === 'undefined') return;
     if (!session?.token || !session?.expiresAt) return;
-    window.localStorage.setItem(
+    window.localStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
+    window.sessionStorage.setItem(
       ADMIN_SESSION_STORAGE_KEY,
       JSON.stringify({
         token: session.token,
@@ -149,6 +170,7 @@ export class AkyinApiClient {
 
   public clearSession(): void {
     if (typeof window === 'undefined') return;
+    window.sessionStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
     window.localStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
   }
 
@@ -491,7 +513,7 @@ export class AkyinApiClient {
 
     const salt = window.crypto.randomUUID();
     preview.passwordSalt = salt;
-    preview.passwordHash = await this.sha256Hex(`${salt}:${password}:PREVIEW`);
+    preview.passwordHash = await this.hashPreviewPassword(password, salt);
     const session = {
       token: `PREVIEW-${window.crypto.randomUUID()}`,
       expiresAt: new Date(Date.now() + SESSION_TTL_MS).toISOString(),
@@ -525,9 +547,16 @@ export class AkyinApiClient {
     if (!preview.passwordHash || !preview.passwordSalt) {
       throw new Error('Please complete initial owner password setup first.');
     }
-    const candidate = await this.sha256Hex(`${preview.passwordSalt}:${password}:PREVIEW`);
-    if (candidate !== preview.passwordHash) {
+    const { matched, needsUpgrade } = await this.verifyPreviewPassword(
+      password,
+      preview.passwordSalt,
+      preview.passwordHash
+    );
+    if (!matched) {
       throw new Error('Invalid administrator password.');
+    }
+    if (needsUpgrade) {
+      preview.passwordHash = await this.hashPreviewPassword(password, preview.passwordSalt);
     }
 
     const session = {
@@ -848,8 +877,12 @@ export class AkyinApiClient {
     }
 
     const preview = this.loadPreviewStore();
-    const actual = await this.sha256Hex(`${preview.passwordSalt}:${currentPassword}:PREVIEW`);
-    if (actual !== preview.passwordHash) {
+    const { matched } = await this.verifyPreviewPassword(
+      currentPassword,
+      preview.passwordSalt,
+      preview.passwordHash
+    );
+    if (!matched) {
       throw new Error('Current password does not match.');
     }
     if (newPassword.length < 8) {
@@ -857,7 +890,7 @@ export class AkyinApiClient {
     }
     const newSalt = window.crypto.randomUUID();
     preview.passwordSalt = newSalt;
-    preview.passwordHash = await this.sha256Hex(`${newSalt}:${newPassword}:PREVIEW`);
+    preview.passwordHash = await this.hashPreviewPassword(newPassword, newSalt);
     preview.logs.unshift({
       logId: this.randomId('LOG'),
       timestamp: this.nowIstTimestamp(),
@@ -945,6 +978,62 @@ export class AkyinApiClient {
     window.localStorage.setItem(PREVIEW_STORE_KEY, JSON.stringify(store));
   }
 
+  private async hashPreviewPassword(password: string, salt: string): Promise<string> {
+    const enc = new TextEncoder();
+    const keyMaterial = await window.crypto.subtle.importKey(
+      'raw',
+      enc.encode(password),
+      { name: 'PBKDF2' },
+      false,
+      ['deriveBits']
+    );
+    const derived = await window.crypto.subtle.deriveBits(
+      {
+        name: 'PBKDF2',
+        salt: enc.encode(`AKYIN_PREVIEW_V2:${salt}`),
+        iterations: 100_000,
+        hash: 'SHA-256',
+      },
+      keyMaterial,
+      256
+    );
+    const hex = Array.from(new Uint8Array(derived))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+    return `pbkdf2v1:${hex}`;
+  }
+
+  private async verifyPreviewPassword(
+    password: string,
+    salt: string,
+    storedHash: string
+  ): Promise<{ matched: boolean; needsUpgrade: boolean }> {
+    if (!salt || !storedHash) {
+      return { matched: false, needsUpgrade: false };
+    }
+    if (storedHash.startsWith('pbkdf2v1:')) {
+      const candidate = await this.hashPreviewPassword(password, salt);
+      return {
+        matched: this.constantTimeEqual(candidate, storedHash),
+        needsUpgrade: false,
+      };
+    }
+    const legacy = await this.sha256Hex(`${salt}:${password}:PREVIEW`);
+    return {
+      matched: this.constantTimeEqual(legacy, storedHash),
+      needsUpgrade: true,
+    };
+  }
+
+  private constantTimeEqual(a: string, b: string): boolean {
+    if (a.length !== b.length) return false;
+    let diff = 0;
+    for (let i = 0; i < a.length; i++) {
+      diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    }
+    return diff === 0;
+  }
+
   private async sha256Hex(input: string): Promise<string> {
     const data = new TextEncoder().encode(input);
     const digest = await window.crypto.subtle.digest('SHA-256', data);
@@ -955,9 +1044,17 @@ export class AkyinApiClient {
 
   private randomId(prefix: string): string {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const bytes = new Uint8Array(6);
+    if (typeof window !== 'undefined' && window.crypto?.getRandomValues) {
+      window.crypto.getRandomValues(bytes);
+    } else {
+      for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = Math.floor(Math.random() * 256);
+      }
+    }
     let out = '';
-    for (let i = 0; i < 6; i++) {
-      out += chars[Math.floor(Math.random() * chars.length)];
+    for (let i = 0; i < bytes.length; i++) {
+      out += chars[bytes[i] % chars.length];
     }
     return `${prefix}-${out}`;
   }

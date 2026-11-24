@@ -4,16 +4,24 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Download,
   FileText,
   Minus,
   Sparkles,
 } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AgencyValueCalculator } from '../components/AgencyValueCalculator';
+import { AutomotiveBenchmarkAnalysis } from '../components/AutomotiveBenchmarkAnalysis';
+import { AutomotiveDealershipDossier } from '../components/AutomotiveDealershipDossier';
+import { AutomotiveGrowthNewsletter } from '../components/AutomotiveGrowthNewsletter';
+import { AutomotiveIndustryNews } from '../components/AutomotiveIndustryNews';
 import { AutomotiveLeadFunnel } from '../components/AutomotiveLeadFunnel';
-import { AutomotiveResultsSection } from '../components/AutomotiveResultsSection';
+import { AutomotiveMarketMomentum } from '../components/AutomotiveMarketMomentum';
+import { AutomotiveQuickQuoteFab } from '../components/AutomotiveQuickQuoteFab';
+import { AutomotiveRoiCalculator } from '../components/AutomotiveRoiCalculator';
+import {
+  AutomotiveResultsSection,
+  VehicleSegmentKey,
+} from '../components/AutomotiveResultsSection';
 import { AutomotiveSuccessStories } from '../components/AutomotiveSuccessStories';
 import { ContactDispatcher } from '../components/ContactDispatcher';
 import { DealershipGrowthCalculator } from '../components/DealershipGrowthCalculator';
@@ -23,9 +31,12 @@ import {
   GlassImageFrame,
   GlassPanel,
 } from '../components/liquid-glass';
+import { PresentationDeckViewer } from '../components/PresentationDeckViewer';
 import { ResilientImage } from '../components/ResilientImage';
 import { VerifiedAutomotiveBadge } from '../components/VerifiedAutomotiveBadge';
+import { VideoSuccessStories } from '../components/VideoSuccessStories';
 import { AppRoute, IMAGES } from '../data/akyinData';
+import { ALL_BUSINESSES_DECK, AUTOMOTIVE_DECK } from '../data/presentationDecks';
 
 interface AutomotiveMarketingPageProps {
   onNavigate: (route: AppRoute) => void;
@@ -302,16 +313,20 @@ const COMPARISON_TIERS = [
 
 const AUTOMOTIVE_FAQS = [
   {
+    question: 'How does AKYIN filter high-intent automotive test-drive leads?',
+    answer: 'Every incoming enquiry undergoes automated phone verification followed by structured AI and human telephonic screening. We confirm target vehicle model, on-road budget readiness, purchase timeline, and showroom proximity before passing only genuine test-drive buyers to your floor team.',
+  },
+  {
     question: 'How does AKYIN ensure leads are not spam or unqualified?',
-    answer: 'We maintain strict separation between lead generation and human/AI lead qualification. Every inquiry undergoes automated phone number verification and quick intent screening before being dispatched to your sales executives, ensuring zero spam and high showroom conversion intent.',
+    answer: 'We maintain strict separation between lead generation and lead qualification. Enquiries are tagged into Hot, Warm, Future Follow-up, Unreachable, or Not Interested so dealership sales executives never waste floor hours on cold clicks or duplicate form fills.',
   },
   {
     question: 'Can AKYIN integrate directly with our dealership CRM?',
-    answer: 'Yes. We integrate seamlessly with all major dealership CRM systems and WhatsApp notification workflows, pushing hot test-drive and booking leads instantly to your sales floor executives within seconds.',
+    answer: 'Yes. We integrate with major dealership CRM systems and WhatsApp notification workflows, routing confirmed test-drive and booking leads to your sales executives within seconds alongside structured daily Excel pipeline sheets.',
   },
   {
     question: 'What is the exact difference between lead generation and lead filtering?',
-    answer: 'Lead generation focuses on ad creative, targeting, and capturing buyer attention across Meta and Google. Lead filtering is a separate, rigorous vetting step where we verify budget, timeline, and model preference so your sales team only spends time on genuine buyers.',
+    answer: 'Lead generation focuses on ad creative, targeting, and capturing buyer attention across Meta and Google. Lead filtering is a separate, rigorous vetting step where we verify budget, timeline, and model preference so your sales team only spends time on high-intent test-drive buyers.',
   },
   {
     question: 'Do you support festive seasons and old-car exchange carnivals?',
@@ -327,33 +342,12 @@ const AUTOMOTIVE_FAQS = [
   },
 ];
 
-const PRESENTATION_SLIDES = [
-  { slide: 1, title: 'AKYIN Marketing — Automotive Growth Presentation', subtitle: 'Marketing That Moves Dealerships Forward' },
-  { slide: 2, title: 'Executive Summary & Industry Overview', subtitle: 'Navigating modern dealership challenges and showroom footfall dynamics' },
-  { slide: 3, title: 'The AKYIN Advantage · 16 Years Experience', subtitle: 'Deep domain expertise spanning Maruti Suzuki to Audi dealerships' },
-  { slide: 4, title: 'Service 1 & 2: Lead Generation & Qualification', subtitle: 'High-intent digital acquisition paired with rigorous AI & human vetting' },
-  { slide: 5, title: 'Service 3 & 4: Influencer & Social Media Marketing', subtitle: 'Building organic brand desire through trusted automotive creators and daily reels' },
-  { slide: 6, title: 'Service 5 & 6: Video Production & Product Launches', subtitle: 'Cinematic vehicle showcases and high-impact showroom launch events' },
-  { slide: 7, title: 'Service 7 & 8: Test Drive & Festive Campaigns', subtitle: 'Driving maximum footfalls and seasonal exchange carnivals' },
-  { slide: 8, title: 'Service 9 & 10: Google Local SEO & Customer Retention', subtitle: 'Dominating local map packs and securing repeat after-sales business' },
-  { slide: 9, title: 'Service 11 & 12: Pre-Owned & Corporate Fleet Marketing', subtitle: 'Expanding revenue streams into certified used cars and institutional fleets' },
-  { slide: 10, title: 'Service 13 & 14: Landing Pages & Analytics Dashboards', subtitle: 'High-speed conversion funnels and transparent 24/7 ROI tracking' },
-  { slide: 11, title: 'Service 15: Custom App Development for Dealerships', subtitle: 'Proprietary lead tracking and executive target monitoring portals' },
-  { slide: 12, title: 'Service 16: Sales Team Training & Conversion Discipline', subtitle: 'Transforming floor executives into high-closing automotive advisors' },
-  { slide: 13, title: 'Dealership Success Case Study: Multi-Location SUV Growth', subtitle: 'Achieving a 3.4x increase in qualified test-drive enquiries within 90 days' },
-  { slide: 14, title: 'The AKYIN Lead Quality Guarantee', subtitle: 'Zero spam, 100% verified phone numbers, and instant CRM routing' },
-  { slide: 15, title: 'Transparent Pricing & Retainer Models', subtitle: 'Tailored engagement packages designed for single dealerships and multi-brand groups' },
-  { slide: 16, title: 'Technology & AI Integration in Dealerships', subtitle: 'Leveraging automated WhatsApp follow-ups and smart pipeline sorting' },
-  { slide: 17, title: 'About AKYIN Ventures Parent Group Ecosystem', subtitle: 'Synergies across Publishing, Fashion, AI Tools, and B2B Commerce' },
-  { slide: 18, title: 'Frequently Asked Questions by Dealership Principals', subtitle: 'Answers to lead exclusivity, campaign setup speeds, and training schedules' },
-  { slide: 19, title: 'Let’s Move Your Dealership Forward · Contact AKYIN', subtitle: 'Schedule an executive consultation with our automotive growth directors' },
-];
-
 export function AutomotiveMarketingPage({}: AutomotiveMarketingPageProps) {
   const shouldReduceMotion = useReducedMotion();
-  const [activeSlide, setActiveSlide] = useState(1);
   const [enquiryMessage, setEnquiryMessage] = useState('');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const [monthlyBudget, setMonthlyBudget] = useState<number>(150000);
+  const [segmentId, setSegmentId] = useState<VehicleSegmentKey>('suv-mid');
 
   const scrollToEnquiry = () => {
     const el = document.getElementById('dealership-enquiry');
@@ -376,24 +370,18 @@ export function AutomotiveMarketingPage({}: AutomotiveMarketingPageProps) {
     qualifiedLeads: number;
     testDrives: number;
     projectedBookings: number;
+    scenarioLabel?: string;
   }) => {
     const formattedBudget = new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(summary.budget);
+    const scenarioText = summary.scenarioLabel ? ` | Mode: ${summary.scenarioLabel}` : '';
     setEnquiryMessage(
-      `Dealership Growth Calculator Audit Request — Segment: ${summary.segmentLabel} | Monthly Ad Budget: ${formattedBudget} | Benchmark Estimate: ~${summary.totalEnquiries} enquiries, ~${summary.qualifiedLeads} qualified leads, ~${summary.testDrives} test drives, ~${summary.projectedBookings} bookings/mo.`
+      `Dealership Growth Calculator Audit Request — Segment: ${summary.segmentLabel}${scenarioText} | Monthly Ad Budget: ${formattedBudget} | Benchmark Estimate: ~${summary.totalEnquiries} enquiries, ~${summary.qualifiedLeads} qualified leads, ~${summary.testDrives} test drives, ~${summary.projectedBookings} bookings/mo.`
     );
     scrollToEnquiry();
-  };
-
-  const nextSlide = () => {
-    setActiveSlide((prev) => (prev >= 19 ? 1 : prev + 1));
-  };
-
-  const prevSlide = () => {
-    setActiveSlide((prev) => (prev <= 1 ? 19 : prev - 1));
   };
 
   return (
@@ -605,8 +593,21 @@ export function AutomotiveMarketingPage({}: AutomotiveMarketingPageProps) {
         </div>
       </section>
 
-      {/* Automotive Results (Recharts Dealership KPI Visualizations) */}
-      <AutomotiveResultsSection />
+      {/* Automotive Results (Recharts Dealership KPI Visualizations & 3/6/12-Mo Trend Projection) */}
+      <AutomotiveResultsSection
+        monthlyBudget={monthlyBudget}
+        segmentId={segmentId}
+        onChangeBudget={setMonthlyBudget}
+      />
+
+      {/* Regional Dealership Benchmark Analysis (Recharts Regional Comparison & Radar) */}
+      <AutomotiveBenchmarkAnalysis />
+
+      {/* Market Momentum: Real-Time Lead Quality Index & ROI Progression */}
+      <AutomotiveMarketMomentum />
+
+      {/* Live Google Search Grounded Automotive Industry News */}
+      <AutomotiveIndustryNews />
 
       {/* 4. Service Tier Comparison Table */}
       <section className="py-20 lg:py-28 bg-[#FFFFFF] border-t border-[#E8E8ED]">
@@ -695,115 +696,63 @@ export function AutomotiveMarketingPage({}: AutomotiveMarketingPageProps) {
         </div>
       </section>
 
-      {/* Interactive Dealership Growth Calculator */}
-      <DealershipGrowthCalculator onRequestAudit={handleCalculatorAudit} />
+      {/* Simple Dealership Media ROI & Monthly Lead Estimator */}
+      <AutomotiveRoiCalculator
+        onApplyPlan={(summaryText) => {
+          setEnquiryMessage(summaryText);
+          scrollToEnquiry();
+        }}
+      />
 
-      {/* Featured Automotive Client Success Stories */}
+      {/* Interactive Dealership Growth Calculator */}
+      <DealershipGrowthCalculator
+        monthlyBudget={monthlyBudget}
+        onChangeBudget={setMonthlyBudget}
+        segmentId={segmentId}
+        onChangeSegment={setSegmentId}
+        onRequestAudit={handleCalculatorAudit}
+      />
+
+      {/* Agency Value Calculator: In-House Marketing Team vs. AKYIN Partnership */}
+      <AgencyValueCalculator
+        onRequestBreakdown={(summaryText) => {
+          setEnquiryMessage(summaryText);
+          scrollToEnquiry();
+        }}
+      />
+
+      {/* Featured Automotive Client Success Stories (with category filters & sort) */}
       <AutomotiveSuccessStories />
 
+      {/* Auto-Playing Dealership Manager Video Success Stories */}
+      <VideoSuccessStories />
+
       {/* 5. Company Presentation Viewer Section */}
-      <section id="presentation-viewer" className="py-20 lg:py-28 bg-[#F5F5F7] border-t border-[#E8E8ED]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-              Official 19-Slide Deck Viewer
-            </p>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F]">
-              Explore Our Company Presentation
-            </h2>
-            <p className="text-base text-[#6E6E73] leading-relaxed">
-              Browse through all 19 slides of the official AKYIN Marketing presentation or download the PDF directly.
-            </p>
-          </div>
+      <PresentationDeckViewer
+        sectionId="presentation-viewer"
+        eyebrow="Official 19-Slide Presentation Viewer"
+        heading="Explore Our Company Presentation"
+        subheading="Browse all 19 slides of the official AKYIN Automotive Marketing presentation, switch to the All Businesses overview deck, zoom in, view full-screen, or download either PDF directly."
+        decks={[AUTOMOTIVE_DECK, ALL_BUSINESSES_DECK]}
+        initialDeckId="automotive"
+        backgroundClass="bg-[#F5F5F7]"
+      />
 
-          <GlassPanel className="p-6 sm:p-8 space-y-6">
-            {/* Presentation Controls Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#E8E8ED]">
-              <div className="flex items-center gap-2">
-                <span className="font-mono-num text-sm font-bold bg-black text-white px-3 py-1.5 rounded-xl">
-                  Slide {activeSlide} of 19
-                </span>
-                <span className="text-xs text-[#6E6E73] hidden sm:inline">
-                  AKYIN_Marketing_Presentation.pdf
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <GlassButton variant="glass" size="sm" onClick={prevSlide}>
-                  <ChevronLeft className="w-4 h-4" />
-                  <span className="hidden sm:inline">Previous</span>
-                </GlassButton>
-                <GlassButton variant="glass" size="sm" onClick={nextSlide}>
-                  <span className="hidden sm:inline">Next</span>
-                  <ChevronRight className="w-4 h-4" />
-                </GlassButton>
-                <a
-                  href="/assets/akyin-marketing-presentation.pdf"
-                  download="AKYIN_Marketing_Presentation.pdf"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#1D1D1F] text-white hover:bg-[#1D1D1F]/90 transition-colors shadow-xs"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download PDF</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Slide Stage / Embedded View */}
-            <div className="aspect-[16/9] bg-gradient-to-br from-[#F5F5F7] to-[#E8E8ED] rounded-2xl border border-[#E8E8ED] p-8 sm:p-12 flex flex-col justify-between relative overflow-hidden shadow-inner">
-              <div className="absolute top-4 right-4 text-xs font-mono-num text-[#6E6E73] uppercase tracking-widest bg-white/60 px-3 py-1 rounded-full">
-                AKYIN Ventures Official Deck
-              </div>
-
-              <div className="space-y-4 my-auto max-w-2xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#6E6E73]">
-                  Slide {activeSlide} · AKYIN Automotive Marketing
-                </p>
-                <h3 className="font-display text-2xl sm:text-4xl font-bold text-[#1D1D1F] tracking-tight">
-                  {PRESENTATION_SLIDES[activeSlide - 1]?.title}
-                </h3>
-                <p className="text-base sm:text-lg text-[#6E6E73] leading-relaxed">
-                  {PRESENTATION_SLIDES[activeSlide - 1]?.subtitle}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between pt-6 border-t border-[#1D1D1F]/10 text-xs text-[#6E6E73]">
-                <span>akyin.com/marketing/automotive</span>
-                <span className="font-mono-num font-bold">19 Slides Total</span>
-              </div>
-            </div>
-
-            {/* Slide Thumbnail Quick Selector */}
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-              {PRESENTATION_SLIDES.map((s) => (
-                <button
-                  key={s.slide}
-                  onClick={() => setActiveSlide(s.slide)}
-                  className={`px-3 py-2 rounded-xl text-xs font-mono-num font-bold transition-all shrink-0 cursor-pointer ${
-                    activeSlide === s.slide
-                      ? 'bg-[#1D1D1F] text-white shadow-xs'
-                      : 'bg-white text-[#6E6E73] hover:bg-white/80 border border-[#E8E8ED]'
-                  }`}
-                >
-                  {s.slide}
-                </button>
-              ))}
-            </div>
-          </GlassPanel>
-        </div>
-      </section>
+      {/* Download Dealership Dossier (Glassmorphism PDF-Style Executive Brief) */}
+      <AutomotiveDealershipDossier onRequestConsultation={handleEnquire} />
 
       {/* 6. Automotive FAQ Component (Glassmorphism Accordion) */}
       <section className="py-20 lg:py-28 bg-[#FFFFFF] border-t border-[#E8E8ED]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-              Dealership Inquiries &amp; Answers
+              Lead Qualification FAQ &amp; Dealership Answers
             </p>
             <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F]">
-              Frequently Asked Questions
+              Lead Qualification &amp; Dealership FAQs
             </h2>
             <p className="text-base text-[#6E6E73] leading-relaxed max-w-2xl mx-auto">
-              Clear answers regarding lead generation, AI filtering, CRM integrations, and sales team training for automotive dealership principals.
+              Clear answers on how AKYIN filters high-intent test-drive buyers, integrates with dealership CRMs, and coaches showroom sales teams.
             </p>
           </div>
 
@@ -864,6 +813,12 @@ export function AutomotiveMarketingPage({}: AutomotiveMarketingPageProps) {
         heading="Schedule a Dealership Growth Consultation."
         subheading="Connect directly with AKYIN’s automotive marketing directors to discuss custom lead generation, two-tier lead qualification, CRM integration, and sales team training for your dealership group."
       />
+
+      {/* 8. Automotive Growth Newsletter Sign-Up Footer Strip */}
+      <AutomotiveGrowthNewsletter />
+
+      {/* 9. Floating Quick-Quote Audit Action Button & Modal */}
+      <AutomotiveQuickQuoteFab />
     </div>
   );
 }

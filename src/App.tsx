@@ -24,10 +24,13 @@ import { InsightsPage } from './pages/InsightsPage';
 import { KartigoPage } from './pages/KartigoPage';
 import { MarketingPage } from './pages/MarketingPage';
 import { AutomotiveMarketingPage } from './pages/AutomotiveMarketingPage';
+import { PricingPage } from './pages/PricingPage';
 import { PublishingPage } from './pages/PublishingPage';
 import { SitemapPage } from './pages/SitemapPage';
 import { StorePage } from './pages/StorePage';
+import { TermsPage } from './pages/TermsPage';
 import { SiteConfigProvider } from './context/SiteConfigContext';
+import { registerAkyinWebMcpTools } from './utils/webmcp';
 
 const VALID_ROUTES: AppRoute[] = [
   '/',
@@ -41,8 +44,11 @@ const VALID_ROUTES: AppRoute[] = [
   '/ventures/kartigo',
   '/ventures/biznxt',
   '/ventures/budget-bazaar',
+  '/pricing',
   '/advisory',
   '/insights',
+  '/terms',
+  '/privacy',
   '/contact',
   '/sitemap',
   '/admin',
@@ -51,23 +57,25 @@ const VALID_ROUTES: AppRoute[] = [
 export interface RouteMetadata {
   title: string;
   description: string;
+  ogTitle?: string;
+  ogDescription?: string;
   structuredData: Record<string, unknown>;
 }
 
 const ROUTE_META: Record<AppRoute, RouteMetadata> = {
   '/': {
-    title: 'AKYIN Ventures — Multi-Business Group & Full-Service Marketing Agency | akyin.com',
+    title: 'AKYIN Ventures — Multi-Business Group & Marketing Agency',
     description:
-      'AKYIN Ventures is a multi-business parent group operating across full-service marketing agency solutions, publishing, AI tools, fashion retail, B2B stock commerce, value retail, and business consulting.',
+      'AKYIN Ventures is a diversified multi-business group and marketing agency spanning publishing, automotive growth, retail, AI tools, B2B trade, and advisory.',
     structuredData: {
       '@context': 'https://schema.org',
       '@graph': [
         {
-          '@type': 'Corporation',
-          '@id': 'https://akyin.com/#corporation',
+          '@type': 'Organization',
+          '@id': 'https://akyin.com/#organization',
           name: 'AKYIN Ventures',
-          alternateName: 'AKYIN',
-          url: 'https://akyin.com',
+          alternateName: ['AKYIN', 'AKYIN MARKETINGS'],
+          url: 'https://akyin.com/',
           logo: 'https://akyin.com/assets/aistudio/akyin_logo_clean.png',
           description:
             'Multi-business parent group and full-service marketing agency overseeing seven operating verticals across publishing, performance marketing, fashion retail, AI utilities, B2B wholesale trade, and business consulting.',
@@ -78,6 +86,12 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
             'https://www.facebook.com/akyinmarketing/',
             'https://x.com/akyinmarketing',
             'https://www.youtube.com/@akyinmarketing',
+            'https://www.amazon.com/stores/author/B0DT3L2T15/allbooks',
+            'https://play.google.com/store/books/details/Akyin_s_THE_DISCIPLINE_CODE?id=seHuEQAAQBAJ',
+            'https://aicalc.in',
+            'https://kartigo.online',
+            'https://biznxt.online',
+            'https://budgetbazaar.org',
           ],
           contactPoint: [
             {
@@ -88,50 +102,119 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
               availableLanguage: ['English', 'Hindi', 'Telugu'],
             },
           ],
-          department: [
-            {
-              '@type': 'Organization',
-              name: 'AKYIN Publishing',
-              url: 'https://akyin.com/ventures/publishing',
-            },
-            {
-              '@type': 'ProfessionalService',
-              name: 'AKYIN Marketing Agency',
-              url: 'https://akyin.com/ventures/marketing',
-            },
-            {
-              '@type': 'ClothingStore',
-              name: 'AKYIN Store / AKYIN THRIFT',
-              url: 'https://akyin.com/ventures/store',
-            },
-            {
-              '@type': 'SoftwareApplication',
-              name: 'AICalc.in',
-              url: 'https://aicalc.in',
-            },
-            {
-              '@type': 'WholesaleStore',
-              name: 'Kartigo.online',
-              url: 'https://kartigo.online',
-            },
-            {
-              '@type': 'ConsultingService',
-              name: 'BizNXT.online',
-              url: 'https://biznxt.online',
-            },
-            {
-              '@type': 'Store',
-              name: 'Budget Bazaar',
-              url: 'https://budgetbazaar.org',
-            },
+        },
+        {
+          '@type': 'LocalBusiness',
+          '@id': 'https://akyin.com/#localbusiness',
+          name: 'AKYIN Ventures & Marketing Agency',
+          image: 'https://akyin.com/assets/aistudio/akyin_logo_clean.png',
+          url: 'https://akyin.com/',
+          telephone: '+91-6305694011',
+          email: 'connect@akyin.com',
+          priceRange: '₹1,999 - ₹49,999',
+          address: {
+            '@type': 'PostalAddress',
+            addressCountry: 'IN',
+          },
+          sameAs: [
+            'https://www.instagram.com/akyinmarketing/',
+            'https://www.facebook.com/akyinmarketing/',
+            'https://x.com/akyinmarketing',
+            'https://www.youtube.com/@akyinmarketing',
           ],
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: '4.9',
+            reviewCount: '8',
+            bestRating: '5',
+          },
         },
         {
           '@type': 'WebSite',
           '@id': 'https://akyin.com/#website',
-          url: 'https://akyin.com',
+          url: 'https://akyin.com/',
           name: 'AKYIN Ventures',
-          publisher: { '@id': 'https://akyin.com/#corporation' },
+          publisher: { '@id': 'https://akyin.com/#organization' },
+        },
+        {
+          '@type': 'Service',
+          name: 'AKYIN Full-Service Growth Marketing & Automotive Retainer',
+          provider: { '@id': 'https://akyin.com/#organization' },
+          serviceType: 'Performance Marketing & Lead Qualification',
+          areaServed: ['IN', 'AE', 'US', 'GB'],
+          offers: [
+            {
+              '@type': 'Offer',
+              name: 'Package A — Complete Marketing Growth & Lead Qualification',
+              price: '49999',
+              priceCurrency: 'INR',
+              url: 'https://akyin.com/pricing',
+            },
+            {
+              '@type': 'Offer',
+              name: 'Package B — Lead Filtering & Qualification Only',
+              price: '19999',
+              priceCurrency: 'INR',
+              url: 'https://akyin.com/pricing',
+            },
+            {
+              '@type': 'Offer',
+              name: 'Commercial & Dealership Sales Training Workshop',
+              price: '25000',
+              priceCurrency: 'INR',
+              url: 'https://akyin.com/pricing',
+            },
+            {
+              '@type': 'Offer',
+              name: '1-on-1 Business Advisory Consultation (30 min IST)',
+              price: '1999',
+              priceCurrency: 'INR',
+              url: 'https://akyin.com/advisory',
+            },
+          ],
+        },
+        {
+          '@type': 'Product',
+          name: 'THE DISCIPLINE CODE by Akyin S.',
+          brand: { '@type': 'Brand', name: 'AKYIN Publishing' },
+          description:
+            'Independent book published by AKYIN Publishing on practical business and personal execution.',
+          offers: {
+            '@type': 'Offer',
+            price: '299',
+            priceCurrency: 'INR',
+            availability: 'https://schema.org/InStock',
+            url: 'https://play.google.com/store/books/details/Akyin_s_THE_DISCIPLINE_CODE?id=seHuEQAAQBAJ',
+          },
+        },
+        {
+          '@type': 'FAQPage',
+          mainEntity: [
+            {
+              '@type': 'Question',
+              name: 'What businesses operate under AKYIN Ventures?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'AKYIN Ventures operates seven verticals: AKYIN Publishing, AKYIN MARKETINGS (Agency), AKYIN Store / AKYIN Thrift, AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'How much do AKYIN Marketing retainers and advisory sessions cost?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Package A is ₹39,999 one-time setup plus ₹49,999/month, Package B (Lead Qualification Only) is ₹14,999 setup plus ₹19,999/month, Sales Training is ₹25,000/session, and 1-on-1 Business Advisory is ₹1,999 per 30-minute IST session.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'What are AKYIN Marketing Agency service timelines and deliverables?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Campaign onboarding and architecture launch within 7 to 14 business days after setup. Deliverables cover Meta and Google ad setup, independent lead filtering and qualification, CRM pipeline tracking, creative assets, and optional sales team training, with media spend paid directly to ad platforms.',
+              },
+            },
+          ],
         },
       ],
     },
@@ -214,9 +297,9 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/ventures/publishing': {
-    title: 'AKYIN Publishing — Ideas Worth Reading | akyin.com',
+    title: 'AKYIN Publishing — Stories, Knowledge & Ideas Worth Sharing | akyin.com',
     description:
-      'Independent book and digital publishing by AKYIN Publishing. Featuring THE DISCIPLINE CODE on Google Play Books and our Amazon Author Store.',
+      'Discover five books published by AKYIN on Amazon, created to inspire learning, personal development, and new perspectives.',
     structuredData: {
       '@context': 'https://schema.org',
       '@graph': [
@@ -228,12 +311,48 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
         },
         {
           '@type': 'Book',
-          name: 'THE DISCIPLINE CODE',
+          name: 'The Discipline Code: Master Your Mind. Build Unbreakable Habits. Win Every Day.',
           author: { '@type': 'Person', name: 'Akyin S.' },
           publisher: { '@type': 'Organization', name: 'AKYIN Publishing' },
-          'inLanguage': 'en',
+          inLanguage: 'en',
           bookFormat: 'https://schema.org/EBook',
-          url: 'https://play.google.com/store/books/details/Akyin_s_THE_DISCIPLINE_CODE?id=seHuEQAAQBAJ',
+          url: 'https://a.co/d/0ggfRzci',
+        },
+        {
+          '@type': 'Book',
+          name: 'BIOPIC OF LOSER: A Gritty Real-Life Biography of Failure, Resilience, and the Ultimate Corporate Automobile Hustle (1989–2013)',
+          author: { '@type': 'Person', name: 'AKYIN S.' },
+          publisher: { '@type': 'Organization', name: 'AKYIN Publishing' },
+          inLanguage: 'en',
+          bookFormat: 'https://schema.org/EBook',
+          url: 'https://a.co/d/0ig3AHqX',
+        },
+        {
+          '@type': 'Book',
+          name: 'THE SCROLL RECOVERY PLAN: A 30-Day System to Stop Doomscrolling, Rebuild Focus, and Take Back Your Time',
+          author: { '@type': 'Person', name: 'Akyin S.' },
+          publisher: { '@type': 'Organization', name: 'AKYIN Publishing' },
+          inLanguage: 'en',
+          bookFormat: 'https://schema.org/EBook',
+          url: 'https://a.co/d/0ewHC6eM',
+        },
+        {
+          '@type': 'Book',
+          name: 'The Wealth Trap: Why Smart People Stay Stuck, Make Emotional Money Mistakes, and Never Build the Wealth They Deserve',
+          author: { '@type': 'Person', name: 'Akyin S.' },
+          publisher: { '@type': 'Organization', name: 'AKYIN Publishing' },
+          inLanguage: 'en',
+          bookFormat: 'https://schema.org/EBook',
+          url: 'https://a.co/d/0eUuZA8r',
+        },
+        {
+          '@type': 'Book',
+          name: 'THE RESET CODE: Why Smart People Stay Stuck, Self-Sabotage Success, and Repeat the Same Mistakes—And How to Finally Change Their Life',
+          author: { '@type': 'Person', name: 'AKYIN S.' },
+          publisher: { '@type': 'Organization', name: 'AKYIN Publishing' },
+          inLanguage: 'en',
+          bookFormat: 'https://schema.org/EBook',
+          url: 'https://a.co/d/0h7g4V7g',
         },
       ],
     },
@@ -258,21 +377,68 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/marketing/automotive': {
-    title: 'AKYIN Marketing — Automotive Marketing & Dealership Growth | akyin.com',
+    title: 'Car Dealership Marketing & Test-Drive Leads | AKYIN',
     description:
-      'From customer enquiries to showroom performance, AKYIN helps automotive dealerships improve visibility, organise leads and strengthen their sales teams.',
+      'Book qualified showroom test drives, not cold clicks. Targeted Meta & Google auto ads, lead vetting, and floor sales coaching. Get a quote.',
+    ogTitle: 'More Showroom Test Drives. Zero Cold Leads. | AKYIN',
+    ogDescription:
+      'High-intent Meta & Google auto ads, automated lead vetting, and dealer sales coaching built to fill your showroom floor faster.',
     structuredData: {
       '@context': 'https://schema.org',
-      '@type': 'ProfessionalService',
-      name: 'AKYIN Marketing — Automotive Division',
-      url: 'https://akyin.com/marketing/automotive',
-      parentOrganization: { '@type': 'Corporation', name: 'AKYIN Ventures' },
-      description:
-        'Specialised automotive marketing and dealership growth solutions covering lead generation, lead qualification, test drive campaigns, and sales training.',
-      priceRange: '$$',
-      areaServed: ['IN', 'AE', 'US', 'GB'],
-      telephone: '+91-6305694011',
-      email: 'connect@akyin.com',
+      '@graph': [
+        {
+          '@type': 'ProfessionalService',
+          '@id': 'https://akyin.com/marketing/automotive#service',
+          name: 'AKYIN Marketing — Automotive Division',
+          url: 'https://akyin.com/marketing/automotive',
+          parentOrganization: { '@type': 'Corporation', name: 'AKYIN Ventures' },
+          description:
+            'Book qualified showroom test drives, not cold clicks. Targeted Meta & Google auto ads, lead vetting, and floor sales coaching. Get a quote.',
+          priceRange: '$$',
+          areaServed: ['IN', 'AE', 'US', 'GB'],
+          telephone: '+91-6305694011',
+          email: 'connect@akyin.com',
+        },
+        {
+          '@type': 'FAQPage',
+          '@id': 'https://akyin.com/marketing/automotive#lead-qualification-faq',
+          name: 'Lead Qualification FAQ — AKYIN Automotive Marketing',
+          mainEntity: [
+            {
+              '@type': 'Question',
+              name: 'How does AKYIN filter high-intent automotive test-drive leads?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'AKYIN enforces strict separation between Meta/Google lead generation and multi-tier lead qualification. Every raw enquiry undergoes automated phone verification and AI-assisted plus human telephonic vetting to confirm vehicle model interest, budget readiness, purchase timeline, and preferred showroom or doorstep test-drive slot before routing.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'What buyer signals are checked before routing a test-drive lead to dealership sales executives?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Each prospect is screened for target vehicle model and variant, on-road budget or financing readiness, purchase window (immediate vs. 30–90 days), local catchment proximity, and confirmed test-drive appointment intent, then classified as Hot, Warm, Future Follow-up, Unreachable, or Not Interested.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'How quickly are qualified test-drive leads delivered to showroom teams?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Hot test-drive buyers are pushed within seconds via dealership CRM integrations and instant WhatsApp alerts to floor executives, backed by structured daily Excel qualification logs to eliminate follow-up leakage.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'What is the difference between AKYIN lead generation and lead qualification?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Lead generation captures buyer demand through geo-fenced Meta and Google ads (with ad spend paid directly to platforms), while lead qualification vets incoming enquiries by phone and intent scoring so dealership sales teams focus exclusively on ready-to-visit test-drive buyers.',
+              },
+            },
+          ],
+        },
+      ],
     },
   },
   '/ventures/store': {
@@ -345,6 +511,47 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
         'Value-oriented retail storefront bringing affordable household goods and everyday essentials directly to shoppers.',
     },
   },
+  '/pricing': {
+    title: 'Pricing & Rate Card — AKYIN Ventures & Marketing Agency',
+    description:
+      'Transparent INR pricing for AKYIN Marketing Agency packages, lead filtering retainers, dealership sales training, and 1-on-1 business advisory.',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'Pricing & Rate Card — AKYIN Ventures',
+      url: 'https://akyin.com/pricing',
+      mainEntity: {
+        '@type': 'OfferCatalog',
+        name: 'AKYIN Ventures Commercial Rate Card',
+        itemListElement: [
+          {
+            '@type': 'Offer',
+            name: 'Package A — Complete Marketing Growth & Lead Qualification',
+            price: '49999',
+            priceCurrency: 'INR',
+          },
+          {
+            '@type': 'Offer',
+            name: 'Package B — Lead Filtering & Qualification Only',
+            price: '19999',
+            priceCurrency: 'INR',
+          },
+          {
+            '@type': 'Offer',
+            name: 'Commercial & Dealership Sales Training',
+            price: '25000',
+            priceCurrency: 'INR',
+          },
+          {
+            '@type': 'Offer',
+            name: '1-on-1 Business Advisory (30 min IST)',
+            price: '1999',
+            priceCurrency: 'INR',
+          },
+        ],
+      },
+    },
+  },
   '/advisory': {
     title: 'Business Advisory & Consultation Booking — AKYIN Ventures',
     description:
@@ -354,11 +561,16 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
       '@type': 'Service',
       name: 'AKYIN Business Advisory & Consultation',
       url: 'https://akyin.com/advisory',
-      provider: { '@type': 'Corporation', name: 'AKYIN Ventures' },
+      provider: { '@type': 'Organization', name: 'AKYIN Ventures' },
       serviceType: 'Executive Business Advisory Session',
       description:
         '1-on-1 strategic consultation addressing business feasibility, sales conversion discipline, and venture execution on India Standard Time (Asia/Kolkata).',
       areaServed: 'Global',
+      offers: {
+        '@type': 'Offer',
+        price: '1999',
+        priceCurrency: 'INR',
+      },
     },
   },
   '/insights': {
@@ -372,6 +584,28 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
       url: 'https://akyin.com/insights',
       description:
         'Operational perspectives and automotive marketing trends across publishing, full-service agency marketing, discounted fashion retail, AI tools, and B2B commerce.',
+    },
+  },
+  '/terms': {
+    title: 'Terms of Service — AKYIN Ventures | akyin.com',
+    description:
+      'Terms of Service, direct ad platform billing rules, service scope separation, and governance policies for AKYIN Ventures.',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'Terms of Service — AKYIN Ventures',
+      url: 'https://akyin.com/terms',
+    },
+  },
+  '/privacy': {
+    title: 'Privacy Policy — AKYIN Ventures | akyin.com',
+    description:
+      'Zero-broker data privacy, enquiry validation, and security standards across AKYIN Ventures.',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'Privacy Policy — AKYIN Ventures',
+      url: 'https://akyin.com/privacy',
     },
   },
   '/contact': {
@@ -515,20 +749,38 @@ function AppShell() {
     if (meta) {
       document.title = meta.title;
 
-      const descTag = document.querySelector('meta[name="description"]');
-      if (descTag) {
-        descTag.setAttribute('content', meta.description);
+      const canonicalUrl = `https://akyin.com${currentRoute === '/' ? '/' : currentRoute}`;
+      let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+      if (!canonicalLink) {
+        canonicalLink = document.createElement('link');
+        canonicalLink.rel = 'canonical';
+        document.head.appendChild(canonicalLink);
       }
+      canonicalLink.setAttribute('href', canonicalUrl);
+
+      let descTag = document.querySelector('meta[name="description"]');
+      if (!descTag) {
+        descTag = document.createElement('meta');
+        descTag.setAttribute('name', 'description');
+        document.head.appendChild(descTag);
+      }
+      descTag.setAttribute('content', meta.description);
 
       // Update OpenGraph & Twitter tags
+      const ogTitleValue = meta.ogTitle || meta.title;
+      const ogDescValue = meta.ogDescription || meta.description;
+
       const ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle) ogTitle.setAttribute('content', meta.title);
+      if (ogTitle) ogTitle.setAttribute('content', ogTitleValue);
       const ogDesc = document.querySelector('meta[property="og:description"]');
-      if (ogDesc) ogDesc.setAttribute('content', meta.description);
+      if (ogDesc) ogDesc.setAttribute('content', ogDescValue);
       const ogUrl = document.querySelector('meta[property="og:url"]');
-      if (ogUrl && typeof window !== 'undefined') {
-        ogUrl.setAttribute('content', `${window.location.origin}${currentRoute}`);
-      }
+      if (ogUrl) ogUrl.setAttribute('content', canonicalUrl);
+
+      const twTitle = document.querySelector('meta[name="twitter:title"]');
+      if (twTitle) twTitle.setAttribute('content', ogTitleValue);
+      const twDesc = document.querySelector('meta[name="twitter:description"]');
+      if (twDesc) twDesc.setAttribute('content', ogDescValue);
 
       // Inject / update Schema.org structured data (JSON-LD)
       if (meta.structuredData) {
@@ -551,6 +803,10 @@ function AppShell() {
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  useEffect(() => {
+    registerAkyinWebMcpTools(navigate);
+  }, [navigate]);
 
   const navigateEcosystem = useCallback(() => {
     setCurrentRoute('/');
@@ -602,10 +858,16 @@ function AppShell() {
         return <BizNXTPage onNavigate={navigate} />;
       case '/ventures/budget-bazaar':
         return <BudgetBazaarPage />;
+      case '/pricing':
+        return <PricingPage onNavigate={navigate} onStartEnquiry={handleStartEnquiry} />;
       case '/advisory':
         return <AdvisoryPage onNavigate={navigate} />;
       case '/insights':
         return <InsightsPage onNavigate={navigate} />;
+      case '/terms':
+        return <TermsPage onNavigate={navigate} section="terms" />;
+      case '/privacy':
+        return <TermsPage onNavigate={navigate} section="privacy" />;
       case '/contact':
         return (
           <ContactPage

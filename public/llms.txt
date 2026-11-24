@@ -1,0 +1,42 @@
+# AKYIN Ventures (akyin.com)
+
+> Multi-business corporate group and full-service marketing agency operating seven independent verticals across digital marketing, automotive dealership growth, publishing, fashion retail, AI calculation tools, B2B stock commerce, and business consulting.
+
+## Corporate & Core Pages
+
+- [Home — AKYIN Ventures](https://akyin.com/): Corporate overview, all seven operating verticals, verified client reviews, transparent pricing summary, and direct enquiry gateway.
+- [About Us & FAQs](https://akyin.com/about): Corporate profile, group architecture, 16-year commercial track record, security standards, and frequently asked questions.
+- [Our Businesses Directory](https://akyin.com/ventures): Portfolio comparison of all seven AKYIN Ventures verticals.
+- [Pricing & Rate Card](https://akyin.com/pricing): Transparent retainer packages (Package A & Package B), 21-item service rate card, and training fees in INR.
+- [Business Advisory Booking](https://akyin.com/advisory): Schedule a 1-on-1 business advisory consultation on India Standard Time (Asia/Kolkata).
+- [Insights & Business Philosophy](https://akyin.com/insights): Operational essays on publishing, dealership lead qualification, retail, and digital platforms.
+- [Contact Us](https://akyin.com/contact): Structured enquiry desk with instant WhatsApp and email draft generation.
+- [Terms of Service & Privacy Policy](https://akyin.com/terms): Commercial engagement terms, direct platform billing policy, advisory disclaimers, and privacy protections.
+- [Privacy Policy](https://akyin.com/privacy): Visitor data protection, CSP safeguards, and zero-broker enquiry handling.
+- [Site Map](https://akyin.com/sitemap): Full index of internal routes and verified external domains.
+
+## Operating Verticals
+
+- [AKYIN Publishing](https://akyin.com/ventures/publishing): Independent book publishing featuring five titles on Amazon (*The Discipline Code*, *BIOPIC OF LOSER*, *The Scroll Recovery Plan*, *The Wealth Trap*, *The Reset Code*) and Google Play Books.
+- [AKYIN MARKETINGS (Marketing Agency)](https://akyin.com/ventures/marketing): 18-service performance marketing, AI-assisted enquiry qualification, creative production, and sales team coaching.
+- [AKYIN Automotive Marketing Division](https://akyin.com/marketing/automotive): Specialized 16-service growth engine for car dealerships, lead density mapping, ROI calculators, and showroom sales training.
+- [AKYIN Store · AKYIN THRIFT](https://akyin.com/ventures/store): Curated men's and women's discounted fashion apparel retail.
+- [AICalc.in](https://akyin.com/ventures/aicalc): Natural-language AI calculation and manual calculator platform ([aicalc.in](https://aicalc.in)).
+- [Kartigo.online](https://akyin.com/ventures/kartigo): B2B wholesale stock supply and commercial trade platform ([kartigo.online](https://kartigo.online)).
+- [BizNXT.online](https://akyin.com/ventures/biznxt): Entrepreneur business clarity, feasibility, and consulting ([biznxt.online](https://biznxt.online)).
+- [Budget Bazaar](https://akyin.com/ventures/budget-bazaar): Value-first everyday household goods retail ([budgetbazaar.org](https://budgetbazaar.org)).
+
+## Transparent Pricing Highlights (INR)
+
+- **Package A — Full-Service Growth Marketing & Lead Management**: ₹39,999 one-time setup + ₹49,999/month.
+- **Package B — Lead Filtering & Qualification Only**: ₹14,999 one-time setup + ₹19,999/month.
+- **Commercial & Dealership Sales Training / Personality Development**: ₹25,000 per session.
+- **Individual Services Rate Card**: 21 transparent modular services from ₹2,500/campaign to ₹25,000/session ([Full Pricing](https://akyin.com/pricing)).
+
+## Official Contact & Agent Endpoints
+
+- **Email**: mailto:connect@akyin.com
+- **Phone / WhatsApp**: tel:+916305694011 (`+91-6305694011`)
+- **Social Channels (`@akyinmarketing`)**: Instagram, Facebook, X, YouTube
+- **MCP Server Card**: https://akyin.com/.well-known/mcp/server-card.json
+- **Robots & Content Signals**: https://akyin.com/robots.txt (`search=yes, ai-input=yes, ai-train=no`)

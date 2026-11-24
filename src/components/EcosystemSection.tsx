@@ -10,7 +10,6 @@ import {
 } from '../data/akyinData';
 import { sanitizeHref } from '../utils/security';
 import { EditorialReveal } from './EditorialReveal';
-import { GlassCard } from './liquid-glass';
 
 interface EcosystemSectionProps {
   onNavigate: (route: AppRoute) => void;
@@ -124,7 +123,7 @@ function TickerItemCard({
         : 'text-[#6E6E73]';
 
   const innerContent = (
-    <GlassCard interactive className="rounded-2xl px-5 py-3.5 min-w-[220px] sm:min-w-[248px]">
+    <div className="liquid-glass-card rounded-2xl px-5 py-3.5 min-w-[220px] sm:min-w-[248px] transition-transform duration-200 hover:-translate-y-0.5">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
           {entry.iconKey && <ThirdPartyMark iconKey={entry.iconKey} />}
@@ -145,7 +144,7 @@ function TickerItemCard({
           />
         )}
       </div>
-    </GlassCard>
+    </div>
   );
 
   if (entry.externalUrl) {

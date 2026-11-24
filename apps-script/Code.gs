@@ -788,6 +788,18 @@ function hashPassword_(password, salt) {
 }
 
 /**
+ * Authenticated HtmlService Wrappers (for AdminPortal.html)
+ */
+function portalLogin(password) {
+  return authenticateAdmin_(password);
+}
+
+function portalGetDashboard(token) {
+  requireAdminSession_(token);
+  return getAdminDashboardData_();
+}
+
+/**
  * Admin Workspace Operations
  */
 function getAdminDashboardData_() {
@@ -822,14 +834,23 @@ function adminSaveAppointment_(payload) {
     : null;
 
   if (!existing) {
+    const appointmentDate = sanitizeStr_(payload.appointmentDate, 10);
+    const startTime = sanitizeStr_(payload.startTime, 5);
+    const endTime = sanitizeStr_(payload.endTime, 5);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(appointmentDate)) {
+      throw new Error('Appointment date must be in YYYY-MM-DD format.');
+    }
+    if (!/^\d{2}:\d{2}$/.test(startTime) || !/^\d{2}:\d{2}$/.test(endTime)) {
+      throw new Error('Start and end times must be in HH:mm format.');
+    }
     const bookingId = generateId_('AKY');
     let calendarEventId = '';
     try {
       const cal = getTargetCalendar_();
       const evt = cal.createEvent(
         '[' + bookingStatus + '] AKYIN Advisory – ' + sanitizeStr_(payload.customerName, 100) + ' (' + bookingId + ')',
-        combineIstDateTime_(payload.appointmentDate, payload.startTime),
-        combineIstDateTime_(payload.appointmentDate, payload.endTime),
+        combineIstDateTime_(appointmentDate, startTime),
+        combineIstDateTime_(appointmentDate, endTime),
         { description: 'Manual admin booking ' + bookingId }
       );
       calendarEventId = evt.getId();
@@ -850,9 +871,9 @@ function adminSaveAppointment_(payload) {
       escapeFormula_(sanitizeStr_(payload.businessStage, 80)),
       escapeFormula_(sanitizeStr_(payload.consultationTopic, 120)),
       escapeFormula_(sanitizeStr_(payload.businessChallenge, 1500)),
-      sanitizeStr_(payload.appointmentDate, 10),
-      sanitizeStr_(payload.startTime, 5),
-      sanitizeStr_(payload.endTime, 5),
+      appointmentDate,
+      startTime,
+      endTime,
       paymentStatus,
       bookingStatus,
       escapeFormula_(sanitizeStr_(payload.adminNotes, 1000)),
@@ -861,6 +882,16 @@ function adminSaveAppointment_(payload) {
     ]);
     appendAdminLog_(ss, 'Owner', 'CREATE_APPOINTMENT', bookingId, 'Added appointment (' + bookingStatus + ').');
     return { bookingId: bookingId };
+  }
+
+  const nextDate = sanitizeStr_(payload.appointmentDate || existing.appointmentDate, 10);
+  const nextStart = sanitizeStr_(payload.startTime || existing.startTime, 5);
+  const nextEnd = sanitizeStr_(payload.endTime || existing.endTime, 5);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(nextDate)) {
+    throw new Error('Appointment date must be in YYYY-MM-DD format.');
+  }
+  if (!/^\d{2}:\d{2}$/.test(nextStart) || !/^\d{2}:\d{2}$/.test(nextEnd)) {
+    throw new Error('Start and end times must be in HH:mm format.');
   }
 
   const rowIdx = existing._rowIndex;
@@ -875,12 +906,10 @@ function adminSaveAppointment_(payload) {
           calendarEventId = '';
         } else {
           evt.setTitle('[' + bookingStatus + '] AKYIN Advisory – ' + sanitizeStr_(payload.customerName || existing.customerName, 100) + ' (' + existing.bookingId + ')');
-          if (payload.appointmentDate && payload.startTime && payload.endTime) {
-            evt.setTime(
-              combineIstDateTime_(payload.appointmentDate, payload.startTime),
-              combineIstDateTime_(payload.appointmentDate, payload.endTime)
-            );
-          }
+          evt.setTime(
+            combineIstDateTime_(nextDate, nextStart),
+            combineIstDateTime_(nextDate, nextEnd)
+          );
         }
       }
     } catch (e) {
@@ -899,9 +928,9 @@ function adminSaveAppointment_(payload) {
     escapeFormula_(sanitizeStr_(payload.businessStage || existing.businessStage, 80)),
     escapeFormula_(sanitizeStr_(payload.consultationTopic || existing.consultationTopic, 120)),
     escapeFormula_(sanitizeStr_(payload.businessChallenge !== undefined ? payload.businessChallenge : existing.businessChallenge, 1500)),
-    sanitizeStr_(payload.appointmentDate || existing.appointmentDate, 10),
-    sanitizeStr_(payload.startTime || existing.startTime, 5),
-    sanitizeStr_(payload.endTime || existing.endTime, 5),
+    nextDate,
+    nextStart,
+    nextEnd,
     paymentStatus,
     bookingStatus,
     escapeFormula_(sanitizeStr_(payload.adminNotes !== undefined ? payload.adminNotes : existing.adminNotes, 1000)),
@@ -996,6 +1025,16 @@ function adminUpdateEnquiry_(payload) {
   return { enquiryId: target.enquiryId, enquiryStatus: status };
 }
 
+const URL_SETTING_KEYS = {
+  logoUrl: true,
+  instagramUrl: true,
+  facebookUrl: true,
+  xUrl: true,
+  youtubeUrl: true,
+  amazonUrl: true,
+  googlePlayBooksUrl: true,
+};
+
 function adminSaveWebsiteSettings_(settings) {
   const ss = getSpreadsheet_();
   const sheet = ss.getSheetByName('WebsiteSettings');
@@ -1005,7 +1044,10 @@ function adminSaveWebsiteSettings_(settings) {
 
   keys.forEach(function (k) {
     const cleanKey = sanitizeStr_(k, 80);
-    const cleanVal = sanitizeStr_(String(settings[k] || ''), 2000);
+    const rawVal = sanitizeStr_(String(settings[k] || ''), 2000);
+    const cleanVal = URL_SETTING_KEYS[cleanKey]
+      ? (rawVal ? sanitizeSafeUrl_(rawVal) : '')
+      : rawVal;
     let foundRow = -1;
     for (let i = 1; i < data.length; i++) {
       if (String(data[i][0]) === cleanKey) {

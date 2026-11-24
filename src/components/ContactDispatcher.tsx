@@ -288,15 +288,23 @@ export function ContactDispatcher({
               </div>
               <div className="h-px bg-[#1D1D1F]/10" />
               <div>
-                <p className="text-xs font-medium text-[#6E6E73]">Official WhatsApp / Phone</p>
-                <a
-                  href={safeOfficialWhatsapp}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-1 inline-flex items-center gap-2 font-mono-num text-base font-semibold text-[#1D1D1F] hover:underline transition-colors"
-                >
-                  {displayPhone}
-                </a>
+                <p className="text-xs font-medium text-[#6E6E73]">Official Phone &amp; WhatsApp</p>
+                <div className="mt-1 flex flex-wrap items-center gap-3">
+                  <a
+                    href={`tel:+${displayWhatsappNum}`}
+                    className="inline-flex items-center gap-2 font-mono-num text-base font-semibold text-[#1D1D1F] hover:underline transition-colors"
+                  >
+                    {displayPhone}
+                  </a>
+                  <a
+                    href={safeOfficialWhatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-semibold text-[#6E6E73] hover:text-[#1D1D1F] underline"
+                  >
+                    Message on WhatsApp
+                  </a>
+                </div>
               </div>
               <div className="h-px bg-[#1D1D1F]/10" />
               <div className="space-y-3">
@@ -317,6 +325,8 @@ export function ContactDispatcher({
             <form
               onSubmit={handlePrepareDispatch}
               noValidate
+              toolname="submit_akyin_enquiry"
+              tooldescription="Validate and dispatch a business, marketing agency, automotive dealership, publishing, or partnership enquiry to AKYIN Ventures."
               className="frosted-glass-panel rounded-3xl p-6 sm:p-8 space-y-6 shadow-[0_20px_50px_rgba(0,0,0,0.06)]"
             >
               <div className="sr-only" aria-hidden="true">

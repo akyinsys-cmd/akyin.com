@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, Menu, X } from 'lucide-react';
+import { ChevronDown, Menu, Search, X } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { AppRoute, VENTURES_PORTFOLIO } from '../data/akyinData';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { isSafeImageSrc } from '../utils/security';
 import { AkyinLogo } from './AkyinLogo';
+import { HeaderSearch } from './HeaderSearch';
 import {
   GlassButton,
   GlassDropdown,
@@ -28,6 +29,7 @@ export function Navbar({
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
@@ -50,6 +52,13 @@ export function Navbar({
       if (e.key === 'Escape') {
         setDropdownOpen(false);
         setMobileMenuOpen(false);
+        setSearchOpen(false);
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setDropdownOpen(false);
+        setMobileMenuOpen(false);
+        setSearchOpen((prev) => !prev);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -76,23 +85,24 @@ export function Navbar({
     currentRoute === '/ventures' || currentRoute.startsWith('/ventures/');
 
   const linkClass = (isActive: boolean) =>
-    `relative px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F]/35 ${
+    `relative px-2 xl:px-3.5 py-1.5 rounded-full text-[12px] xl:text-[13px] font-medium transition-all duration-200 whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F]/35 ${
       isActive
         ? 'frosted-glass-pill text-[#1D1D1F] font-semibold shadow-[0_2px_10px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,1)] border border-white/95'
         : 'text-[#1D1D1F] hover:text-[#1D1D1F] hover:bg-white/60'
     }`;
 
   return (
-    <LiquidGlassHeader scrolled={scrolled}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 lg:h-16 flex items-center justify-between gap-4">
-        {/* Zone 1: Custom AKYIN Mark & Wordmark */}
+    <>
+      <LiquidGlassHeader scrolled={scrolled}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 lg:h-16 flex items-center justify-between gap-3 xl:gap-4">
+        {/* Zone 1: Custom AKYIN Mark, Wordmark & Group Descriptor */}
         <a
           href="/"
           onClick={(e) => {
             e.preventDefault();
             navigateTo('/');
           }}
-          className="inline-flex items-center whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F]/35 rounded-xl px-1 py-0.5 transition-opacity hover:opacity-85"
+          className="inline-flex items-center gap-2 xl:gap-2.5 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F]/35 rounded-xl px-1 py-0.5 transition-opacity hover:opacity-85"
         >
           {settings.logoUrl && isSafeImageSrc(settings.logoUrl) ? (
             <img
@@ -103,6 +113,13 @@ export function Navbar({
           ) : (
             <AkyinLogo wordmark={settings.brandWordmark || 'AKYIN'} size="sm" />
           )}
+          <span
+            className="hidden sm:inline-block h-3.5 w-px bg-[#1D1D1F]/15 shrink-0"
+            aria-hidden="true"
+          />
+          <span className="hidden sm:inline-block text-[9.5px] xl:text-[11px] font-semibold tracking-[0.04em] xl:tracking-[0.06em] uppercase text-[#6E6E73] whitespace-nowrap shrink-0">
+            Multi-Business Group &amp; Agency
+          </span>
         </a>
 
         {/* Zone 2: Floating Glass Navigation Pill */}
@@ -157,38 +174,77 @@ export function Navbar({
             <GlassDropdown open={dropdownOpen} className="w-80">
               <div className="space-y-0.5">
                 {VENTURES_PORTFOLIO.map((venture) => (
-                  <a
-                    key={venture.id}
-                    role="menuitem"
-                    href={venture.route}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigateTo(venture.route);
-                    }}
-                    className={`block px-3.5 py-2.5 rounded-xl transition-all ${
-                      currentRoute === venture.route
-                        ? 'frosted-glass text-[#1D1D1F] font-semibold shadow-xs'
-                        : 'hover:bg-white/80 text-[#1D1D1F]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold">{venture.shortName}</span>
-                      <span
-                        className={`font-mono-num text-[11px] ${
-                          currentRoute === venture.route ? 'text-[#1D1D1F]/70 font-bold' : 'text-[#6E6E73]'
-                        }`}
-                      >
-                        {venture.code}
-                      </span>
-                    </div>
-                    <p
-                      className={`text-[11px] mt-0.5 truncate ${
-                        currentRoute === venture.route ? 'text-[#1D1D1F]/80 font-medium' : 'text-[#6E6E73]'
+                  <div key={venture.id} className="space-y-0.5">
+                    <a
+                      role="menuitem"
+                      href={venture.route}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigateTo(venture.route);
+                      }}
+                      className={`block px-3.5 py-2.5 rounded-xl transition-all ${
+                        currentRoute === venture.route
+                          ? 'frosted-glass text-[#1D1D1F] font-semibold shadow-xs'
+                          : 'hover:bg-white/80 text-[#1D1D1F]'
                       }`}
                     >
-                      {venture.sector}
-                    </p>
-                  </a>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-semibold">{venture.shortName}</span>
+                        <span
+                          className={`font-mono-num text-[11px] ${
+                            currentRoute === venture.route ? 'text-[#1D1D1F]/70 font-bold' : 'text-[#6E6E73]'
+                          }`}
+                        >
+                          {venture.code}
+                        </span>
+                      </div>
+                      <p
+                        className={`text-[11px] mt-0.5 truncate ${
+                          currentRoute === venture.route ? 'text-[#1D1D1F]/80 font-medium' : 'text-[#6E6E73]'
+                        }`}
+                      >
+                        {venture.sector}
+                      </p>
+                    </a>
+
+                    {venture.id === 'marketing' && (
+                      <a
+                        role="menuitem"
+                        href="/marketing/automotive"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigateTo('/marketing/automotive');
+                        }}
+                        className={`block ml-3 px-3.5 py-2 rounded-xl transition-all ${
+                          currentRoute === '/marketing/automotive'
+                            ? 'frosted-glass text-[#1D1D1F] font-semibold shadow-xs'
+                            : 'hover:bg-white/80 text-[#1D1D1F]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-semibold">Automotive Marketing</span>
+                          <span
+                            className={`font-mono-num text-[11px] ${
+                              currentRoute === '/marketing/automotive'
+                                ? 'text-[#1D1D1F]/70 font-bold'
+                                : 'text-[#6E6E73]'
+                            }`}
+                          >
+                            Division
+                          </span>
+                        </div>
+                        <p
+                          className={`text-[11px] mt-0.5 truncate ${
+                            currentRoute === '/marketing/automotive'
+                              ? 'text-[#1D1D1F]/80 font-medium'
+                              : 'text-[#6E6E73]'
+                          }`}
+                        >
+                          Dealership Growth &amp; Lead Solutions
+                        </p>
+                      </a>
+                    )}
+                  </div>
                 ))}
 
                 <div className="pt-1.5 mt-1.5 border-t border-[#1D1D1F]/8">
@@ -207,6 +263,18 @@ export function Navbar({
               </div>
             </GlassDropdown>
           </div>
+
+          <a
+            href="/marketing/automotive"
+            aria-current={currentRoute === '/marketing/automotive' ? 'page' : undefined}
+            onClick={(e) => {
+              e.preventDefault();
+              navigateTo('/marketing/automotive');
+            }}
+            className={linkClass(currentRoute === '/marketing/automotive')}
+          >
+            Automotive
+          </a>
 
           <a
             href="/#our-ecosystem"
@@ -256,8 +324,27 @@ export function Navbar({
           </a>
         </GlassNavigation>
 
-        {/* Zone 3: Single Primary Action */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        {/* Zone 3: Search Trigger & Primary Action */}
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              setDropdownOpen(false);
+              setMobileMenuOpen(false);
+              setSearchOpen(true);
+            }}
+            aria-label="Search ventures and site pages (Ctrl+K)"
+            aria-expanded={searchOpen}
+            aria-haspopup="dialog"
+            className="inline-flex items-center justify-center gap-1.5 h-9 px-2.5 xl:px-3.5 rounded-full liquid-glass-cta text-xs font-semibold text-[#1D1D1F] hover:bg-white/95 transition-all cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F]/35"
+          >
+            <Search className="w-3.5 h-3.5 text-[#1D1D1F]" aria-hidden="true" />
+            <span className="hidden xl:inline">Search</span>
+            <kbd className="hidden 2xl:inline-block font-mono-num text-[10px] font-semibold text-[#6E6E73] bg-white/80 border border-[#1D1D1F]/10 rounded px-1.5 py-0.5 leading-none">
+              ⌘K
+            </kbd>
+          </button>
+
           <GlassButton
             variant="primary"
             size="sm"
@@ -323,17 +410,41 @@ export function Navbar({
             </div>
             <div className="pl-3 space-y-0.5">
               {VENTURES_PORTFOLIO.map((venture) => (
-                <a
-                  key={venture.id}
-                  href={venture.route}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigateTo(venture.route);
-                  }}
-                  className="block px-3.5 py-2 text-sm text-[#1D1D1F] rounded-xl hover:bg-white/80"
-                >
-                  {venture.shortName}
-                </a>
+                <div key={venture.id} className="space-y-0.5">
+                  <a
+                    href={venture.route}
+                    aria-current={currentRoute === venture.route ? 'page' : undefined}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateTo(venture.route);
+                    }}
+                    className={`block px-3.5 py-2 text-sm rounded-xl transition-colors ${
+                      currentRoute === venture.route
+                        ? 'frosted-glass font-semibold text-[#1D1D1F]'
+                        : 'text-[#1D1D1F] hover:bg-white/80'
+                    }`}
+                  >
+                    {venture.shortName}
+                  </a>
+
+                  {venture.id === 'marketing' && (
+                    <a
+                      href="/marketing/automotive"
+                      aria-current={currentRoute === '/marketing/automotive' ? 'page' : undefined}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigateTo('/marketing/automotive');
+                      }}
+                      className={`block pl-7 pr-3.5 py-2 text-[13px] rounded-xl transition-colors ${
+                        currentRoute === '/marketing/automotive'
+                          ? 'frosted-glass font-semibold text-[#1D1D1F]'
+                          : 'text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-white/80'
+                      }`}
+                    >
+                      Automotive Marketing
+                    </a>
+                  )}
+                </div>
               ))}
             </div>
 
@@ -408,5 +519,12 @@ export function Navbar({
         )}
       </AnimatePresence>
     </LiquidGlassHeader>
+
+    <HeaderSearch
+      open={searchOpen}
+      onClose={() => setSearchOpen(false)}
+      onNavigate={navigateTo}
+    />
+  </>
   );
 }

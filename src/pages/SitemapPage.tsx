@@ -111,6 +111,39 @@ const CORPORATE_ROUTES: CorporateRouteItem[] = [
     ],
   },
   {
+    route: '/pricing',
+    title: 'Pricing & Rate Card — Transparent Commercial Terms',
+    description:
+      'Complete INR pricing for AKYIN MARKETINGS retainers, lead filtering, sales coaching workshops, advisory consultations, and 21-item rate card.',
+    sections: [
+      'Retainer Packages (Package A & Package B)',
+      'Training Workshops & Business Advisory Fees',
+      'Complete 21-Item Individual Service Rate Card',
+    ],
+  },
+  {
+    route: '/terms',
+    title: 'Terms of Service — Governance & Engagement Scope',
+    description:
+      'Parent group attribution, direct platform ad billing policy, and lead generation vs. qualification separation.',
+    sections: [
+      'Corporate Attribution & Scope',
+      'Direct Platform Ad Billing Rules',
+      'Service Separation Commitments',
+    ],
+  },
+  {
+    route: '/privacy',
+    title: 'Privacy Policy — Data Protection & Zero-Broker Policy',
+    description:
+      'Enquiry validation standards, direct routing, and zero third-party data brokering guarantees.',
+    sections: [
+      'Enquiry & Booking Data Processing',
+      'Security Standards & Content Policy',
+      'Direct Data Governance Contacts',
+    ],
+  },
+  {
     route: '/sitemap',
     title: 'Sitemap — Complete Directory & Index',
     description:
@@ -133,9 +166,9 @@ const VERTICAL_SECTION_INDEX: VerticalSectionItem[] = [
     externalUrl: PUBLISHING_LINKS.amazonAuthorStore,
     externalLabel: 'Amazon Author Store',
     keySections: [
-      'Editorial Publishing Hero & Marketplace Links',
-      'Featured Publication: THE DISCIPLINE CODE by Akyin',
-      'Amazon Author Store & Google Play Books Distribution',
+      'Editorial Publishing Hero & Author Store Links',
+      '5-Book Amazon Catalog Grid (Stories, Knowledge & Ideas Worth Sharing)',
+      'Amazon Kindle & Google Play Books Distribution',
       'About Our Publishing Initiative',
       'Publishing Enquiries Form',
     ],
@@ -249,7 +282,7 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
             A structured overview of all AKYIN Ventures corporate pages, dedicated vertical destinations, key content sections, and verified external platforms.
           </p>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-2 text-xs font-medium text-[#6E6E73]">
-            <span className="font-mono-num font-bold text-[#1D1D1F]">7 Corporate Pages</span>
+            <span className="font-mono-num font-bold text-[#1D1D1F]">10 Corporate Pages</span>
             <span aria-hidden="true">·</span>
             <span className="font-mono-num font-bold text-[#1D1D1F]">
               {VENTURES_PORTFOLIO.length} Operating Verticals
@@ -547,14 +580,12 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
                   </a>
 
                   <a
-                    href={OFFICIAL_CONTACT.whatsappUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href={`tel:+${OFFICIAL_CONTACT.whatsappNumber}`}
                     className="rounded-2xl liquid-glass-cta p-4 space-y-1 transition-all"
                   >
                     <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#1D1D1F]">
                       <Phone className="w-3.5 h-3.5" aria-hidden="true" />
-                      <span>WhatsApp / Phone</span>
+                      <span>Phone / WhatsApp</span>
                     </div>
                     <p className="font-mono-num text-sm font-bold text-[#1D1D1F]">
                       {OFFICIAL_CONTACT.phoneDisplay}

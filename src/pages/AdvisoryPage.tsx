@@ -53,6 +53,7 @@ import {
   GlassModal,
   GlassPanel,
 } from '../components/liquid-glass';
+import { RazorpayCheckoutButton } from '../components/RazorpayCheckoutButton';
 import { ResilientImage } from '../components/ResilientImage';
 
 interface AdvisoryPageProps {
@@ -110,6 +111,7 @@ export function AdvisoryBookingForm() {
   const [submitError, setSubmitError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [confirmation, setConfirmation] = useState<BookingConfirmationResult | null>(null);
+  const [razorpayPaymentId, setRazorpayPaymentId] = useState<string | null>(null);
 
   // Personal Google Calendar Integration (in-memory OAuth token only)
   const [googleUser, setGoogleUser] = useState<User | null>(null);
@@ -420,9 +422,43 @@ export function AdvisoryBookingForm() {
           <div>
             <p className="text-xs text-[#6E6E73]">Current Status</p>
             <p className="font-semibold text-[#1D1D1F] mt-0.5">
-              {confirmation.bookingStatus} · {confirmation.paymentStatus}
+              {razorpayPaymentId
+                ? `Paid · Verified (${razorpayPaymentId})`
+                : `${confirmation.bookingStatus} · ${confirmation.paymentStatus}`}
             </p>
           </div>
+        </div>
+
+        {/* Instant Razorpay Settlement Option for Requested Slot */}
+        <div className="rounded-2xl border border-white/85 bg-white/70 backdrop-blur-md p-4 sm:p-5 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-xs font-bold text-[#1D1D1F]">
+                Complete Consultation Fee Online (Razorpay · ₹1,999)
+              </p>
+              <p className="text-[11px] text-[#6E6E73]">
+                Pay via UPI, Card, or NetBanking to fast-track your slot confirmation for reference{' '}
+                <span className="font-mono-num font-semibold text-[#1D1D1F]">
+                  {confirmation.bookingId}
+                </span>
+                .
+              </p>
+            </div>
+            <span className="font-mono-num text-sm font-bold text-[#1D1D1F]">₹1,999</span>
+          </div>
+          <RazorpayCheckoutButton
+            sku="advisory-session"
+            label="Pay ₹1,999 Consultation Fee via Razorpay"
+            variant="primary"
+            size="md"
+            referenceId={confirmation.bookingId}
+            prefill={{
+              name: customerName,
+              email,
+              contact: phone,
+            }}
+            onVerified={(res) => setRazorpayPaymentId(res.paymentId)}
+          />
         </div>
 
         {confirmation.emailStatus.error && (
@@ -435,13 +471,13 @@ export function AdvisoryBookingForm() {
           <GlassButton
             href={sanitizeHref(
               `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-                `Hello AKYIN Ventures, I submitted Business Advisory request ${confirmation.bookingId} for ${confirmation.appointmentDate} (${confirmation.slotLabel}).`
+                `Hello AKYIN Ventures, I submitted Business Advisory request ${confirmation.bookingId} for ${confirmation.appointmentDate} (${confirmation.slotLabel})${razorpayPaymentId ? ` · Razorpay Payment ID: ${razorpayPaymentId}` : ''}.`
               )}`,
               OFFICIAL_CONTACT.whatsappUrl
             )}
             target="_blank"
             rel="noopener noreferrer"
-            variant="primary"
+            variant="subtle"
             size="md"
           >
             <MessageCircle className="w-4 h-4" aria-hidden="true" />
@@ -473,6 +509,7 @@ export function AdvisoryBookingForm() {
             size="md"
             onClick={() => {
               setConfirmation(null);
+              setRazorpayPaymentId(null);
               setCreatedCalendarLink('');
               setCalendarNotice('');
             }}
@@ -730,17 +767,29 @@ export function AdvisoryBookingForm() {
 
           <div className="h-px bg-[#1D1D1F]/8" />
 
-          <div className="space-y-1.5">
+          <div className="space-y-2.5">
             <div className="inline-flex items-center gap-2 font-bold text-[#1D1D1F]">
               <CreditCard className="w-4 h-4 text-[#1D1D1F]" aria-hidden="true" />
-              <span>Payment Requirement</span>
+              <span>Payment &amp; Razorpay Checkout</span>
             </div>
             <p className="font-semibold text-[#1D1D1F]">
               Consultation Fee: {feeDisplay}
             </p>
             <p className="text-[#6E6E73] leading-relaxed">
-              No online payment gateway is used on this page. Our team contacts you to discuss the consultation and payment confirmation. Your appointment is not confirmed until AKYIN verifies payment.
+              Submit your requested IST slot to settle the fee online via Razorpay (UPI, Cards, NetBanking) with HMAC-SHA256 verification, or confirm directly with our advisory desk. Appointments finalize once payment is verified.
             </p>
+            <RazorpayCheckoutButton
+              sku="advisory-session"
+              label="Pay ₹1,999 Consultation Fee Now"
+              variant="glass"
+              size="sm"
+              prefill={{
+                name: customerName,
+                email,
+                contact: phone,
+              }}
+              className="w-full"
+            />
           </div>
         </GlassPanel>
       </div>
@@ -749,6 +798,8 @@ export function AdvisoryBookingForm() {
       <form
         onSubmit={handleBookingSubmit}
         noValidate
+        toolname="book_akyin_advisory"
+        tooldescription="Submit a 1-on-1 30-minute IST business advisory consultation booking request with AKYIN Ventures."
         className="lg:col-span-7 frosted-glass-panel rounded-3xl p-6 sm:p-8 space-y-5 shadow-[0_20px_50px_rgba(0,0,0,0.06)]"
       >
         <div className="sr-only" aria-hidden="true">

@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, ChevronDown, Sparkles } from 'lucide-react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { useRef } from 'react';
 import {
@@ -8,7 +8,6 @@ import {
   PUBLISHING_LINKS,
   VENTURES_PORTFOLIO,
 } from '../data/akyinData';
-import { AkyinLogo } from '../components/AkyinLogo';
 import { ContactDispatcher } from '../components/ContactDispatcher';
 import { CustomerReviews } from '../components/CustomerReviews';
 import { EcosystemSection } from '../components/EcosystemSection';
@@ -22,6 +21,7 @@ import {
 } from '../components/liquid-glass';
 import { ResilientImage } from '../components/ResilientImage';
 import { SocialLinks } from '../components/SocialLinks';
+import { SuccessStoriesCarousel } from '../components/SuccessStoriesCarousel';
 import { useSiteConfig } from '../context/SiteConfigContext';
 
 interface HomePageProps {
@@ -84,19 +84,6 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
               transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-6 space-y-6"
             >
-              <motion.div
-                initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, delay: 0.04, ease: [0.16, 1, 0.3, 1] }}
-                className="inline-flex items-center gap-3 rounded-full liquid-glass-cta px-3.5 py-1.5"
-              >
-                <AkyinLogo wordmark="AKYIN" size="sm" animated />
-                <span className="h-3.5 w-px bg-[#1D1D1F]/15" aria-hidden="true" />
-                <span className="text-[11px] font-semibold tracking-[0.06em] uppercase text-[#6E6E73]">
-                  Multi-Business Group &amp; Agency
-                </span>
-              </motion.div>
-
               <div className="space-y-3">
                 <motion.h1
                   initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
@@ -196,6 +183,33 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
                 </GlassPanel>
               </div>
             </motion.div>
+          </div>
+
+          {/* Subtle Scroll-Down Discovery Indicator */}
+          <div className="mt-12 lg:mt-16 flex justify-center">
+            <a
+              href="#our-ecosystem"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('our-ecosystem')?.scrollIntoView({
+                  behavior: shouldReduceMotion ? 'auto' : 'smooth',
+                  block: 'start',
+                });
+              }}
+              aria-label="Scroll down to discover our ecosystem verticals"
+              className="group inline-flex flex-col items-center gap-2.5 text-xs font-medium text-[#6E6E73] hover:text-[#1D1D1F] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F]/30 rounded-2xl px-4 py-2"
+            >
+              <span className="tracking-[0.12em] uppercase text-[10px] font-semibold">
+                Scroll to explore verticals
+              </span>
+              <motion.span
+                animate={shouldReduceMotion ? undefined : { y: [0, 5, 0] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                className="w-9 h-9 rounded-full frosted-glass-pill flex items-center justify-center text-[#1D1D1F] group-hover:bg-white transition-all shadow-xs"
+              >
+                <ChevronDown className="w-4 h-4" aria-hidden="true" />
+              </motion.span>
+            </a>
           </div>
         </div>
       </section>
@@ -582,23 +596,31 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
             <EditorialReveal delay={0} className="h-full">
               <GlassCard interactive className="h-full group rounded-3xl p-6 flex flex-col justify-between space-y-5">
                 <div className="space-y-2.5">
-                  <p className="text-xs font-semibold text-[#6E6E73]">Publishing</p>
+                  <p className="text-xs font-semibold text-[#0071E3]">Publishing · 5 Books</p>
                   <h3 className="font-editorial text-lg font-bold text-[#1D1D1F]">
-                    THE DISCIPLINE CODE
+                    AKYIN Publishing
                   </h3>
                   <p className="text-xs text-[#6E6E73] leading-relaxed">
-                    Published by AKYIN Publishing. Available on Google Play Books and Amazon.
+                    Five published titles on Amazon—including <span className="font-semibold text-[#1D1D1F]">The Discipline Code</span>, <span className="font-semibold text-[#1D1D1F]">The Reset Code</span>, and <span className="font-semibold text-[#1D1D1F]">The Wealth Trap</span>.
                   </p>
                 </div>
-                <div className="pt-3 border-t border-[#1D1D1F]/8">
+                <div className="pt-3 border-t border-[#1D1D1F]/8 flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('/ventures/publishing')}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline cursor-pointer"
+                  >
+                    <span>Explore Books</span>
+                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  </button>
                   <a
-                    href={PUBLISHING_LINKS.googlePlayDisciplineCode}
+                    href={PUBLISHING_LINKS.amazonAuthorStore}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#6E6E73] hover:text-[#1D1D1F]"
                   >
-                    <span>Google Play Books</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
+                    <span>Amazon</span>
+                    <ArrowUpRight className="w-3 h-3" aria-hidden="true" />
                   </a>
                 </div>
               </GlassCard>
@@ -792,6 +814,11 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
         </EditorialReveal>
       </section>
 
+      {/* Automotive & B2B Client Success Stories Carousel */}
+      <EditorialReveal>
+        <SuccessStoriesCarousel onNavigate={onNavigate} />
+      </EditorialReveal>
+
       {/* 8. Customer & Client Endorsements — Verified Reviews across AKYIN Ventures */}
       <EditorialReveal>
         <CustomerReviews onNavigate={onNavigate} />
@@ -806,25 +833,101 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
         />
       </EditorialReveal>
 
-      <section className="py-8 bg-[#FFFFFF] border-t border-[#E8E8ED]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-[#6E6E73]">
-            Need a specialized category form? Visit our central enquiry desk.
-          </p>
-          <GlassButton
-            variant="primary"
-            size="sm"
-            onClick={() =>
-              onStartEnquiry({
-                category: 'Partnership Enquiry',
-                vertical: 'AKYIN Ventures (Corporate Group)',
-                enquiryType: 'Strategic Business Partnership',
-              })
-            }
-          >
-            <span>Open Dedicated Contact Page</span>
-            <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-          </GlassButton>
+      {/* Transparent Pricing Summary & Corporate Gateways */}
+      <section className="py-14 bg-[#FFFFFF] border-t border-[#E8E8ED]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
+                Transparent Commercial Pricing · INR
+              </p>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-[-0.02em] text-[#1D1D1F]">
+                Clear Agency Retainers, Training &amp; Advisory Rates.
+              </h2>
+            </div>
+            <a
+              href="/pricing"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/pricing');
+              }}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1D1D1F] hover:underline whitespace-nowrap"
+            >
+              <span>View Full Pricing &amp; 21-Item Rate Card</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="frosted-glass-card rounded-2xl p-5 space-y-1.5">
+              <p className="text-xs font-semibold text-[#6E6E73]">Package A · Full Growth</p>
+              <p className="font-mono-num text-xl font-bold text-[#1D1D1F]">₹49,999/mo</p>
+              <p className="text-xs text-[#6E6E73]">+ ₹39,999 one-time setup</p>
+            </div>
+            <div className="frosted-glass-card rounded-2xl p-5 space-y-1.5">
+              <p className="text-xs font-semibold text-[#6E6E73]">Package B · Lead Filtering</p>
+              <p className="font-mono-num text-xl font-bold text-[#1D1D1F]">₹19,999/mo</p>
+              <p className="text-xs text-[#6E6E73]">+ ₹14,999 one-time setup</p>
+            </div>
+            <div className="frosted-glass-card rounded-2xl p-5 space-y-1.5">
+              <p className="text-xs font-semibold text-[#6E6E73]">Sales Team Training</p>
+              <p className="font-mono-num text-xl font-bold text-[#1D1D1F]">₹25,000</p>
+              <p className="text-xs text-[#6E6E73]">Per showroom/team session</p>
+            </div>
+            <div className="frosted-glass-card rounded-2xl p-5 space-y-1.5">
+              <p className="text-xs font-semibold text-[#6E6E73]">1-on-1 Advisory</p>
+              <p className="font-mono-num text-xl font-bold text-[#1D1D1F]">₹1,999</p>
+              <p className="text-xs text-[#6E6E73]">30-min IST strategy session</p>
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-[#E8E8ED] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#6E6E73]">
+              <a href="mailto:connect@akyin.com" className="font-semibold text-[#1D1D1F] hover:underline">
+                connect@akyin.com
+              </a>
+              <span aria-hidden="true">·</span>
+              <a href="tel:+916305694011" className="font-mono-num font-semibold text-[#1D1D1F] hover:underline">
+                +91-6305694011
+              </a>
+              <span aria-hidden="true">·</span>
+              <a
+                href="/terms"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onNavigate('/terms');
+                }}
+                className="hover:text-[#1D1D1F] hover:underline"
+              >
+                Terms of Service
+              </a>
+              <span aria-hidden="true">·</span>
+              <a
+                href="/privacy"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onNavigate('/privacy');
+                }}
+                className="hover:text-[#1D1D1F] hover:underline"
+              >
+                Privacy Policy
+              </a>
+            </div>
+            <GlassButton
+              variant="primary"
+              size="sm"
+              onClick={() =>
+                onStartEnquiry({
+                  category: 'Partnership Enquiry',
+                  vertical: 'AKYIN Ventures (Corporate Group)',
+                  enquiryType: 'Strategic Business Partnership',
+                })
+              }
+            >
+              <span>Open Dedicated Contact Page</span>
+              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+            </GlassButton>
+          </div>
         </div>
       </section>
     </div>

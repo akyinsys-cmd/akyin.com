@@ -10,8 +10,11 @@ export type AppRoute =
   | '/ventures/kartigo'
   | '/ventures/biznxt'
   | '/ventures/budget-bazaar'
+  | '/pricing'
   | '/advisory'
   | '/insights'
+  | '/terms'
+  | '/privacy'
   | '/contact'
   | '/sitemap'
   | '/admin';
@@ -115,12 +118,92 @@ export const OFFICIAL_CONTACT = {
   ],
 } as const;
 
+export interface PublishedBook {
+  id: string;
+  number: string;
+  title: string;
+  subtitle: string;
+  author: string;
+  amazonUrl: string;
+  asin: string;
+  coverImage: string;
+  coverAlt: string;
+  marketplaceLabel: string;
+}
+
 export const PUBLISHING_LINKS = {
   amazonAuthorStore:
     'https://www.amazon.com/stores/Akyin-S/author/B0H6SY7N3T?_encoding=UTF8&pd_rd_w=r7GRE&content-id=amzn1.sym.7e190e19-9f6f-4df8-807a-5a7608594741&pd_rd_wg=EdC74&pd_rd_r=d01ba7b6-b1c7-4bd2-87fb-cbd0fc9deddb&ref=ap_rdr&shoppingPortalEnabled=true&ccs_id=98bb1963-9c8a-4dab-9f1b-d21a6f908208',
   googlePlayDisciplineCode:
     'https://play.google.com/store/books/details/Akyin_s_THE_DISCIPLINE_CODE?id=seHuEQAAQBAJ',
 } as const;
+
+export const PUBLISHING_BOOKS: PublishedBook[] = [
+  {
+    id: 'book-discipline-code',
+    number: '01',
+    title: 'The Discipline Code',
+    subtitle: 'Master Your Mind. Build Unbreakable Habits. Win Every Day.',
+    author: 'Akyin S.',
+    amazonUrl: 'https://a.co/d/0ggfRzci',
+    asin: 'B0H6R3BCQR',
+    coverImage: '/assets/books/the-discipline-code.jpg',
+    coverAlt: 'Official Amazon book cover of The Discipline Code by Akyin S.',
+    marketplaceLabel: 'Amazon · Kindle Edition',
+  },
+  {
+    id: 'book-biopic-of-loser',
+    number: '02',
+    title: 'BIOPIC OF LOSER',
+    subtitle:
+      'A Gritty Real-Life Biography of Failure, Resilience, and the Ultimate Corporate Automobile Hustle (1989–2013)',
+    author: 'AKYIN S. & MAULA S.',
+    amazonUrl: 'https://a.co/d/0ig3AHqX',
+    asin: 'B0H2QTMXP9',
+    coverImage: '/assets/books/biopic-of-loser.jpg',
+    coverAlt: 'Official Amazon book cover of Biopic of Loser by AKYIN S. and MAULA S.',
+    marketplaceLabel: 'Amazon · Kindle Edition',
+  },
+  {
+    id: 'book-scroll-recovery-plan',
+    number: '03',
+    title: 'THE SCROLL RECOVERY PLAN',
+    subtitle:
+      'A 30-Day System to Stop Doomscrolling, Rebuild Focus, and Take Back Your Time',
+    author: 'Akyin S.',
+    amazonUrl: 'https://a.co/d/0ewHC6eM',
+    asin: 'B0HKQ8DDSY',
+    coverImage: '/assets/books/the-scroll-recovery-plan.jpg',
+    coverAlt: 'Official Amazon book cover of The Scroll Recovery Plan by Akyin S.',
+    marketplaceLabel: 'Amazon · Kindle Edition',
+  },
+  {
+    id: 'book-wealth-trap',
+    number: '04',
+    title: 'The Wealth Trap',
+    subtitle:
+      'Why Smart People Stay Stuck, Make Emotional Money Mistakes, and Never Build the Wealth They Deserve',
+    author: 'Akyin S.',
+    amazonUrl: 'https://a.co/d/0eUuZA8r',
+    asin: 'B0H4YG4CM9',
+    coverImage: '/assets/books/the-wealth-trap.jpg',
+    coverAlt: 'Official Amazon book cover of The Wealth Trap by Akyin S.',
+    marketplaceLabel: 'Amazon · Kindle Edition',
+  },
+  {
+    id: 'book-reset-code',
+    number: '05',
+    title: 'THE RESET CODE',
+    subtitle:
+      'Why Smart People Stay Stuck, Self-Sabotage Success, and Repeat the Same Mistakes—And How to Finally Change Their Life',
+    author: 'AKYIN S.',
+    amazonUrl: 'https://a.co/d/0h7g4V7g',
+    asin: 'B0H5DRF16M',
+    coverImage: '/assets/books/the-reset-code.jpg',
+    coverAlt: 'Official Amazon book cover of The Reset Code by AKYIN S.',
+    marketplaceLabel: 'Amazon · Kindle Edition',
+  },
+];
 
 export const EXTERNAL_VERTICAL_URLS = {
   aicalc: 'https://aicalc.in',
@@ -156,10 +239,10 @@ export const VENTURES_PORTFOLIO: VentureOverview[] = [
     name: 'AKYIN Publishing',
     shortName: 'Akyin Publishing',
     route: '/ventures/publishing',
-    sector: 'Book & Digital Publishing',
-    positioning: 'Ideas Worth Reading. Knowledge Worth Sharing.',
+    sector: 'Book & Digital Publishing · 5 Books',
+    positioning: 'Stories, Knowledge & Ideas Worth Sharing.',
     description:
-      'Independent book and digital publishing initiative creating and distributing titles for readers across international marketplaces including Amazon and Google Play Books.',
+      'Discover books published by AKYIN, created to inspire learning, personal development and new perspectives across Amazon and Google Play Books.',
     externalUrl: PUBLISHING_LINKS.amazonAuthorStore,
     externalLabel: 'Amazon Author Store',
     image: IMAGES.publishingHero,

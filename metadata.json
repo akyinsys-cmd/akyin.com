@@ -1,6 +1,6 @@
 {
   "name": "AKYIN.com — AKYIN Ventures & AKYIN MARKETINGS",
   "description": "Corporate hub for AKYIN Ventures and the AKYIN MARKETINGS automotive dealership growth, lead qualification, and sales training division.",
-  "requestFramePermissions": [],
-  "majorCapabilities": []
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

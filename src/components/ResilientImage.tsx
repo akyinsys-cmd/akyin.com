@@ -1,4 +1,4 @@
-import { ImgHTMLAttributes, useState } from 'react';
+import { ImgHTMLAttributes, useEffect, useState } from 'react';
 
 interface ResilientImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'> {
   src: string;
@@ -17,9 +17,14 @@ export function ResilientImage({
   branded: _branded,
   loading = 'lazy',
   decoding = 'async',
+  referrerPolicy = 'no-referrer',
   ...rest
 }: ResilientImageProps) {
   const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [src]);
 
   if (hasError) {
     return (
@@ -47,6 +52,7 @@ export function ResilientImage({
         alt={alt}
         loading={loading}
         decoding={decoding}
+        referrerPolicy={referrerPolicy}
         onError={() => setHasError(true)}
         className={`w-full h-full ${hasFitUtility ? '' : 'object-cover'} transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${imageClassName}`}
         {...rest}

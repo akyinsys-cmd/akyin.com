@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+
+Sitemap: https://akyin.com/sitemap.xml

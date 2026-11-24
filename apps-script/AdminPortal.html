@@ -79,7 +79,10 @@
     let sessionToken = '';
     const msg = document.getElementById('msg');
     document.getElementById('loginBtn').addEventListener('click', function () {
-      const pw = document.getElementById('adminPass').value;
+      const pwInput = document.getElementById('adminPass');
+      const pw = pwInput.value;
+      pwInput.value = '';
+      msg.textContent = '';
       google.script.run
         .withSuccessHandler(function (session) {
           sessionToken = session.token;
@@ -90,7 +93,7 @@
         .withFailureHandler(function (err) {
           msg.textContent = err.message || 'Sign in failed.';
         })
-        .authenticateAdmin_(pw);
+        .portalLogin(pw);
     });
 
     function loadData() {
@@ -112,7 +115,7 @@
         .withFailureHandler(function (err) {
           msg.textContent = err.message || 'Failed to load appointments.';
         })
-        .getAdminDashboardData_();
+        .portalGetDashboard(sessionToken);
     }
   </script>
 </body>

@@ -38,7 +38,7 @@ export function GlassNavigation({
   return (
     <nav
       aria-label={ariaLabel}
-      className={`hidden lg:flex items-center gap-1 rounded-full bg-white/45 backdrop-blur-2xl border border-white/85 px-2 py-1 shadow-[inset_0_1.5px_1px_rgba(255,255,255,0.95),inset_0_-1px_1px_rgba(255,255,255,0.4),0_4px_14px_rgba(0,0,0,0.045)] ${className}`}
+      className={`hidden lg:flex items-center gap-1 rounded-full bg-white/55 backdrop-blur-3xl border border-white/90 px-2 py-1 shadow-[inset_0_1.5px_1.5px_rgba(255,255,255,1),inset_0_-1px_1px_rgba(255,255,255,0.45),0_6px_18px_rgba(0,0,0,0.055)] ${className}`}
     >
       {children}
     </nav>
@@ -83,8 +83,8 @@ export function GlassButton({
     variant === 'primary'
       ? 'liquid-glass-pill-dark text-white'
       : variant === 'subtle'
-        ? 'frosted-glass-pill hover:bg-white text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.03)]'
-        : 'liquid-glass-cta hover:bg-white/85 text-[#1D1D1F]';
+        ? 'frosted-glass-pill hover:bg-white text-[#1D1D1F] shadow-[0_2px_10px_rgba(0,0,0,0.035)]'
+        : 'liquid-glass-cta hover:bg-white/90 text-[#1D1D1F]';
 
   const baseCls = `group inline-flex items-center justify-center gap-2 rounded-full font-semibold tracking-[-0.01em] transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-55 disabled:pointer-events-none whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F] focus-visible:ring-offset-2 ${sizeCls} ${variantCls} ${className}`;
 
@@ -133,19 +133,32 @@ export function GlassCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
+  const [glare, setGlare] = useState<{ x: number; y: number; active: boolean }>({
+    x: 50,
+    y: 50,
+    active: false,
+  });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!tilt || shouldReduceMotion || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setRotateX(Number((-y * 6).toFixed(2)));
-    setRotateY(Number((x * 6).toFixed(2)));
+    const relX = (e.clientX - rect.left) / rect.width;
+    const relY = (e.clientY - rect.top) / rect.height;
+    const x = relX - 0.5;
+    const y = relY - 0.5;
+    setRotateX(Number((-y * 5.5).toFixed(2)));
+    setRotateY(Number((x * 5.5).toFixed(2)));
+    setGlare({
+      x: Math.round(relX * 100),
+      y: Math.round(relY * 100),
+      active: true,
+    });
   };
 
   const handleMouseLeave = () => {
     setRotateX(0);
     setRotateY(0);
+    setGlare((prev) => ({ ...prev, active: false }));
   };
 
   return (
@@ -168,10 +181,20 @@ export function GlassCard({
         damping: 24,
       }}
       style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
-      className={`liquid-glass-card rounded-3xl transition-shadow duration-300 ${
-        interactive ? 'hover:border-white hover:shadow-[0_28px_64px_rgba(0,0,0,0.095)]' : ''
+      className={`liquid-glass-card rounded-3xl overflow-hidden transition-shadow duration-300 ${
+        interactive ? 'hover:border-white hover:shadow-[0_30px_68px_rgba(0,0,0,0.095)]' : ''
       } ${className}`}
     >
+      {tilt && !shouldReduceMotion && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 transition-opacity duration-300"
+          style={{
+            opacity: glare.active ? 1 : 0,
+            background: `radial-gradient(360px circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,0.52), transparent 65%)`,
+          }}
+        />
+      )}
       {children}
     </motion.div>
   );
