@@ -1,0 +1,46 @@
+name: AKYIN production build check
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: akyin-production-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Generate package lockfile
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      - name: Commit generated lockfile when changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet -- package-lock.json; then
+            git add package-lock.json
+            git commit -m "chore: generate npm lockfile for reproducible deployment"
+            git push
+          fi
+
+      - name: Install exact locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Build production frontend
+        run: npm run build
