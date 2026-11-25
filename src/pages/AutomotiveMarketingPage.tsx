@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import {
   ArrowRight,
-  Check,
   CheckCircle2,
   ChevronDown,
   FileText,
-  Minus,
   Sparkles,
 } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
@@ -26,6 +24,8 @@ import { AutomotiveSuccessStories } from '../components/AutomotiveSuccessStories
 import { ClientSuccessCarousel } from '../components/ClientSuccessCarousel';
 import { ContactDispatcher } from '../components/ContactDispatcher';
 import { DealershipGrowthCalculator } from '../components/DealershipGrowthCalculator';
+import { LeadImpactTracker } from '../components/LeadImpactTracker';
+import { PerformanceGrowthRoadmap } from '../components/PerformanceGrowthRoadmap';
 import {
   GlassButton,
   GlassCard,
@@ -254,60 +254,41 @@ const AUTOMOTIVE_SERVICES = [
   },
 ];
 
-const COMPARISON_TIERS = [
+const STANDALONE_AUTOMOTIVE_TRACKS = [
   {
-    name: 'Starter Showroom',
-    subtitle: 'Essential Growth',
-    badge: 'Single Location',
-    description: 'For single-location dealerships looking to establish robust digital presence & lead generation.',
-    features: [
-      { name: 'Geo-fenced Meta & Google Ads', included: true },
-      { name: 'Lead Generation Campaigns', included: true },
-      { name: 'Basic Lead Filtering', included: true },
-      { name: 'Social Media Management (3 posts/wk)', included: true },
-      { name: 'Google Business Profile Optimization', included: true },
-      { name: 'Test Drive & Festive Campaigns', included: false },
-      { name: 'AI & Human Telephonic Vetting', included: false },
-      { name: 'Custom Lead Tracking Web App', included: false },
-      { name: 'Sales Team Training Workshops', included: false },
-      { name: 'Dedicated Account Director', included: false },
+    name: 'Automotive Dealership Growth & Showroom Marketing',
+    slug: '/services/automotive-marketing' as AppRoute,
+    category: 'Automotive Marketing',
+    description:
+      'Independent showroom visibility, model-level paid demand, and dealer campaign management with direct client ad spend billing.',
+    highlights: [
+      'Model-wise paid search & social demand',
+      'Local Google Maps showroom positioning',
+      'Weekly cost-per-booking attribution',
     ],
   },
   {
-    name: 'Growth Dealership',
-    subtitle: 'Full-Service Performance',
-    badge: 'Most Popular',
-    description: 'For high-volume multi-model showrooms needing advanced lead filtering, social media, and test drive campaigns.',
-    highlighted: true,
-    features: [
-      { name: 'Geo-fenced Meta & Google Ads', included: true },
-      { name: 'Lead Generation Campaigns', included: true },
-      { name: 'Basic Lead Filtering', included: true },
-      { name: 'Social Media Management (Daily)', included: true },
-      { name: 'Google Business Profile Optimization', included: true },
-      { name: 'Test Drive & Festive Campaigns', included: true },
-      { name: 'AI & Human Telephonic Vetting', included: true },
-      { name: 'Custom Lead Tracking Web App', included: false },
-      { name: 'Sales Team Training Workshops', included: true },
-      { name: 'Dedicated Account Director', included: true },
+    name: 'Test Drive & Exchange Lead Generation',
+    slug: '/services/test-drive-lead-generation' as AppRoute,
+    category: 'Automotive Marketing',
+    description:
+      'Dedicated conversion funnels engineered strictly to fill showroom and home test-drive calendars.',
+    highlights: [
+      'Home & showroom test-drive booking flows',
+      'Festive & old-car exchange carnival drives',
+      'Automated SMS & WhatsApp slot reminders',
     ],
   },
   {
-    name: 'Enterprise Group',
-    subtitle: 'Nationwide / Multi-Brand Mastery',
-    badge: 'Multi-Brand Groups',
-    description: 'For large automotive groups requiring custom app development, dedicated telephonic lead qualification, and executive sales training.',
-    features: [
-      { name: 'Geo-fenced Meta & Google Ads', included: true },
-      { name: 'Lead Generation Campaigns', included: true },
-      { name: 'Basic Lead Filtering', included: true },
-      { name: 'Social Media Management (Multi-Channel)', included: true },
-      { name: 'Google Business Profile Optimization', included: true },
-      { name: 'Test Drive & Festive Campaigns', included: true },
-      { name: 'AI & Human Telephonic Vetting', included: true },
-      { name: 'Custom Lead Tracking Web App', included: true },
-      { name: 'Sales Team Training Workshops', included: true },
-      { name: 'Dedicated Account Director', included: true },
+    name: 'Lead Filtering & Floor Sales Enablement',
+    slug: '/services/lead-filtering' as AppRoute,
+    category: 'Lead Management & Training',
+    description:
+      'Separate telephonic screening and showroom executive coaching so sales consultants convert higher-intent buyers.',
+    highlights: [
+      'Hot, Warm & Follow-up pipeline tagging',
+      'Instant showroom sales team escalation',
+      'Optional standalone Floor Sales Training',
     ],
   },
 ];
@@ -610,86 +591,79 @@ export function AutomotiveMarketingPage({ onNavigate }: AutomotiveMarketingPageP
       {/* Live Google Search Grounded Automotive Industry News */}
       <AutomotiveIndustryNews />
 
-      {/* 4. Service Tier Comparison Table */}
+      {/* Real-Time Lead Impact Tracker */}
+      <section className="py-16 lg:py-24 bg-[#F5F5F7] border-t border-[#E8E8ED]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <LeadImpactTracker />
+        </div>
+      </section>
+
+      {/* Performance Growth Roadmap */}
+      <section className="py-16 lg:py-24 bg-[#FFFFFF] border-t border-[#E8E8ED]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <PerformanceGrowthRoadmap />
+        </div>
+      </section>
+
+      {/* 4. Standalone Modular Dealership Services (No Forced Bundles) */}
       <section className="py-20 lg:py-28 bg-[#FFFFFF] border-t border-[#E8E8ED]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-              Flexible Dealership Retainers
+              Modular Standalone Scope · Zero Compulsory Bundles
             </p>
             <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F]">
-              Compare Marketing Support Tiers
+              Select Only the Dealership Services You Need
             </h2>
             <p className="text-base text-[#6E6E73] leading-relaxed">
-              Differentiate between standard showroom awareness and enterprise multi-location dealership growth support.
+              Engage AKYIN independently for showroom demand generation, test-drive acquisition, lead filtering, or sales team coaching without forced multi-service retainers.
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {COMPARISON_TIERS.map((tier, idx) => (
+            {STANDALONE_AUTOMOTIVE_TRACKS.map((track) => (
               <GlassPanel
-                key={idx}
-                solid={!tier.highlighted}
-                className={`p-8 flex flex-col justify-between space-y-8 relative ${
-                  tier.highlighted
-                    ? 'border-2 border-[#1D1D1F] shadow-xl bg-gradient-to-b from-white via-purple-50/20 to-white'
-                    : 'bg-white'
-                }`}
+                key={track.slug}
+                solid
+                className="p-8 flex flex-col justify-between space-y-7 bg-white"
               >
-                {tier.highlighted && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#1D1D1F] text-white text-[11px] font-semibold uppercase tracking-wider px-3.5 py-1 rounded-full shadow-md">
-                    {tier.badge}
-                  </div>
-                )}
-
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-[#6E6E73]">
-                      {tier.badge}
-                    </span>
-                    <span className="text-xs font-mono-num font-bold text-[#1D1D1F] bg-[#F5F5F7] px-2.5 py-1 rounded-lg">
-                      Tier {idx + 1}
-                    </span>
-                  </div>
-
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#0071E3]">
+                    {track.category}
+                  </span>
                   <h3 className="font-display text-2xl font-bold text-[#1D1D1F]">
-                    {tier.name}
+                    {track.name}
                   </h3>
-                  <p className="text-xs font-semibold text-[#6E6E73]">{tier.subtitle}</p>
                   <p className="text-sm text-[#6E6E73] leading-relaxed">
-                    {tier.description}
+                    {track.description}
                   </p>
-
-                  <ul className="space-y-3 pt-6 border-t border-[#E8E8ED]">
-                    {tier.features.map((feat, fIdx) => (
-                      <li key={fIdx} className="flex items-center gap-3 text-xs sm:text-sm text-[#1D1D1F]">
-                        {feat.included ? (
-                          <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                            <Check className="w-3.5 h-3.5" />
-                          </div>
-                        ) : (
-                          <div className="w-5 h-5 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center shrink-0">
-                            <Minus className="w-3.5 h-3.5" />
-                          </div>
-                        )}
-                        <span className={feat.included ? 'font-medium' : 'text-gray-400 line-through'}>
-                          {feat.name}
-                        </span>
+                  <ul className="space-y-2.5 pt-4 border-t border-[#E8E8ED]">
+                    {track.highlights.map((item) => (
+                      <li key={item} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#1D1D1F]">
+                        <CheckCircle2 className="w-4 h-4 text-[#1D1D1F] shrink-0 mt-0.5" aria-hidden="true" />
+                        <span>{item}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="pt-6 border-t border-[#E8E8ED]">
+                <div className="pt-4 border-t border-[#E8E8ED] space-y-2.5">
                   <GlassButton
-                    variant={tier.highlighted ? 'primary' : 'glass'}
-                    size="lg"
+                    variant="primary"
+                    size="md"
                     className="w-full justify-center"
-                    onClick={() => handleEnquire(`${tier.name} (${tier.subtitle})`)}
+                    onClick={() => onNavigate(track.slug)}
                   >
-                    <span>Choose {tier.name}</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <span>Explore Standalone Service</span>
+                    <ArrowRight className="w-4 h-4" aria-hidden="true" />
                   </GlassButton>
+                  <button
+                    type="button"
+                    onClick={() => handleEnquire(track.name)}
+                    className="w-full text-center text-xs font-semibold text-[#1D1D1F] hover:text-[#0071E3] py-1.5 cursor-pointer"
+                  >
+                    Request Dealership Quotation
+                  </button>
                 </div>
               </GlassPanel>
             ))}
@@ -816,10 +790,10 @@ export function AutomotiveMarketingPage({ onNavigate }: AutomotiveMarketingPageP
         sectionId="dealership-enquiry"
         defaultCategory="Marketing Services Enquiry"
         defaultVertical="Akyin Marketing"
-        defaultEnquiryType="Package A — Full-Service Growth Marketing & Lead Management"
+        defaultEnquiryType="Automotive Dealership Marketing & Sales Strategy"
         defaultMessage={enquiryMessage}
         heading="Schedule a Dealership Growth Consultation."
-        subheading="Connect directly with AKYIN’s automotive marketing directors to discuss custom lead generation, two-tier lead qualification, CRM integration, and sales team training for your dealership group."
+        subheading="Connect directly with AKYIN’s automotive marketing directors to discuss standalone lead generation, two-tier lead qualification, CRM integration, and sales team training for your showroom."
       />
 
       {/* 8. Automotive Growth Newsletter Sign-Up Footer Strip */}

@@ -1,43 +1,56 @@
 # AKYIN Ventures (akyin.com)
 
-> Multi-business corporate group and full-service marketing agency operating seven independent verticals across digital marketing, automotive dealership growth, publishing, fashion retail, AI calculation tools, B2B stock commerce, and business consulting.
+> Multi-business corporate group and standalone marketing service marketplace operating core ventures across digital marketing, automotive dealership growth, publishing, and fashion retail while supporting 58+ client businesses across India and the UAE.
 
 ## Corporate & Core Pages
 
-- [Home — AKYIN Ventures](https://akyin.com/): Corporate overview, all seven operating verticals, verified client reviews, transparent pricing summary, and direct enquiry gateway.
+- [Home — AKYIN Ventures](https://akyin.com/): Corporate overview, operating verticals, verified client portfolio ticker, standalone pricing highlights, and direct enquiry gateway.
 - [About Us & FAQs](https://akyin.com/about): Corporate profile, group architecture, 16-year commercial track record, security standards, and frequently asked questions.
-- [Our Businesses Directory](https://akyin.com/ventures): Portfolio comparison of all seven AKYIN Ventures verticals.
-- [Pricing & Rate Card](https://akyin.com/pricing): Transparent retainer packages (Package A & Package B), 21-item service rate card, and training fees in INR.
+- [Our Businesses Directory](https://akyin.com/ventures): Portfolio comparison across AKYIN Ventures and featured client platforms.
+- [Standalone Service Pricing & Quotation Builder](https://akyin.com/pricing): Transparent INR pricing across all 10 standalone service categories and custom quotation builder.
+- [Business, Marketing & Sales Calculators Suite](https://akyin.com/tools): 20 free interactive calculators for ROI, ROAS, CAC, CPL, break-even, GST, margins, commissions, quotation estimation, and advisory booking.
 - [Business Advisory Booking](https://akyin.com/advisory): Schedule a 1-on-1 business advisory consultation on India Standard Time (Asia/Kolkata).
 - [Insights & Business Philosophy](https://akyin.com/insights): Operational essays on publishing, dealership lead qualification, retail, and digital platforms.
 - [Contact Us](https://akyin.com/contact): Structured enquiry desk with instant WhatsApp and email draft generation.
-- [Terms of Service & Privacy Policy](https://akyin.com/terms): Commercial engagement terms, direct platform billing policy, advisory disclaimers, and privacy protections.
+- [Terms of Service](https://akyin.com/terms): Commercial engagement terms, direct platform billing policy, and advisory disclaimers.
 - [Privacy Policy](https://akyin.com/privacy): Visitor data protection, CSP safeguards, and zero-broker enquiry handling.
-- [Site Map](https://akyin.com/sitemap): Full index of internal routes and verified external domains.
+- [Site Map](https://akyin.com/sitemap): Full index of internal routes, standalone service pages (`/services/:slug`), and verified external domains.
 
-## Operating Verticals
+## Operating Verticals & Showcased Client Platforms
 
 - [AKYIN Publishing](https://akyin.com/ventures/publishing): Independent publishing featuring eight Amazon books (*The Discipline Code*, *BIOPIC OF LOSER*, *The Scroll Recovery Plan*, *The Wealth Trap*, *The Reset Code*, *The Discipline Reset*, *The Overthinking Reset*, *The Dopamine Reset Code*), three Gumroad digital productivity kits (*ATS Resume Kit*, *The Scroll Recovery Plan*, *The Money OS*), Google Play Books, and Pinterest.
-- [AKYIN MARKETINGS (Marketing Agency)](https://akyin.com/ventures/marketing): 18-service performance marketing, AI-assisted enquiry qualification, creative production, and sales team coaching.
-- [AKYIN Automotive Marketing Division](https://akyin.com/marketing/automotive): Specialized 16-service growth engine for car dealerships, lead density mapping, ROI calculators, and showroom sales training.
+- [AKYIN MARKETINGS (Standalone Service Marketplace)](https://akyin.com/ventures/marketing): 10 modular service categories spanning Automotive Marketing, Digital Marketing, Social Media Management, Creative & Graphic Design, Video & Content, Business Documents & Presentations, Excel & Reporting, Messaging & Communication, Lead Management & CRM, and Business Consulting & Training.
+- [AKYIN Automotive Marketing Division](https://akyin.com/marketing/automotive): Specialized standalone services for car dealerships, test-drive lead generation, showroom launch camps, ROI calculators, and showroom sales training.
 - [AKYIN Store · AKYIN THRIFT](https://akyin.com/ventures/store): Curated men's and women's discounted fashion apparel retail.
 - [AICalc.in](https://akyin.com/ventures/aicalc): Natural-language AI calculation and manual calculator platform ([aicalc.in](https://aicalc.in)).
 - [Kartigo.online](https://akyin.com/ventures/kartigo): B2B wholesale stock supply and commercial trade platform ([kartigo.online](https://kartigo.online)).
 - [BizNXT.online](https://akyin.com/ventures/biznxt): Entrepreneur business clarity, feasibility, and consulting ([biznxt.online](https://biznxt.online)).
 - [Budget Bazaar](https://akyin.com/ventures/budget-bazaar): Value-first everyday household goods retail ([budgetbazaar.org](https://budgetbazaar.org)).
 
-## Transparent Pricing Highlights (INR)
+## Key Standalone Service Pages (`/services/:slug`) & Transparent Pricing Highlights (INR)
 
-- **Package A — Full-Service Growth Marketing & Lead Management**: ₹39,999 one-time setup + ₹49,999/month.
-- **Package B — Lead Filtering & Qualification Only**: ₹14,999 one-time setup + ₹19,999/month.
-- **Commercial & Dealership Sales Training / Personality Development**: ₹25,000 per session.
-- **Individual Services Rate Card**: 21 transparent modular services from ₹2,500/campaign to ₹25,000/session ([Full Pricing](https://akyin.com/pricing)).
+Every service at AKYIN MARKETINGS is standalone—zero compulsory bundles:
+
+- **Automotive Dealership Marketing & Sales Strategy** (`/services/automotive-marketing`): ₹50,000/session
+- **Online Lead Generation Campaigns** (`/services/lead-generation`): Custom quote on request
+- **Lead Filtering & Qualification** (`/services/lead-filtering`): ₹24,000/month
+- **Meta Ads Management** (`/services/meta-ads-management`): ₹40,000/month (ad spend paid directly by client)
+- **Logo Design** (`/services/logo-design`): ₹6,000 project / ₹10,000 monthly
+- **YouTube Thumbnail Design** (`/services/youtube-thumbnail-design`): ₹3,000 (5-pack) / ₹8,000 monthly
+- **Script Writing** (`/services/script-writing`): ₹4,000 (3-pack) / ₹12,000 monthly
+- **PowerPoint Presentation Design** (`/services/presentation-design`): ₹6,000 (12 slides) / ₹14,000 monthly
+- **Excel Reports & Automation** (`/services/excel-reporting`): ₹5,000 report / ₹10,000 monthly
+- **Bulk SMS Marketing** (`/services/bulk-sms`): ₹3,000 for 10,000 SMS credits (₹0.30/SMS; extra credits configurable by admin)
+- **WhatsApp Business Messaging Setup** (`/services/whatsapp-business-setup`): ₹4,999 one-time setup (strictly separate from ₹1.50/message usage)
+- **1-on-1 Business Advisory Consultation (30 min IST)** (`https://akyin.com/advisory`): ₹3,998 per session
+
+> Messaging disclaimer: Messaging rates are subject to provider charges, applicable taxes, message category, destination and delivery conditions. Final charges are confirmed in the quotation.
 
 ## Official Contact & Agent Endpoints
 
 - **Email**: mailto:connect@akyin.com
-- **Phone**: tel:+916395694011 (`+91 63956 94011`)
+- **WhatsApp Connect**: https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U
 - **Service Availability**: INDIA | UAE (Serving businesses across India and the UAE)
-- **Follow AKYIN**: Facebook, YouTube, Instagram, WhatsApp Channel
+- **Dynamic Sitemap**: https://akyin.com/sitemap.xml
 - **MCP Server Card**: https://akyin.com/.well-known/mcp/server-card.json
 - **Robots & Content Signals**: https://akyin.com/robots.txt (`search=yes, ai-input=yes, ai-train=no`)

@@ -118,8 +118,8 @@ const DEFAULT_SETTINGS = [
   ['advisoryMaxBookings', 'Business Advisory', '2'],
   ['notificationEmail', 'Contact Settings', 'connect@akyin.com'],
   ['contactEmail', 'Contact Settings', 'connect@akyin.com'],
-  ['contactPhone', 'Contact Settings', '+91-6305694011'],
-  ['whatsappNumber', 'Contact Settings', '916305694011'],
+  ['contactPhone', 'Contact Settings', ''],
+  ['whatsappNumber', 'Contact Settings', ''],
   ['heroHeadline', 'Website Settings', 'Building Ideas Into Businesses.'],
   ['heroSubheadline', 'Website Settings', 'AKYIN Ventures brings together diverse business initiatives across publishing, marketing, retail, digital technology, B2B commerce and business consulting.'],
   ['footerTagline', 'Website Settings', 'Parent corporate group bringing together operating ventures across publishing, automotive marketing, value retail, AI utility software, B2B stock commerce, and business consulting.'],
@@ -1150,8 +1150,7 @@ function sendBookingEmails_(bookingId, payload, settings) {
         'Requested Time (IST): ' + slotLabel + '\n' +
         'Consultation Topic: ' + payload.consultationTopic + '\n' +
         'Consultation Fee Info: ' + feeLabel + '\n\n' +
-        'Warm regards,\nAKYIN Ventures\nhttps://akyin.com\n' +
-        (settings.contactPhone || '+91-6305694011'),
+        'Warm regards,\nAKYIN Ventures\nhttps://akyin.com\nWhatsApp Connect: https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U',
     });
     report.customerNotified = true;
   } catch (err) {

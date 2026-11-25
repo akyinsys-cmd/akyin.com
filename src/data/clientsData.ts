@@ -34,36 +34,35 @@ export const CLIENT_PREVIEW_URLS = {
 export const CLIENT_STATS = {
   sectionTitle: 'OUR CLIENTS',
   sectionHeading: 'Businesses That Trust AKYIN for Their Growth.',
-  clientCount: '58 Clients',
-  clientSupportText: 'Supporting businesses across multiple industries.',
+  clientCount: '58 Clients Currently Handled',
+  clientSupportText: '11 featured verified brands displayed below; remaining client identities are privately held in the AKYIN directory.',
   clientDisclaimer:
     'Clients are independent businesses supported by AKYIN for marketing, technology, or commercial growth; they are not owned subsidiaries or internal brands.',
 } as const;
 
 /**
  * Verified Client Directory:
- * Contains the four newly reclassified clients (AICalc, Kartigo, BizNXT, Budget Bazaar)
- * alongside all existing client relationships. No extra clients invented.
+ * Contains strictly the 11 supplied client/brand names. No identities of the remaining 47 clients are fabricated.
  */
 export const AKYIN_CLIENTS: ClientItem[] = [
   {
-    id: 'aicalc',
-    name: 'AICalc',
-    category: 'AI & Technology',
-    websiteUrl: CLIENT_PREVIEW_URLS.aicalc,
+    id: 'biznxt',
+    name: 'BizNXT.online',
+    category: 'Business Guidance & Consulting',
+    websiteUrl: CLIENT_PREVIEW_URLS.biznxt,
     websiteLabel: 'Visit Website',
     isPreviewUrl: true,
     featured: true,
     summary:
-      'AI-assisted and natural-language calculation platform solving complex business and daily calculations.',
-    supportScope: 'Digital Infrastructure, Technology & Marketing',
+      'Entrepreneurial consulting and strategic guidance platform assisting business founders in evaluating commercial opportunities.',
+    supportScope: 'Advisory Funnels, Commercial Structure & Digital Positioning',
     status: 'Client Relationship',
-    wordmarkStyle: 'mono',
-    internalShowcaseRoute: '/ventures/aicalc',
+    wordmarkStyle: 'sans',
+    internalShowcaseRoute: '/ventures/biznxt',
   },
   {
     id: 'kartigo',
-    name: 'Kartigo',
+    name: 'Kartigo.online',
     category: 'B2B Stock Supply',
     websiteUrl: CLIENT_PREVIEW_URLS.kartigo,
     websiteLabel: 'Visit Website',
@@ -77,19 +76,16 @@ export const AKYIN_CLIENTS: ClientItem[] = [
     internalShowcaseRoute: '/ventures/kartigo',
   },
   {
-    id: 'biznxt',
-    name: 'BizNXT',
-    category: 'Business Guidance & Consulting',
-    websiteUrl: CLIENT_PREVIEW_URLS.biznxt,
-    websiteLabel: 'Visit Website',
-    isPreviewUrl: true,
+    id: 'thrift-store',
+    name: 'Thrift Store',
+    category: 'Fashion Retail & Thrift',
     featured: true,
     summary:
-      'Entrepreneurial consulting and strategic guidance platform assisting business founders in evaluating commercial opportunities.',
-    supportScope: 'Advisory Funnels, Commercial Structure & Digital Positioning',
+      'Value-first consumer apparel and thrift retail engagement focused on digital merchandising and customer acquisition.',
+    supportScope: 'Retail Positioning & Customer Acquisition',
     status: 'Client Relationship',
-    wordmarkStyle: 'sans',
-    internalShowcaseRoute: '/ventures/biznxt',
+    wordmarkStyle: 'serif',
+    internalShowcaseRoute: '/ventures/store',
   },
   {
     id: 'budget-bazaar',
@@ -105,6 +101,21 @@ export const AKYIN_CLIENTS: ClientItem[] = [
     status: 'Client Relationship',
     wordmarkStyle: 'sans',
     internalShowcaseRoute: '/ventures/budget-bazaar',
+  },
+  {
+    id: 'aicalc',
+    name: 'AICalc',
+    category: 'AI & Technology',
+    websiteUrl: CLIENT_PREVIEW_URLS.aicalc,
+    websiteLabel: 'Visit Website',
+    isPreviewUrl: true,
+    featured: true,
+    summary:
+      'AI-assisted and natural-language calculation platform solving complex business and daily calculations.',
+    supportScope: 'Digital Infrastructure, Technology & Marketing',
+    status: 'Client Relationship',
+    wordmarkStyle: 'mono',
+    internalShowcaseRoute: '/ventures/aicalc',
   },
   {
     id: 'autoclub',

@@ -70,12 +70,7 @@ export function RazorpayCheckoutButton({
         <p className="text-[11px] text-emerald-800">
           Verified via server HMAC-SHA256 signature. A confirmation receipt can also be shared via{' '}
           <a
-            href={sanitizeHref(
-              `https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=${encodeURIComponent(
-                `Hello AKYIN Ventures, I completed Razorpay payment ${result.paymentId} (Order ${result.orderId}) for ${result.title} (${result.displayPrice}).`
-              )}`,
-              OFFICIAL_CONTACT.whatsappUrl
-            )}
+            href={sanitizeHref(OFFICIAL_CONTACT.whatsappUrl, OFFICIAL_CONTACT.whatsappChannelUrl)}
             target="_blank"
             rel="noopener noreferrer"
             className="font-semibold underline"
@@ -128,18 +123,13 @@ export function RazorpayCheckoutButton({
             </div>
           </div>
           <a
-            href={sanitizeHref(
-              `https://wa.me/${OFFICIAL_CONTACT.whatsappNumber}?text=${encodeURIComponent(
-                `Hello AKYIN Ventures, I would like a payment link for ${item.title} (${item.displayPrice})${referenceId ? ` (Ref: ${referenceId})` : ''}.`
-              )}`,
-              OFFICIAL_CONTACT.whatsappUrl
-            )}
+            href={sanitizeHref(OFFICIAL_CONTACT.whatsappUrl, OFFICIAL_CONTACT.whatsappChannelUrl)}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 font-semibold text-[#1D1D1F] hover:underline"
           >
             <MessageCircle className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>Request Razorpay Link on WhatsApp ({OFFICIAL_CONTACT.phoneDisplay})</span>
+            <span>Connect via Official WhatsApp Desk</span>
           </a>
         </div>
       )}

@@ -3,6 +3,7 @@ import { PaymentCatalogItem, PaymentSku } from '../data/paymentCatalog';
 
 export interface RazorpayGatewayConfig {
   configured: boolean;
+  mode?: 'test' | 'live';
   keyId: string | null;
   currency: 'INR';
   catalog: PaymentCatalogItem[];
@@ -17,9 +18,11 @@ export interface RazorpayPrefill {
 export type RazorpayPaymentResult =
   | {
       status: 'verified';
+      mode?: 'test' | 'live';
       orderId: string;
       paymentId: string;
-      sku: PaymentSku;
+      sku?: PaymentSku | null;
+      invoiceId?: string | null;
       title: string;
       displayPrice: string;
       verifiedAt: string;
@@ -104,7 +107,8 @@ export function loadRazorpayCheckoutScript(): Promise<boolean> {
 }
 
 export async function startRazorpayPayment(params: {
-  sku: PaymentSku;
+  sku?: PaymentSku;
+  invoiceId?: string;
   prefill?: RazorpayPrefill;
   referenceId?: string;
 }): Promise<RazorpayPaymentResult> {
@@ -114,6 +118,7 @@ export async function startRazorpayPayment(params: {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         sku: params.sku,
+        invoiceId: params.invoiceId,
         customerName: params.prefill?.name?.trim() || '',
         customerEmail: params.prefill?.email?.trim() || '',
         customerPhone: params.prefill?.contact?.trim() || '',
@@ -202,11 +207,13 @@ export async function startRazorpayPayment(params: {
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
                 sku: params.sku,
+                invoiceId: params.invoiceId,
               }),
             });
 
             const verifyJson = (await verifyRes.json().catch(() => ({}))) as {
               verified?: boolean;
+              mode?: 'test' | 'live';
               orderId?: string;
               paymentId?: string;
               verifiedAt?: string;
@@ -218,9 +225,11 @@ export async function startRazorpayPayment(params: {
               if (verifyRes.ok && verifyJson.verified && verifyJson.paymentId) {
                 resolve({
                   status: 'verified',
+                  mode: verifyJson.mode || 'test',
                   orderId: verifyJson.orderId || response.razorpay_order_id,
                   paymentId: verifyJson.paymentId,
-                  sku: params.sku,
+                  sku: params.sku || null,
+                  invoiceId: params.invoiceId || null,
                   title: orderData.title || 'AKYIN Service',
                   displayPrice: orderData.displayPrice || 'INR',
                   verifiedAt: verifyJson.verifiedAt || new Date().toISOString(),

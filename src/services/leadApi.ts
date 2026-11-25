@@ -6,14 +6,18 @@ export interface LeadSubmissionPayload {
   businessName: string;
   mobileNumber: string;
   email: string;
+  website?: string;
   city: string;
   country: string;
+  businessCategory?: string;
   requiredService: string;
   monthlyMarketingBudget: string;
+  preferredContactMethod?: string;
   message: string;
   consentAccepted: boolean;
   honeypot?: string;
   source?: string;
+  campaignSource?: string;
 }
 
 export interface LeadSubmissionResult {
@@ -31,14 +35,22 @@ export async function submitValidatedLead(
     businessName: sanitizeTextInput(payload.businessName, 120, false),
     mobileNumber: sanitizeTextInput(payload.mobileNumber, 28, false),
     email: sanitizeTextInput(payload.email, 160, false),
+    website: sanitizeTextInput(payload.website || '', 240, false),
     city: sanitizeTextInput(payload.city, 80, false),
     country: sanitizeTextInput(payload.country, 80, false),
+    businessCategory: sanitizeTextInput(payload.businessCategory || '', 120, false),
     requiredService: sanitizeTextInput(payload.requiredService, 140, false),
     monthlyMarketingBudget: sanitizeTextInput(payload.monthlyMarketingBudget, 80, false),
+    preferredContactMethod: sanitizeTextInput(
+      payload.preferredContactMethod || 'Phone / WhatsApp',
+      60,
+      false
+    ),
     message: sanitizeTextInput(payload.message, 1500, true),
     consentAccepted: Boolean(payload.consentAccepted),
     honeypot: payload.honeypot ? String(payload.honeypot).slice(0, 60) : '',
     source: sanitizeTextInput(payload.source || 'Interactive Lead Enquiry Widget', 80, false),
+    campaignSource: sanitizeTextInput(payload.campaignSource || 'Website', 40, false),
   };
 
   const response = await fetch('/api/leads', {

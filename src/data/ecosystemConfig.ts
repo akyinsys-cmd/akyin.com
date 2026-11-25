@@ -25,10 +25,10 @@ export const ECOSYSTEM_STATS = {
   subheading:
     'Building relationships, enabling growth and supporting businesses across multiple industries.',
   tickerHeading: 'OUR CLIENTS & BUSINESS ECOSYSTEM',
-  clientsHandledCount: '58 Clients',
-  clientsHandledLabel: 'Businesses & Client Relationships',
+  clientsHandledCount: '58 Clients Currently Handled',
+  clientsHandledLabel: 'Verified Client Portfolio & Growth Mandates',
   clientsHandledFootnote:
-    'Supporting businesses across multiple industries.',
+    'Displaying 11 identified client brands; remaining 47 client records managed privately by AKYIN admin.',
 } as const;
 
 /**
@@ -52,27 +52,33 @@ export const CLIENT_ECOSYSTEM_RECORDS: ClientEcosystemRecord[] = [
   },
   {
     id: 'eco-kartigo',
-    name: 'Kartigo',
+    name: 'Kartigo.online',
     relationshipType: 'Client',
     industryCategory: 'B2B Stock Supply',
     summary:
       'B2B wholesale commerce and commercial stock supply platform connecting trade buyers and suppliers.',
-    externalUrl: 'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/kartigo',
-    externalLabel: 'Visit Website',
     internalRoute: '/ventures/kartigo',
     wordmarkStyle: 'sans',
   },
   {
     id: 'eco-biznxt',
-    name: 'BizNXT',
+    name: 'BizNXT.online',
     relationshipType: 'Client',
     industryCategory: 'Business Guidance & Consulting',
     summary:
       'Business guidance, feasibility clarity, and growth advisory platform for entrepreneurs.',
-    externalUrl: 'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/biznxt',
-    externalLabel: 'Visit Website',
     internalRoute: '/ventures/biznxt',
     wordmarkStyle: 'sans',
+  },
+  {
+    id: 'eco-thrift-client',
+    name: 'Thrift Store',
+    relationshipType: 'Client',
+    industryCategory: 'Fashion Retail & Thrift',
+    summary:
+      'Curated consumer apparel and thrift retail client supported for digital positioning and growth.',
+    internalRoute: '/ventures/store',
+    wordmarkStyle: 'serif',
   },
   {
     id: 'eco-budget-bazaar',
@@ -80,9 +86,7 @@ export const CLIENT_ECOSYSTEM_RECORDS: ClientEcosystemRecord[] = [
     relationshipType: 'Client',
     industryCategory: 'B2C E-commerce',
     summary:
-      'Value-first household essentials and everyday goods storefront operating at budgetbazaar.org.',
-    externalUrl: 'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/budget-bazaar',
-    externalLabel: 'Visit Website',
+      'Value-first household essentials and everyday goods storefront.',
     internalRoute: '/ventures/budget-bazaar',
     wordmarkStyle: 'sans',
   },
@@ -136,7 +140,7 @@ export const CLIENT_ECOSYSTEM_RECORDS: ClientEcosystemRecord[] = [
   },
   {
     id: 'eco-mei-cosmetics',
-    name: 'MEÌ Cosmetics',
+    name: 'MEI Cosmetics',
     relationshipType: 'Client',
     industryCategory: 'Cosmetics & Beauty',
     summary:
@@ -223,18 +227,18 @@ export const SERVICE_FINDER_OPTIONS: ServiceFinderOption[] = [
   {
     id: 'sf-digital-marketing',
     label: 'Digital Marketing',
-    tagline: 'Full-funnel growth retainers & multi-channel execution',
-    recommendedDivision: 'AKYIN MARKETINGS · Growth Retainers',
+    tagline: 'Modular performance ads, SEO & campaign optimization',
+    recommendedDivision: 'AKYIN MARKETINGS · Digital Marketing',
     outcomeSummary:
-      'Integrated campaign execution combining creatives, paid reach, qualification workflows, and monthly analytics.',
+      'Standalone Meta Ads, Google Ads, SEO, and landing page conversion services tailored independently to your goals.',
     includedCapabilities: [
-      'Package A / Starter / Growth / Business Plus options',
-      'Creative suite, reels & conversion messaging',
+      'Standalone Meta Ads & Google Ads management',
+      'SEO & landing page conversion optimization',
       'Transparent platform billing directly by client',
     ],
     route: '/pricing',
-    ctaLabel: 'Compare Marketing Plans',
-    enquiryServiceValue: 'Package A — Full-Service Growth Marketing & Lead Management',
+    ctaLabel: 'Explore Standalone Pricing',
+    enquiryServiceValue: 'Meta Ads Management',
   },
   {
     id: 'sf-website-dev',
@@ -347,5 +351,21 @@ export const SERVICE_FINDER_OPTIONS: ServiceFinderOption[] = [
     route: '/advisory',
     ctaLabel: 'Open Advisory Booking',
     enquiryServiceValue: 'Business Consulting (1-on-1 Advisory)',
+  },
+  {
+    id: 'sf-messaging',
+    label: 'Bulk SMS & WhatsApp Business Messaging',
+    tagline: 'Direct customer messaging workflows & campaign setup',
+    recommendedDivision: 'AKYIN MARKETINGS · Business Messaging',
+    outcomeSummary:
+      'Bulk SMS Marketing (₹3,000 for 10,000 SMS; ₹0.30/SMS) and WhatsApp Business Messaging Setup (₹4,999 one-time setup + ₹1.50/message billed separately). Provider API activated once credentials are tested.',
+    includedCapabilities: [
+      'Bulk SMS: ₹3,000 / 10,000 SMS (₹0.30/SMS effective rate)',
+      'WhatsApp Setup: ₹4,999 one-time setup fee (separate from ₹1.50/msg usage)',
+      'Configurable INR & international quotation pricing',
+    ],
+    route: '/pricing',
+    ctaLabel: 'View Messaging Pricing',
+    enquiryServiceValue: 'WhatsApp Business Messaging Setup',
   },
 ];

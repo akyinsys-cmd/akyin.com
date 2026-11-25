@@ -118,7 +118,7 @@ export const ALL_BUSINESSES_DECK: PresentationDeckConfig = {
     {
       slide: 19,
       title: 'Partner With AKYIN: Let’s Grow Your Business',
-      subtitle: 'Clear scope, agreed deliverables & measurable work — connect@akyin.com · +91-6395694011.',
+      subtitle: 'Clear scope, agreed deliverables & measurable work — connect@akyin.com · WhatsApp Connect.',
     },
   ],
 };
@@ -226,7 +226,7 @@ export const AUTOMOTIVE_DECK: PresentationDeckConfig = {
     {
       slide: 19,
       title: 'Work With AKYIN: Let’s Grow Your Dealership',
-      subtitle: 'Shaikh Nazir · +91-6395694011 · akyinsys@gmail.com · Transparent working terms.',
+      subtitle: 'Shaikh Nazir · connect@akyin.com · WhatsApp Connect · Transparent working terms.',
     },
   ],
 };

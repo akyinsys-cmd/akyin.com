@@ -1,75 +1,160 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft,
   Briefcase,
+  Calculator,
   Calendar,
   CalendarCheck2,
   CheckCircle2,
-  Compass,
+  CreditCard,
+  ExternalLink,
   FileSpreadsheet,
+  FileText,
   Globe,
   Inbox,
-  KeyRound,
   LayoutDashboard,
+  LineChart as LineChartIcon,
   LogOut,
-  Mail,
   Menu,
-  Palette,
+  RefreshCw,
+  Save,
   Share2,
   Shield,
+  TrendingUp,
+  UserCog,
+  Users,
   X,
 } from 'lucide-react';
 import { AppRoute } from '../data/akyinData';
+import { useRouteMeta } from '../context/RouteMetaContext';
 import { useSiteConfig } from '../context/SiteConfigContext';
-import { akyinApiClient } from '../utils/AkyinApiClient';
-import { AdminDashboardData } from '../types/advisory';
-import { formatSlotRangeIst } from '../utils/advisoryHelpers';
+import {
+  CrmLead,
+  PublicSuiteUser,
+  UserRole,
+  suiteApi,
+} from '../services/suiteApi';
+import {
+  AppointmentRecord,
+  AvailabilityRule,
+  BlockedDateRecord,
+  EnquiryRecord,
+} from '../types/advisory';
 import { AkyinLogo } from '../components/AkyinLogo';
 import { GlassButton } from '../components/liquid-glass';
+import { AdminConfigDashboard } from '../components/AdminConfigDashboard';
 import { AdminAppointmentsPanel } from '../components/admin/AdminAppointmentsPanel';
 import { AdminCalendarPanel } from '../components/admin/AdminCalendarPanel';
-import {
-  AdminSettingsSection,
-  AdminVenturesPanel,
-} from '../components/admin/AdminContentPanels';
-import { AdminEnquiriesPanel } from '../components/admin/AdminEnquiriesPanel';
+import { AdminClientsPanel } from '../components/admin/AdminClientsPanel';
+import { AdminCrmLeadsPanel } from '../components/admin/AdminCrmLeadsPanel';
 import { AdminLoginPage } from '../components/admin/AdminLoginPage';
-import { DeploymentChecklistCard } from '../components/admin/DeploymentChecklistCard';
+import { AdminPaymentsPanel } from '../components/admin/AdminPaymentsPanel';
+import { AdminRecurringPaymentsPanel } from '../components/admin/AdminRecurringPaymentsPanel';
+import { AdminRecurringRevenueInsightsPanel } from '../components/admin/AdminRecurringRevenueInsightsPanel';
+import { AdminRevenueReportsPanel } from '../components/admin/AdminRevenueReportsPanel';
+import { AdminRouteSeoPanel } from '../components/admin/AdminRouteSeoPanel';
+import { AdminSecurityAuditPanel } from '../components/admin/AdminSecurityAuditPanel';
+import { AdminServicesPanel } from '../components/admin/AdminServicesPanel';
+import { AdminSuiteOverview } from '../components/admin/AdminSuiteOverview';
+import { AdminUsersPanel } from '../components/admin/AdminUsersPanel';
+import { AdminQuotationsPanel } from '../components/admin/AdminQuotationsPanel';
 import { GoogleWorkspacePanel } from '../components/admin/GoogleWorkspacePanel';
 
 export { AdminLoginPage } from '../components/admin/AdminLoginPage';
 
 type AdminSidebarTab =
   | 'Overview'
+  | 'Leads and Enquiries'
+  | 'Clients'
+  | 'Service Catalogue'
+  | 'Quotations'
   | 'Appointments'
-  | 'Calendar'
-  | 'Google Workspace'
-  | 'Enquiries'
-  | 'Business Advisory'
-  | 'Ventures'
+  | 'Payments'
+  | 'Manage Recurring Payments'
+  | 'Recurring Revenue Insights'
+  | 'Revenue Reports'
+  | 'Marketing Tools'
   | 'Website Settings'
-  | 'Branding'
-  | 'Social Links'
-  | 'Contact Settings'
-  | 'Admin Security'
+  | 'Social Media'
+  | 'User and Admin Management'
+  | 'Security and Audit Logs'
   | 'Logout';
+
+type AdminResource =
+  | 'overview'
+  | 'leads'
+  | 'clients'
+  | 'services'
+  | 'quotations'
+  | 'appointments'
+  | 'payments'
+  | 'reports'
+  | 'marketing_tools'
+  | 'website_settings'
+  | 'social_media'
+  | 'users'
+  | 'security_audit';
+
+const ROLE_RESOURCES: Record<UserRole, Set<AdminResource>> = {
+  'Super Admin': new Set<AdminResource>([
+    'overview',
+    'leads',
+    'clients',
+    'services',
+    'quotations',
+    'appointments',
+    'payments',
+    'reports',
+    'marketing_tools',
+    'website_settings',
+    'social_media',
+    'users',
+    'security_audit',
+  ]),
+  'Sales Manager': new Set<AdminResource>([
+    'overview',
+    'leads',
+    'clients',
+    'services',
+    'quotations',
+    'appointments',
+    'marketing_tools',
+  ]),
+  'Finance Manager': new Set<AdminResource>([
+    'overview',
+    'clients',
+    'services',
+    'quotations',
+    'payments',
+    'reports',
+  ]),
+  Staff: new Set<AdminResource>(['overview', 'leads', 'clients', 'appointments']),
+};
+
+function hasClientPermission(role: UserRole, resource: AdminResource): boolean {
+  return ROLE_RESOURCES[role]?.has(resource) ?? false;
+}
 
 const SIDEBAR_ITEMS: Array<{
   id: AdminSidebarTab;
+  resource?: AdminResource;
   icon: typeof LayoutDashboard;
 }> = [
-  { id: 'Overview', icon: LayoutDashboard },
-  { id: 'Appointments', icon: CalendarCheck2 },
-  { id: 'Calendar', icon: Calendar },
-  { id: 'Google Workspace', icon: FileSpreadsheet },
-  { id: 'Enquiries', icon: Inbox },
-  { id: 'Business Advisory', icon: Compass },
-  { id: 'Ventures', icon: Briefcase },
-  { id: 'Website Settings', icon: Globe },
-  { id: 'Branding', icon: Palette },
-  { id: 'Social Links', icon: Share2 },
-  { id: 'Contact Settings', icon: Mail },
-  { id: 'Admin Security', icon: Shield },
+  { id: 'Overview', resource: 'overview', icon: LayoutDashboard },
+  { id: 'Leads and Enquiries', resource: 'leads', icon: Inbox },
+  { id: 'Clients', resource: 'clients', icon: Users },
+  { id: 'Service Catalogue', resource: 'services', icon: Briefcase },
+  { id: 'Quotations', resource: 'quotations', icon: FileText },
+  { id: 'Appointments', resource: 'appointments', icon: CalendarCheck2 },
+  { id: 'Payments', resource: 'payments', icon: CreditCard },
+  { id: 'Manage Recurring Payments', resource: 'payments', icon: RefreshCw },
+  { id: 'Recurring Revenue Insights', resource: 'reports', icon: LineChartIcon },
+  { id: 'Revenue Reports', resource: 'reports', icon: TrendingUp },
+  { id: 'Marketing Tools', resource: 'marketing_tools', icon: Calculator },
+  { id: 'Website Settings', resource: 'website_settings', icon: Globe },
+  { id: 'Social Media', resource: 'social_media', icon: Share2 },
+  { id: 'User and Admin Management', resource: 'users', icon: UserCog },
+  { id: 'Security and Audit Logs', resource: 'security_audit', icon: Shield },
   { id: 'Logout', icon: LogOut },
 ];
 
@@ -79,139 +164,215 @@ interface AdminPageProps {
 
 export function AdminPage({ onNavigate }: AdminPageProps) {
   const { refreshSiteConfig } = useSiteConfig();
+  const { routeMetaMap, defaultRouteMeta, updateRouteMeta, resetRouteMeta } = useRouteMeta();
 
   const [activeTab, setActiveTab] = useState<AdminSidebarTab>('Overview');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
-  const [passwordConfigured, setPasswordConfigured] = useState<boolean>(true);
-  const [isLiveBackend, setIsLiveBackend] = useState<boolean>(false);
+
+  // Auth State
   const [checkingStatus, setCheckingStatus] = useState(true);
+  const [configured, setConfigured] = useState(true);
+  const [currentUser, setCurrentUser] = useState<PublicSuiteUser | null>(null);
 
-  const [endpointDraft, setEndpointDraft] = useState<string>(() =>
-    akyinApiClient.getEndpointUrl()
-  );
-  const [endpointStatus, setEndpointStatus] = useState('');
-  const [endpointError, setEndpointError] = useState('');
+  // Overview State
+  const [overviewData, setOverviewData] =
+    useState<Awaited<ReturnType<typeof suiteApi.getOverview>> | null>(null);
+  const [overviewLoading, setOverviewLoading] = useState(false);
+  const [overviewError, setOverviewError] = useState('');
 
-  const [dashboard, setDashboard] = useState<AdminDashboardData | null>(null);
-  const [loadingDash, setLoadingDash] = useState(false);
+  // Staff list for CRM Lead Assignment
+  const [staffUsers, setStaffUsers] = useState<PublicSuiteUser[]>([]);
 
-  // Admin Security Password Rotation
-  const [currentPw, setCurrentPw] = useState('');
-  const [newPw, setNewPw] = useState('');
-  const [pwMsg, setPwMsg] = useState('');
-  const [pwErr, setPwErr] = useState('');
+  // Appointments sub-navigation & state
+  const [apptSubTab, setApptSubTab] = useState<'ledger' | 'calendar' | 'workspace'>('ledger');
+  const [appointments, setAppointments] = useState<AppointmentRecord[]>([]);
+  const [availability, setAvailability] = useState<AvailabilityRule[]>([]);
+  const [blockedDates, setBlockedDates] = useState<BlockedDateRecord[]>([]);
+  const [workspaceEnquiries, setWorkspaceEnquiries] = useState<EnquiryRecord[]>([]);
+  const [loadingAppts, setLoadingAppts] = useState(false);
 
-  const refreshStatusAndValidate = useCallback(async () => {
+  // Marketing Tools sub-navigation
+  const [marketingSubTab, setMarketingSubTab] = useState<'routes' | 'jsonld'>('routes');
+
+  // Website Settings & Social Media state
+  const [settingsDraft, setSettingsDraft] = useState<Record<string, any>>({});
+  const [loadingSettings, setLoadingSettings] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [settingsNotice, setSettingsNotice] = useState('');
+  const [settingsError, setSettingsError] = useState('');
+
+  const bootstrapAuth = useCallback(async () => {
     setCheckingStatus(true);
     try {
-      const [status, isSessionValid] = await Promise.all([
-        akyinApiClient.checkAdminStatus(),
-        akyinApiClient.validateSession(),
+      const [status, sessionUser] = await Promise.all([
+        suiteApi.getAuthStatus(),
+        suiteApi.validateSession(),
       ]);
-      setPasswordConfigured(status.passwordConfigured);
-      setIsLiveBackend(status.isLiveBackend);
-      setAuthenticated(isSessionValid);
+      setConfigured(status.configured);
+      setCurrentUser(sessionUser);
     } catch {
-      setIsLiveBackend(akyinApiClient.isLiveConnected());
-      setAuthenticated(false);
+      setCurrentUser(null);
     } finally {
       setCheckingStatus(false);
     }
   }, []);
 
-  const loadDashboard = useCallback(async () => {
-    setLoadingDash(true);
-    try {
-      const data = await akyinApiClient.fetchAdminDashboard();
-      setDashboard(data);
-    } catch {
-      akyinApiClient.clearSession();
-      setAuthenticated(false);
-    } finally {
-      setLoadingDash(false);
-    }
-  }, []);
-
   useEffect(() => {
-    void refreshStatusAndValidate();
-  }, [refreshStatusAndValidate]);
+    void bootstrapAuth();
+  }, [bootstrapAuth]);
 
-  useEffect(() => {
-    if (authenticated) {
-      void loadDashboard();
-    }
-  }, [authenticated, loadDashboard]);
-
-  const handleSaveEndpoint = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setEndpointStatus('');
-    setEndpointError('');
+  const loadOverview = useCallback(async () => {
+    if (!currentUser) return;
+    setOverviewLoading(true);
+    setOverviewError('');
     try {
-      akyinApiClient.setEndpointUrl(endpointDraft);
-      setAuthenticated(false);
-      await refreshStatusAndValidate();
-      await refreshSiteConfig();
-      setEndpointStatus(
-        endpointDraft.trim()
-          ? 'Connected Apps Script Web App URL. Please sign in or initialize your owner password.'
-          : 'Cleared custom URL — operating in local preview mode.'
-      );
+      const res = await suiteApi.getOverview();
+      setOverviewData(res);
     } catch (err) {
-      setEndpointError(err instanceof Error ? err.message : 'Invalid URL.');
+      setOverviewError(
+        err instanceof Error ? err.message : 'Unable to load Business Suite overview.'
+      );
+    } finally {
+      setOverviewLoading(false);
     }
-  };
+  }, [currentUser]);
+
+  const loadAppointmentsData = useCallback(async () => {
+    if (!currentUser || !hasClientPermission(currentUser.role, 'appointments')) return;
+    setLoadingAppts(true);
+    try {
+      const [apptRes, leadsRes] = await Promise.all([
+        suiteApi.getAppointments(),
+        hasClientPermission(currentUser.role, 'leads')
+          ? suiteApi.getLeads().catch(() => ({ leads: [] as CrmLead[] }))
+          : Promise.resolve({ leads: [] as CrmLead[] }),
+      ]);
+      setAppointments(apptRes.appointments as AppointmentRecord[]);
+      setAvailability(apptRes.availability as AvailabilityRule[]);
+      setBlockedDates(apptRes.blockedDates as BlockedDateRecord[]);
+      setWorkspaceEnquiries(
+        leadsRes.leads.map((l) => ({
+          enquiryId: l.leadId,
+          createdAt: l.receivedAt,
+          name: l.fullName,
+          business: l.companyName,
+          phone: l.mobileNumber,
+          email: l.email,
+          city: l.city,
+          country: l.country,
+          vertical: l.businessCategory || 'General',
+          enquiryType: l.requiredService,
+          message: l.description,
+          enquiryStatus:
+            l.stage === 'NEW'
+              ? 'New'
+              : l.stage === 'CONTACTED'
+                ? 'Contacted'
+                : l.stage === 'WON'
+                  ? 'Resolved'
+                  : 'In Progress',
+          adminNotes: l.privateNotes,
+        }))
+      );
+    } finally {
+      setLoadingAppts(false);
+    }
+  }, [currentUser]);
+
+  const loadSettingsData = useCallback(async () => {
+    if (!currentUser) return;
+    setLoadingSettings(true);
+    setSettingsError('');
+    try {
+      const res = await suiteApi.getSettings();
+      setSettingsDraft(res.websiteSettings || {});
+    } catch (err) {
+      setSettingsError(
+        err instanceof Error ? err.message : 'Unable to load website configuration.'
+      );
+    } finally {
+      setLoadingSettings(false);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    void loadOverview();
+    if (currentUser.role === 'Super Admin') {
+      suiteApi
+        .getUsers()
+        .then((res) => setStaffUsers(res.users))
+        .catch(() => setStaffUsers([currentUser]));
+    } else {
+      setStaffUsers([currentUser]);
+    }
+  }, [currentUser, loadOverview]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    if (activeTab === 'Appointments') {
+      void loadAppointmentsData();
+    } else if (activeTab === 'Website Settings' || activeTab === 'Social Media') {
+      setSettingsNotice('');
+      setSettingsError('');
+      void loadSettingsData();
+    }
+  }, [activeTab, currentUser, loadAppointmentsData, loadSettingsData]);
+
+  const visibleSidebarItems = useMemo(() => {
+    if (!currentUser) return [];
+    return SIDEBAR_ITEMS.filter(
+      (item) => !item.resource || hasClientPermission(currentUser.role, item.resource)
+    );
+  }, [currentUser]);
 
   const handleLogout = async () => {
-    await akyinApiClient.logoutAdmin();
-    setAuthenticated(false);
-    setDashboard(null);
+    await suiteApi.logout();
+    setCurrentUser(null);
+    setOverviewData(null);
     setActiveTab('Overview');
   };
 
-  const handlePasswordChange = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setPwMsg('');
-    setPwErr('');
+  const handleSaveSettingsPatch = async (keys: string[], label: string) => {
+    setSavingSettings(true);
+    setSettingsNotice('');
+    setSettingsError('');
     try {
-      await akyinApiClient.changeAdminPassword(currentPw, newPw);
-      setCurrentPw('');
-      setNewPw('');
-      setPwMsg('Administrator password rotated securely.');
-      await loadDashboard();
+      const patch: Record<string, unknown> = {};
+      keys.forEach((k) => {
+        if (k in settingsDraft) {
+          patch[k] = settingsDraft[k];
+        }
+      });
+      const res = await suiteApi.updateSettings(patch);
+      setSettingsDraft(res.websiteSettings || settingsDraft);
+      await refreshSiteConfig();
+      await loadOverview();
+      setSettingsNotice(`Saved ${label} to suite database.`);
     } catch (err) {
-      setPwErr(err instanceof Error ? err.message : 'Unable to change password.');
+      setSettingsError(err instanceof Error ? err.message : 'Unable to save settings.');
+    } finally {
+      setSavingSettings(false);
     }
   };
 
-  if (!authenticated) {
+  if (!currentUser) {
     return (
       <AdminLoginPage
-        passwordConfigured={passwordConfigured}
-        isLiveBackend={isLiveBackend}
+        configured={configured}
         checkingStatus={checkingStatus}
         onNavigate={onNavigate}
-        onAuthenticated={() => {
-          setPasswordConfigured(true);
-          setAuthenticated(true);
-        }}
-        onEndpointUpdated={async () => {
-          await refreshStatusAndValidate();
-          await refreshSiteConfig();
+        onAuthenticated={(user) => {
+          setConfigured(true);
+          setCurrentUser(user);
+          setActiveTab('Overview');
         }}
       />
     );
   }
 
-  const pendingCount = (dashboard?.appointments || []).filter(
-    (a) => a.bookingStatus === 'Pending' || a.bookingStatus === 'Payment Awaited'
-  ).length;
-  const confirmedCount = (dashboard?.appointments || []).filter(
-    (a) => a.bookingStatus === 'Confirmed'
-  ).length;
-  const openEnquiriesCount = (dashboard?.enquiries || []).filter(
-    (e) => e.enquiryStatus === 'New' || e.enquiryStatus === 'In Progress'
-  ).length;
+  const inputCls =
+    'w-full rounded-xl border border-[#E8E8ED] bg-[#FFFFFF] px-3.5 py-2.5 text-sm text-[#1D1D1F] focus:outline-none focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/15';
 
   return (
     <div className="min-h-screen bg-[#F5F5F7] text-[#1D1D1F] flex flex-col lg:flex-row">
@@ -219,33 +380,39 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
       <div className="lg:hidden liquid-glass-nav px-4 h-14 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-2">
           <AkyinLogo size="sm" />
-          <span className="font-mono-num text-[11px] font-semibold text-[#6E6E73]">ADMIN</span>
+          <span className="font-mono-num text-[11px] font-semibold text-[#0071E3]">SUITE</span>
         </div>
         <button
           type="button"
           onClick={() => setMobileNavOpen((prev) => !prev)}
+          aria-label="Toggle admin sidebar"
           className="p-2 rounded-xl hover:bg-[#ECECF0] cursor-pointer"
         >
           {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
-      {/* Fixed Sidebar Navigation (12 exact items) */}
+      {/* Fixed Sidebar Navigation — 13 RBAC Sections + Logout */}
       <aside
         className={`${
           mobileNavOpen ? 'block' : 'hidden'
-        } lg:flex w-full lg:w-[264px] shrink-0 liquid-glass-panel border-r border-[#1D1D1F]/8 p-4 flex-col justify-between`}
+        } lg:flex w-full lg:w-[272px] shrink-0 liquid-glass-panel border-r border-[#1D1D1F]/8 p-4 flex-col justify-between`}
       >
-        <div className="space-y-6">
+        <div className="space-y-5">
           <div className="px-3 pt-2 hidden lg:block space-y-2">
             <AkyinLogo />
-            <p className="text-[11px] font-semibold text-[#6E6E73]">
-              Owner Management Console
-            </p>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[11px] font-semibold text-[#6E6E73] truncate">
+                {currentUser.name}
+              </p>
+              <span className="px-2 py-0.5 rounded-md bg-[#F5F5F7] border border-[#E8E8ED] font-mono-num text-[10px] font-bold text-[#0071E3] shrink-0">
+                {currentUser.role}
+              </span>
+            </div>
           </div>
 
           <nav aria-label="Admin sections" className="space-y-1">
-            {SIDEBAR_ITEMS.map((item) => {
+            {visibleSidebarItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               return (
@@ -269,7 +436,7 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
                   }`}
                 >
                   <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-                  <span>{item.id}</span>
+                  <span className="truncate">{item.id}</span>
                 </button>
               );
             })}
@@ -291,371 +458,600 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
       {/* Main Workspace */}
       <div className="flex-1 min-w-0 flex flex-col">
         <header className="liquid-glass-nav border-b border-[#1D1D1F]/8 px-6 h-14 flex items-center justify-between gap-4 sticky top-0 z-20">
-          <div className="flex items-center gap-2 text-xs text-[#6E6E73]">
+          <div className="flex items-center gap-2 text-xs text-[#6E6E73] min-w-0">
             <span>Admin</span>
             <span>/</span>
-            <span className="font-semibold text-[#1D1D1F]">{activeTab}</span>
+            <span className="font-semibold text-[#1D1D1F] truncate">{activeTab}</span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="font-mono-num text-[11px] font-semibold text-[#1D1D1F] whitespace-nowrap">
-              {isLiveBackend ? 'Google Sheets Live' : 'Local Preview Mode'}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <span className="hidden sm:inline-block font-mono-num text-[11px] font-semibold text-[#6E6E73]">
+              {currentUser.email}
             </span>
-            <GlassButton
-              variant="subtle"
-              size="sm"
-              onClick={() => onNavigate('/advisory')}
-            >
+            <GlassButton variant="subtle" size="sm" onClick={() => onNavigate('/tools')}>
+              Open /tools
+            </GlassButton>
+            <GlassButton variant="subtle" size="sm" onClick={() => onNavigate('/advisory')}>
               Open /advisory
             </GlassButton>
           </div>
         </header>
 
-        <div className="p-6 sm:p-8 max-w-6xl w-full mx-auto space-y-6">
-          {loadingDash && !dashboard ? (
-            <div className="liquid-glass-card rounded-3xl p-12 text-center text-sm text-[#6E6E73]">
-              Loading AKYIN operational ledger...
-            </div>
-          ) : !dashboard ? null : (
-            <>
-              {activeTab === 'Overview' && (
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="font-display text-2xl font-bold tracking-[-0.015em] text-[#1D1D1F]">
-                      Executive Overview
-                    </h2>
-                    <p className="text-xs text-[#6E6E73] mt-0.5">
-                      Real-time snapshot across appointments, availability, enquiries, and Google Calendar status ({dashboard.timezone}).
-                    </p>
-                  </div>
+        <main className="p-6 sm:p-8 max-w-6xl w-full mx-auto space-y-6">
+          {/* 1. Overview */}
+          {activeTab === 'Overview' && (
+            <AdminSuiteOverview
+              loading={overviewLoading}
+              error={overviewError}
+              data={overviewData}
+              onRefresh={() => void loadOverview()}
+              onJumpToTab={(tab) => setActiveTab(tab as AdminSidebarTab)}
+            />
+          )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="liquid-glass-card rounded-2xl p-5 space-y-1">
-                      <p className="text-xs text-[#6E6E73]">Pending / Payment Awaited</p>
-                      <p className="font-mono-num text-3xl font-extrabold text-[#1D1D1F]">
-                        {pendingCount}
-                      </p>
-                    </div>
-                    <div className="liquid-glass-card rounded-2xl p-5 space-y-1">
-                      <p className="text-xs text-[#6E6E73]">Confirmed Consultations</p>
-                      <p className="font-mono-num text-3xl font-extrabold text-[#1D1D1F]">
-                        {confirmedCount}
-                      </p>
-                    </div>
-                    <div className="liquid-glass-card rounded-2xl p-5 space-y-1">
-                      <p className="text-xs text-[#6E6E73]">Open Enquiries</p>
-                      <p className="font-mono-num text-3xl font-extrabold text-[#1D1D1F]">
-                        {openEnquiriesCount}
-                      </p>
-                    </div>
-                    <div className="liquid-glass-card rounded-2xl p-5 space-y-1">
-                      <p className="text-xs text-[#6E6E73]">Blocked Dates</p>
-                      <p className="font-mono-num text-3xl font-extrabold text-[#1D1D1F]">
-                        {dashboard.blockedDates.length}
-                      </p>
-                    </div>
-                  </div>
+          {/* 2. Leads and Enquiries */}
+          {activeTab === 'Leads and Enquiries' && (
+            <AdminCrmLeadsPanel
+              staffUsers={staffUsers}
+              onChanged={() => void loadOverview()}
+            />
+          )}
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="liquid-glass-card rounded-3xl p-6 space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-display text-base font-bold text-[#1D1D1F]">
-                          Latest Consultation Requests
-                        </h3>
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab('Appointments')}
-                          className="text-xs font-semibold text-[#1D1D1F] hover:underline cursor-pointer"
-                        >
-                          Manage All
-                        </button>
-                      </div>
-                      {dashboard.appointments.length === 0 ? (
-                        <p className="text-xs text-[#6E6E73] py-3">
-                          No consultation requests yet.
-                        </p>
-                      ) : (
-                        <ul className="divide-y divide-[#E8E8ED] text-xs">
-                          {dashboard.appointments.slice(0, 5).map((a) => (
-                            <li
-                              key={a.bookingId}
-                              className="py-3 flex items-center justify-between gap-3"
-                            >
-                              <div>
-                                <p className="font-semibold text-[#1D1D1F]">
-                                  {a.customerName}{' '}
-                                  <span className="font-mono-num text-[#6E6E73]">
-                                    ({a.bookingId})
-                                  </span>
-                                </p>
-                                <p className="font-mono-num text-[#6E6E73]">
-                                  {a.appointmentDate} · {formatSlotRangeIst(a.startTime, a.endTime)}
-                                </p>
-                              </div>
-                              <span className="px-2.5 py-1 rounded-lg bg-[#FFFFFF]/85 border border-[#E8E8ED] text-[11px] font-semibold text-[#1D1D1F]">
-                                {a.bookingStatus}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
+          {/* 3. Clients */}
+          {activeTab === 'Clients' && (
+            <AdminClientsPanel onChanged={() => void loadOverview()} />
+          )}
 
-                    <div className="liquid-glass-card rounded-3xl p-6 space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-display text-base font-bold text-[#1D1D1F]">
-                          Recent Enquiries
-                        </h3>
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab('Enquiries')}
-                          className="text-xs font-semibold text-[#1D1D1F] hover:underline cursor-pointer"
-                        >
-                          Open Inbox
-                        </button>
-                      </div>
-                      {dashboard.enquiries.length === 0 ? (
-                        <p className="text-xs text-[#6E6E73] py-3">
-                          No enquiries recorded yet.
-                        </p>
-                      ) : (
-                        <ul className="divide-y divide-[#E8E8ED] text-xs">
-                          {dashboard.enquiries.slice(0, 5).map((e) => (
-                            <li
-                              key={e.enquiryId}
-                              className="py-3 flex items-center justify-between gap-3"
-                            >
-                              <div>
-                                <p className="font-semibold text-[#1D1D1F]">
-                                  {e.name} — {e.vertical}
-                                </p>
-                                <p className="text-[#6E6E73] truncate max-w-xs">
-                                  {e.enquiryType}
-                                </p>
-                              </div>
-                              <span className="px-2.5 py-1 rounded-lg bg-[#F5F5F7] border border-[#E8E8ED] text-[11px] font-semibold text-[#1D1D1F]">
-                                {e.enquiryStatus}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  </div>
+          {/* 4. Service Catalogue */}
+          {activeTab === 'Service Catalogue' && (
+            <AdminServicesPanel
+              currentUserRole={currentUser.role}
+              currentUserName={currentUser.name}
+              currentUserEmail={currentUser.email}
+            />
+          )}
+
+          {/* 5. Quotations */}
+          {activeTab === 'Quotations' && (
+            <AdminQuotationsPanel onChanged={() => void loadOverview()} />
+          )}
+
+          {/* 6. Appointments */}
+          {activeTab === 'Appointments' && (
+            <div className="space-y-6">
+              <div className="inline-flex p-1 rounded-xl bg-white border border-[#E8E8ED] gap-1">
+                <button
+                  type="button"
+                  onClick={() => setApptSubTab('ledger')}
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
+                    apptSubTab === 'ledger'
+                      ? 'bg-[#1D1D1F] text-white'
+                      : 'text-[#6E6E73] hover:text-[#1D1D1F]'
+                  }`}
+                >
+                  <CalendarCheck2 className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Appointments Ledger</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setApptSubTab('calendar')}
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
+                    apptSubTab === 'calendar'
+                      ? 'bg-[#1D1D1F] text-white'
+                      : 'text-[#6E6E73] hover:text-[#1D1D1F]'
+                  }`}
+                >
+                  <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Weekly IST Calendar</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setApptSubTab('workspace')}
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
+                    apptSubTab === 'workspace'
+                      ? 'bg-[#1D1D1F] text-white'
+                      : 'text-[#6E6E73] hover:text-[#1D1D1F]'
+                  }`}
+                >
+                  <FileSpreadsheet className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Google Workspace Sync</span>
+                </button>
+              </div>
+
+              {loadingAppts && appointments.length === 0 ? (
+                <div className="liquid-glass-card rounded-3xl p-12 text-center text-sm text-[#6E6E73]">
+                  Loading appointments and availability...
                 </div>
-              )}
-
-              {activeTab === 'Appointments' && (
+              ) : apptSubTab === 'ledger' ? (
                 <AdminAppointmentsPanel
-                  appointments={dashboard.appointments}
+                  appointments={appointments}
                   onSaveAppointment={async (payload) => {
-                    await akyinApiClient.saveAppointment(payload);
-                    await loadDashboard();
+                    await suiteApi.saveAppointment(payload as Record<string, unknown>);
+                    await loadAppointmentsData();
+                    await loadOverview();
                   }}
                 />
-              )}
-
-              {activeTab === 'Calendar' && (
+              ) : apptSubTab === 'calendar' ? (
                 <AdminCalendarPanel
-                  availability={dashboard.availability}
-                  blockedDates={dashboard.blockedDates}
-                  appointments={dashboard.appointments}
+                  availability={availability}
+                  blockedDates={blockedDates}
+                  appointments={appointments}
                   onSaveAvailability={async (rules) => {
-                    const res = await akyinApiClient.saveAvailability(rules);
-                    await loadDashboard();
+                    const res = await suiteApi.saveAvailability(rules);
+                    await loadAppointmentsData();
                     await refreshSiteConfig();
                     return res;
                   }}
                   onBlockDate={async (date, reason) => {
-                    const res = await akyinApiClient.blockDate(date, reason);
-                    await loadDashboard();
+                    const res = await suiteApi.blockDate(date, reason);
+                    await loadAppointmentsData();
                     await refreshSiteConfig();
                     return res;
                   }}
                   onUnblockDate={async (date) => {
-                    await akyinApiClient.unblockDate(date);
-                    await loadDashboard();
+                    await suiteApi.unblockDate(date);
+                    await loadAppointmentsData();
                     await refreshSiteConfig();
                   }}
                 />
-              )}
-
-              {activeTab === 'Google Workspace' && (
+              ) : (
                 <GoogleWorkspacePanel
-                  appointments={dashboard.appointments}
-                  enquiries={dashboard.enquiries}
+                  appointments={appointments}
+                  enquiries={workspaceEnquiries}
                 />
               )}
+            </div>
+          )}
 
-              {activeTab === 'Enquiries' && (
-                <AdminEnquiriesPanel
-                  enquiries={dashboard.enquiries}
-                  onUpdateEnquiry={async (payload) => {
-                    await akyinApiClient.updateEnquiry(payload);
-                    await loadDashboard();
-                  }}
+          {/* 7. Payments */}
+          {activeTab === 'Payments' && (
+            <AdminPaymentsPanel onChanged={() => void loadOverview()} />
+          )}
+
+          {/* 7b. Manage Recurring Payments */}
+          {activeTab === 'Manage Recurring Payments' && (
+            <AdminRecurringPaymentsPanel onChanged={() => void loadOverview()} />
+          )}
+
+          {/* 7c. Recurring Revenue Insights */}
+          {activeTab === 'Recurring Revenue Insights' && (
+            <AdminRecurringRevenueInsightsPanel
+              onJumpToRecurring={() => setActiveTab('Manage Recurring Payments')}
+            />
+          )}
+
+          {/* 8. Revenue Reports */}
+          {activeTab === 'Revenue Reports' && <AdminRevenueReportsPanel />}
+
+          {/* 9. Marketing Tools */}
+          {activeTab === 'Marketing Tools' && (
+            <div className="space-y-6">
+              <div className="liquid-glass-card rounded-3xl p-6 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h2 className="font-display text-2xl font-bold tracking-[-0.015em] text-[#1D1D1F]">
+                    Marketing Tools, SEO &amp; Schema Management
+                  </h2>
+                  <p className="text-xs text-[#6E6E73] mt-0.5">
+                    Public 20-calculator Business Tools Suite (/tools) and dynamic ROUTE_META / JSON-LD configuration.
+                  </p>
+                </div>
+                <GlassButton variant="primary" size="sm" onClick={() => onNavigate('/tools')}>
+                  <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Open 20 Public Calculators (/tools)</span>
+                </GlassButton>
+              </div>
+
+              <div
+                role="tablist"
+                aria-label="SEO configuration mode"
+                className="inline-flex p-1 rounded-xl bg-white border border-[#E8E8ED]"
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={marketingSubTab === 'routes'}
+                  onClick={() => setMarketingSubTab('routes')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
+                    marketingSubTab === 'routes'
+                      ? 'bg-[#1D1D1F] text-white'
+                      : 'text-[#6E6E73] hover:text-[#1D1D1F]'
+                  }`}
+                >
+                  All Routes (Titles &amp; Descriptions)
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={marketingSubTab === 'jsonld'}
+                  onClick={() => setMarketingSubTab('jsonld')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
+                    marketingSubTab === 'jsonld'
+                      ? 'bg-[#1D1D1F] text-white'
+                      : 'text-[#6E6E73] hover:text-[#1D1D1F]'
+                  }`}
+                >
+                  OpenGraph &amp; JSON-LD Inspector
+                </button>
+              </div>
+
+              {marketingSubTab === 'routes' ? (
+                <AdminConfigDashboard onPreviewRoute={onNavigate} />
+              ) : (
+                <AdminRouteSeoPanel
+                  routeMetaMap={routeMetaMap}
+                  defaultRouteMeta={defaultRouteMeta}
+                  onUpdateRouteMeta={updateRouteMeta}
+                  onResetRouteMeta={resetRouteMeta}
+                  onPreviewRoute={onNavigate}
                 />
               )}
+            </div>
+          )}
 
-              {(activeTab === 'Business Advisory' ||
-                activeTab === 'Website Settings' ||
-                activeTab === 'Branding' ||
-                activeTab === 'Social Links' ||
-                activeTab === 'Contact Settings') && (
-                <AdminSettingsSection
-                  key={activeTab}
-                  section={activeTab}
-                  settings={dashboard.settings}
-                  onSaveSettings={async (patch) => {
-                    await akyinApiClient.saveWebsiteSettings(patch);
-                    await loadDashboard();
-                    await refreshSiteConfig();
-                  }}
-                  onSendTestEmail={
-                    activeTab === 'Contact Settings'
-                      ? () => akyinApiClient.sendTestEmail()
-                      : undefined
-                  }
-                />
-              )}
+          {/* 10. Website Settings */}
+          {activeTab === 'Website Settings' && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="font-display text-2xl font-bold tracking-[-0.015em] text-[#1D1D1F]">
+                  Website Settings, Advisory &amp; UAE Gateway Configuration
+                </h2>
+                <p className="text-xs text-[#6E6E73] mt-0.5">
+                  Configure homepage branding, advisory parameters, portfolio client counter, contact details, and UAE AED gateway readiness.
+                </p>
+              </div>
 
-              {activeTab === 'Ventures' && (
-                <AdminVenturesPanel
-                  ventures={dashboard.ventures}
-                  onSaveVentures={async (ventures) => {
-                    await akyinApiClient.saveVentures(ventures);
-                    await loadDashboard();
-                    await refreshSiteConfig();
-                  }}
-                />
-              )}
-
-              {activeTab === 'Admin Security' && (
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="font-display text-2xl font-bold tracking-[-0.015em] text-[#1D1D1F]">
-                      Admin Security, Audit Logs &amp; Deployment
-                    </h2>
-                    <p className="text-xs text-[#6E6E73] mt-0.5">
-                      Manage Google Apps Script connection, rotate owner credentials, and inspect administrative activity.
-                    </p>
-                  </div>
-
-                  <div className="liquid-glass-card rounded-3xl p-6 space-y-4 text-xs">
-                    <h3 className="font-display text-base font-bold text-[#1D1D1F]">
-                      Apps Script Web App Endpoint Connection
-                    </h3>
-                    <form onSubmit={handleSaveEndpoint} className="flex flex-col sm:flex-row gap-3">
-                      <input
-                        type="url"
-                        value={endpointDraft}
-                        onChange={(e) => setEndpointDraft(e.target.value)}
-                        placeholder="https://script.google.com/macros/s/.../exec"
-                        className="flex-1 rounded-xl border border-[#E8E8ED] bg-[#FFFFFF] px-3.5 py-2.5 font-mono-num text-xs text-[#1D1D1F] focus:outline-none focus:border-[#1D1D1F] focus:ring-2 focus:ring-[#1D1D1F]/15"
-                      />
-                      <GlassButton type="submit" variant="primary" size="md">
-                        Update Connection URL
-                      </GlassButton>
-                    </form>
-                    {endpointStatus && (
-                      <p className="text-xs font-semibold text-[#1D1D1F]">{endpointStatus}</p>
-                    )}
-                    {endpointError && (
-                      <p className="text-xs font-semibold text-[#D92D20]">{endpointError}</p>
-                    )}
-                  </div>
-
-                  <div className="liquid-glass-card rounded-3xl p-6 space-y-4 text-xs">
-                    <div className="inline-flex items-center gap-2 text-sm font-bold text-[#1D1D1F]">
-                      <KeyRound className="w-4 h-4 text-[#1D1D1F]" aria-hidden="true" />
-                      <span>Rotate Administrator Password</span>
-                    </div>
-                    <form
-                      onSubmit={handlePasswordChange}
-                      className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end"
-                    >
-                      <div>
-                        <label className="block font-semibold text-[#1D1D1F] mb-1">
-                          Current Password
-                        </label>
-                        <input
-                          type="password"
-                          required
-                          value={currentPw}
-                          onChange={(e) => setCurrentPw(e.target.value)}
-                          className="w-full rounded-xl border border-[#E8E8ED] bg-[#FFFFFF] px-3 py-2 text-sm text-[#1D1D1F] focus:outline-none focus:border-[#1D1D1F] focus:ring-2 focus:ring-[#1D1D1F]/15"
-                        />
-                      </div>
-                      <div>
-                        <label className="block font-semibold text-[#1D1D1F] mb-1">
-                          New Password (min 8 chars)
-                        </label>
-                        <input
-                          type="password"
-                          required
-                          minLength={8}
-                          value={newPw}
-                          onChange={(e) => setNewPw(e.target.value)}
-                          className="w-full rounded-xl border border-[#E8E8ED] bg-[#FFFFFF] px-3 py-2 text-sm text-[#1D1D1F] focus:outline-none focus:border-[#1D1D1F] focus:ring-2 focus:ring-[#1D1D1F]/15"
-                        />
-                      </div>
-                      <GlassButton type="submit" variant="primary" size="md">
-                        Update Password
-                      </GlassButton>
-                    </form>
-                    {pwMsg && (
-                      <p className="text-xs font-semibold text-[#1D1D1F] flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
-                        {pwMsg}
-                      </p>
-                    )}
-                    {pwErr && <p className="text-xs font-semibold text-[#D92D20]">{pwErr}</p>}
-                  </div>
-
-                  <div className="liquid-glass-card rounded-3xl p-6 space-y-4">
-                    <h3 className="font-display text-base font-bold text-[#1D1D1F]">
-                      Audit Trail (AdminLogs)
-                    </h3>
-                    {dashboard.logs.length === 0 ? (
-                      <p className="text-xs text-[#6E6E73]">No audit actions recorded yet.</p>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse text-xs">
-                          <thead>
-                            <tr className="bg-[#F5F5F7] border-b border-[#E8E8ED] text-[#6E6E73]">
-                              <th className="py-2.5 px-3">Timestamp (IST)</th>
-                              <th className="py-2.5 px-3">Action</th>
-                              <th className="py-2.5 px-3">Target</th>
-                              <th className="py-2.5 px-3">Summary</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-[#E8E8ED]">
-                            {dashboard.logs.slice(0, 25).map((log) => (
-                              <tr key={log.logId}>
-                                <td className="py-2.5 px-3 font-mono-num text-[#6E6E73] whitespace-nowrap">
-                                  {log.timestamp}
-                                </td>
-                                <td className="py-2.5 px-3 font-mono-num font-bold text-[#1D1D1F] whitespace-nowrap">
-                                  {log.action}
-                                </td>
-                                <td className="py-2.5 px-3 font-mono-num text-[#1D1D1F]">
-                                  {log.targetId}
-                                </td>
-                                <td className="py-2.5 px-3 text-[#1D1D1F]">{log.summary}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
-                  </div>
-
-                  <DeploymentChecklistCard />
+              {settingsNotice && (
+                <div className="rounded-2xl liquid-glass-panel px-4 py-3 text-xs font-semibold text-[#1D1D1F] flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#067647]" aria-hidden="true" />
+                  <span>{settingsNotice}</span>
                 </div>
               )}
-            </>
+              {settingsError && (
+                <div className="rounded-2xl bg-[#FEF3F2] border border-[#FECDCA] px-4 py-3 text-xs font-semibold text-[#B42318]">
+                  {settingsError}
+                </div>
+              )}
+
+              {loadingSettings ? (
+                <div className="liquid-glass-card rounded-3xl p-10 text-center text-xs text-[#6E6E73]">
+                  Loading website settings...
+                </div>
+              ) : (
+                <div className="liquid-glass-card rounded-3xl p-6 sm:p-8 space-y-6 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block font-semibold text-[#1D1D1F] mb-1">
+                        Homepage Hero Headline
+                      </label>
+                      <input
+                        value={settingsDraft.heroHeadline || ''}
+                        onChange={(e) =>
+                          setSettingsDraft({ ...settingsDraft, heroHeadline: e.target.value })
+                        }
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-[#1D1D1F] mb-1">
+                        Header Brand Wordmark
+                      </label>
+                      <input
+                        value={settingsDraft.brandWordmark || 'AKYIN'}
+                        onChange={(e) =>
+                          setSettingsDraft({ ...settingsDraft, brandWordmark: e.target.value })
+                        }
+                        className={inputCls}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-[#1D1D1F] mb-1">
+                      Homepage Hero Introduction
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={settingsDraft.heroSubheadline || ''}
+                      onChange={(e) =>
+                        setSettingsDraft({ ...settingsDraft, heroSubheadline: e.target.value })
+                      }
+                      className={inputCls}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-[#1D1D1F] mb-1">
+                      Footer Corporate Description
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={settingsDraft.footerTagline || ''}
+                      onChange={(e) =>
+                        setSettingsDraft({ ...settingsDraft, footerTagline: e.target.value })
+                      }
+                      className={inputCls}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-[#E8E8ED]">
+                    <div>
+                      <label className="block font-semibold text-[#1D1D1F] mb-1">
+                        Reported Clients Handled
+                      </label>
+                      <input
+                        type="number"
+                        min={11}
+                        value={settingsDraft.reportedClientsCount ?? 58}
+                        onChange={(e) =>
+                          setSettingsDraft({
+                            ...settingsDraft,
+                            reportedClientsCount: Number(e.target.value) || 58,
+                          })
+                        }
+                        className={`${inputCls} font-mono-num`}
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-[#1D1D1F] mb-1">
+                        Public Contact Email
+                      </label>
+                      <input
+                        type="email"
+                        value={settingsDraft.contactEmail || ''}
+                        onChange={(e) =>
+                          setSettingsDraft({ ...settingsDraft, contactEmail: e.target.value })
+                        }
+                        className={inputCls}
+                      />
+                    </div>
+                    <div className="md:col-span-2 rounded-xl bg-[#F5F5F7] border border-[#E8E8ED] px-4 py-3 text-xs text-[#6E6E73]">
+                      <span className="font-semibold text-[#1D1D1F]">Privacy Mode Active:</span> Public phone numbers are hidden across AKYIN.com. Visitors connect via the official <span className="font-semibold text-[#1D1D1F]">WhatsApp Connect</span> channel and corporate email.
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-[#1D1D1F] mb-1">
+                        Consultation Fee Label
+                      </label>
+                      <input
+                        value={settingsDraft.consultationFee || ''}
+                        onChange={(e) =>
+                          setSettingsDraft({ ...settingsDraft, consultationFee: e.target.value })
+                        }
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-[#1D1D1F] mb-1">
+                        Owner Alert Email
+                      </label>
+                      <input
+                        type="email"
+                        value={settingsDraft.notificationEmail || ''}
+                        onChange={(e) =>
+                          setSettingsDraft({
+                            ...settingsDraft,
+                            notificationEmail: e.target.value,
+                          })
+                        }
+                        className={inputCls}
+                      />
+                    </div>
+                  </div>
+
+                  {/* UAE AED Payment Gateway Readiness */}
+                  <div className="rounded-2xl bg-[#F5F5F7] border border-[#E8E8ED] p-4 space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <p className="font-bold text-[#1D1D1F]">
+                          UAE International Payment Gateway (AED / USD)
+                        </p>
+                        <p className="text-[11px] text-[#6E6E73]">
+                          When disabled, international AED/USD quotations fall back cleanly to UAE bank transfer instructions.
+                        </p>
+                      </div>
+                      <label className="inline-flex items-center gap-2 font-semibold cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(settingsDraft.uaeGatewayEnabled)}
+                          onChange={(e) =>
+                            setSettingsDraft({
+                              ...settingsDraft,
+                              uaeGatewayEnabled: e.target.checked,
+                            })
+                          }
+                          className="accent-[#0071E3] w-4 h-4"
+                        />
+                        <span>Enable UAE Gateway Checkout</span>
+                      </label>
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-[#1D1D1F] mb-1">
+                        UAE Bank Transfer / Payment Note
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={settingsDraft.uaeGatewayNote || ''}
+                        onChange={(e) =>
+                          setSettingsDraft({ ...settingsDraft, uaeGatewayNote: e.target.value })
+                        }
+                        placeholder="UAE AED payments can be settled via official bank transfer or Razorpay International once enabled."
+                        className={inputCls}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <GlassButton
+                      disabled={savingSettings}
+                      variant="primary"
+                      size="md"
+                      onClick={() =>
+                        void handleSaveSettingsPatch(
+                          [
+                            'heroHeadline',
+                            'heroSubheadline',
+                            'footerTagline',
+                            'brandWordmark',
+                            'reportedClientsCount',
+                            'contactEmail',
+                            'consultationFee',
+                            'notificationEmail',
+                            'uaeGatewayEnabled',
+                            'uaeGatewayNote',
+                          ],
+                          'Website & UAE Gateway Settings'
+                        )
+                      }
+                    >
+                      <Save className="w-4 h-4" aria-hidden="true" />
+                      <span>{savingSettings ? 'Saving...' : 'Save Website Settings'}</span>
+                    </GlassButton>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
-        </div>
+
+          {/* 11. Social Media */}
+          {activeTab === 'Social Media' && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="font-display text-2xl font-bold tracking-[-0.015em] text-[#1D1D1F]">
+                  Social Media &amp; Publishing Channels
+                </h2>
+                <p className="text-xs text-[#6E6E73] mt-0.5">
+                  Manage official AKYIN social profiles and Amazon / Google Play Books storefront URLs.
+                </p>
+              </div>
+
+              {settingsNotice && (
+                <div className="rounded-2xl liquid-glass-panel px-4 py-3 text-xs font-semibold text-[#1D1D1F] flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#067647]" aria-hidden="true" />
+                  <span>{settingsNotice}</span>
+                </div>
+              )}
+              {settingsError && (
+                <div className="rounded-2xl bg-[#FEF3F2] border border-[#FECDCA] px-4 py-3 text-xs font-semibold text-[#B42318]">
+                  {settingsError}
+                </div>
+              )}
+
+              {loadingSettings ? (
+                <div className="liquid-glass-card rounded-3xl p-10 text-center text-xs text-[#6E6E73]">
+                  Loading social profile links...
+                </div>
+              ) : (
+                <div className="liquid-glass-card rounded-3xl p-6 sm:p-8 space-y-5 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block font-semibold text-[#1D1D1F] mb-1">Instagram URL</label>
+                      <input
+                        type="url"
+                        value={settingsDraft.instagramUrl || ''}
+                        onChange={(e) =>
+                          setSettingsDraft({ ...settingsDraft, instagramUrl: e.target.value })
+                        }
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-[#1D1D1F] mb-1">Facebook URL</label>
+                      <input
+                        type="url"
+                        value={settingsDraft.facebookUrl || ''}
+                        onChange={(e) =>
+                          setSettingsDraft({ ...settingsDraft, facebookUrl: e.target.value })
+                        }
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-[#1D1D1F] mb-1">X / Twitter URL</label>
+                      <input
+                        type="url"
+                        value={settingsDraft.xUrl || ''}
+                        onChange={(e) =>
+                          setSettingsDraft({ ...settingsDraft, xUrl: e.target.value })
+                        }
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-[#1D1D1F] mb-1">YouTube URL</label>
+                      <input
+                        type="url"
+                        value={settingsDraft.youtubeUrl || ''}
+                        onChange={(e) =>
+                          setSettingsDraft({ ...settingsDraft, youtubeUrl: e.target.value })
+                        }
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-[#1D1D1F] mb-1">
+                        Amazon Author Storefront URL
+                      </label>
+                      <input
+                        type="url"
+                        value={settingsDraft.amazonUrl || ''}
+                        onChange={(e) =>
+                          setSettingsDraft({ ...settingsDraft, amazonUrl: e.target.value })
+                        }
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-[#1D1D1F] mb-1">
+                        Google Play Books URL
+                      </label>
+                      <input
+                        type="url"
+                        value={settingsDraft.googlePlayBooksUrl || ''}
+                        onChange={(e) =>
+                          setSettingsDraft({
+                            ...settingsDraft,
+                            googlePlayBooksUrl: e.target.value,
+                          })
+                        }
+                        className={inputCls}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <GlassButton
+                      disabled={savingSettings}
+                      variant="primary"
+                      size="md"
+                      onClick={() =>
+                        void handleSaveSettingsPatch(
+                          [
+                            'instagramUrl',
+                            'facebookUrl',
+                            'xUrl',
+                            'youtubeUrl',
+                            'amazonUrl',
+                            'googlePlayBooksUrl',
+                          ],
+                          'Social Media & Publishing Links'
+                        )
+                      }
+                    >
+                      <Save className="w-4 h-4" aria-hidden="true" />
+                      <span>{savingSettings ? 'Saving...' : 'Save Social Media Links'}</span>
+                    </GlassButton>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 12. User and Admin Management */}
+          {activeTab === 'User and Admin Management' && (
+            <AdminUsersPanel currentUserId={currentUser.id} />
+          )}
+
+          {/* 13. Security and Audit Logs */}
+          {activeTab === 'Security and Audit Logs' && <AdminSecurityAuditPanel />}
+        </main>
       </div>
     </div>
   );

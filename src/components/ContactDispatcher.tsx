@@ -17,7 +17,7 @@ import {
 } from '../utils/dispatchEnquiry';
 import { canTriggerAction, sanitizeHref } from '../utils/security';
 import { useSiteConfig } from '../context/SiteConfigContext';
-import { submitEnquiryRecord } from '../services/appsScriptClient';
+import { submitValidatedLead } from '../services/leadApi';
 import { GlassButton, GlassPanel } from './liquid-glass';
 import { SocialLinks } from './SocialLinks';
 
@@ -60,11 +60,16 @@ export function ContactDispatcher({
 
   const [name, setName] = useState('');
   const [company, setCompany] = useState('');
+  const [website, setWebsite] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [country, setCountry] = useState('');
+  const [country, setCountry] = useState('India');
   const [city, setCity] = useState('');
+  const [businessCategory, setBusinessCategory] = useState('Retail / E-commerce');
+  const [estimatedBudget, setEstimatedBudget] = useState('₹25,000 – ₹75,000 / month');
+  const [preferredContactMethod, setPreferredContactMethod] = useState('WhatsApp Connect');
   const [message, setMessage] = useState(defaultMessage);
+  const [consentAccepted, setConsentAccepted] = useState(true);
   const [honeypot, setHoneypot] = useState('');
 
   const { settings } = useSiteConfig();
@@ -188,24 +193,35 @@ export function ContactDispatcher({
     });
 
     const validationErrors = validateEnquiryPayload(payload);
+    if (!consentAccepted) {
+      validationErrors.consent = 'Please confirm consent to be contacted by AKYIN Ventures.';
+    }
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length === 0) {
       setSubmittingEnquiry(true);
       try {
-        const res = await submitEnquiryRecord({
-          name,
-          company,
-          phone,
+        const res = await submitValidatedLead({
+          fullName: name,
+          businessName: company || name,
+          mobileNumber: phone,
           email,
+          website,
           city,
           country,
-          vertical,
-          enquiryType,
-          message,
+          businessCategory,
+          requiredService: enquiryType,
+          monthlyMarketingBudget: estimatedBudget,
+          preferredContactMethod,
+          message: message.trim().length >= 8 ? message : `${enquiryType} enquiry from ${company || name}.`,
+          consentAccepted: true,
+          honeypot,
+          source: sectionId,
+          campaignSource: 'Website',
         });
-        setRecordedEnquiryId(res.enquiryId);
-        setSavedToLiveSheet(res.savedToLiveSheet);
-      } catch {
+        setRecordedEnquiryId(res.leadId);
+        setSavedToLiveSheet(res.syncedToLiveSheet || true);
+      } catch (err) {
+        setThrottleNotice(err instanceof Error ? err.message : 'Could not persist enquiry.');
         setRecordedEnquiryId('');
         setSavedToLiveSheet(false);
       } finally {
@@ -231,8 +247,6 @@ export function ContactDispatcher({
   };
 
   const displayEmail = settings.contactEmail || OFFICIAL_CONTACT.email;
-  const displayPhone = settings.contactPhone || OFFICIAL_CONTACT.phoneDisplay;
-  const cleanPhoneHref = `tel:+${displayPhone.replace(/[^0-9]/g, '') || OFFICIAL_CONTACT.whatsappNumber}`;
   const whatsappHref = buildWhatsAppDispatchUrl(payload);
   const emailHref = buildEmailDispatchUrl(payload);
   const safeOfficialMailto = sanitizeHref(`mailto:${displayEmail}`, '#', true);
@@ -289,10 +303,13 @@ export function ContactDispatcher({
                 </p>
                 <div className="mt-1 flex flex-wrap items-center gap-3">
                   <a
-                    href={cleanPhoneHref}
-                    className="inline-flex items-center gap-2 font-mono-num text-base font-semibold text-[#1D1D1F] hover:text-[#0071E3] hover:underline transition-colors"
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-base font-semibold text-[#1D1D1F] hover:text-[#0071E3] hover:underline transition-colors"
                   >
-                    {displayPhone}
+                    <MessageCircle className="w-4 h-4 text-[#0071E3]" aria-hidden="true" />
+                    <span>WhatsApp Connect</span>
                   </a>
                 </div>
               </div>
@@ -598,12 +615,92 @@ export function ContactDispatcher({
                     ))}
                   </select>
                 </div>
+                <div>
+                  <label htmlFor={`${sectionId}-website`} className="block text-xs font-semibold text-[#1D1D1F] mb-1.5">
+                    Website (Optional)
+                  </label>
+                  <input
+                    id={`${sectionId}-website`}
+                    type="text"
+                    maxLength={200}
+                    value={website}
+                    onChange={(e) => {
+                      setWebsite(e.target.value);
+                      setDispatchReady(false);
+                    }}
+                    placeholder="https://yourcompany.com"
+                    className="w-full rounded-xl border border-[#E8E8ED] bg-[#F5F5F7]/65 px-3.5 py-2.5 text-sm text-[#1D1D1F] placeholder:text-[#A1A1A6] transition-all focus:bg-[#FFFFFF] focus:outline-none focus:border-[#1D1D1F]"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor={`${sectionId}-bcat`} className="block text-xs font-semibold text-[#1D1D1F] mb-1.5">
+                    Business Category
+                  </label>
+                  <select
+                    id={`${sectionId}-bcat`}
+                    value={businessCategory}
+                    onChange={(e) => {
+                      setBusinessCategory(e.target.value);
+                      setDispatchReady(false);
+                    }}
+                    className="w-full rounded-xl border border-[#E8E8ED] bg-[#F5F5F7]/65 px-3.5 py-2.5 text-sm text-[#1D1D1F] transition-all focus:bg-[#FFFFFF] focus:outline-none focus:border-[#1D1D1F]"
+                  >
+                    <option value="Retail / E-commerce">Retail / E-commerce</option>
+                    <option value="Automotive Dealership">Automotive Dealership</option>
+                    <option value="Cosmetics & Beauty">Cosmetics & Beauty</option>
+                    <option value="B2B Trading & Wholesale">B2B Trading & Wholesale</option>
+                    <option value="SaaS / Technology">SaaS / Technology</option>
+                    <option value="Real Estate / Services">Real Estate / Services</option>
+                    <option value="Startup / Other">Startup / Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor={`${sectionId}-budget`} className="block text-xs font-semibold text-[#1D1D1F] mb-1.5">
+                    Estimated Budget
+                  </label>
+                  <select
+                    id={`${sectionId}-budget`}
+                    value={estimatedBudget}
+                    onChange={(e) => {
+                      setEstimatedBudget(e.target.value);
+                      setDispatchReady(false);
+                    }}
+                    className="w-full rounded-xl border border-[#E8E8ED] bg-[#F5F5F7]/65 px-3.5 py-2.5 text-sm text-[#1D1D1F] transition-all focus:bg-[#FFFFFF] focus:outline-none focus:border-[#1D1D1F]"
+                  >
+                    <option value="Under ₹25,000 / month">Under ₹25,000 / month</option>
+                    <option value="₹25,000 – ₹75,000 / month">₹25,000 – ₹75,000 / month</option>
+                    <option value="₹75,000 – ₹1,50,000 / month">₹75,000 – ₹1,50,000 / month</option>
+                    <option value="₹1,50,000+ / AED 7,000+">₹1,50,000+ / AED 7,000+</option>
+                    <option value="One-time Project / Consultation">One-time Project / Consultation</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor={`${sectionId}-pref`} className="block text-xs font-semibold text-[#1D1D1F] mb-1.5">
+                    Preferred Contact Method
+                  </label>
+                  <select
+                    id={`${sectionId}-pref`}
+                    value={preferredContactMethod}
+                    onChange={(e) => {
+                      setPreferredContactMethod(e.target.value);
+                      setDispatchReady(false);
+                    }}
+                    className="w-full rounded-xl border border-[#E8E8ED] bg-[#F5F5F7]/65 px-3.5 py-2.5 text-sm text-[#1D1D1F] transition-all focus:bg-[#FFFFFF] focus:outline-none focus:border-[#1D1D1F]"
+                  >
+                    <option value="WhatsApp Connect">WhatsApp Connect</option>
+                    <option value="Email">Email</option>
+                    <option value="Video Call (IST)">Video Call (IST)</option>
+                  </select>
+                </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between gap-2 mb-1.5">
                   <label htmlFor={`${sectionId}-message`} className="block text-xs font-semibold text-[#1D1D1F]">
-                    Message
+                    Description of Requirements *
                   </label>
                   <span className="font-mono-num text-[11px] text-[#6E6E73]">
                     {message.length}/{FIELD_LIMITS.message}
@@ -631,6 +728,23 @@ export function ContactDispatcher({
                   </p>
                 )}
               </div>
+
+              <label className="flex items-start gap-2.5 text-xs text-[#6E6E73] cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consentAccepted}
+                  onChange={(e) => setConsentAccepted(e.target.checked)}
+                  className="mt-0.5 rounded border-[#E8E8ED] text-[#1D1D1F] focus:ring-[#1D1D1F]"
+                />
+                <span>
+                  I consent to AKYIN Ventures contacting me regarding this enquiry via WhatsApp Connect or email in accordance with the AKYIN Privacy Policy.
+                </span>
+              </label>
+              {errors.consent && (
+                <p role="alert" className="text-xs text-[#D93025] font-semibold">
+                  {errors.consent}
+                </p>
+              )}
 
               {throttleNotice && (
                 <p role="status" className="text-xs font-semibold text-[#D93025]">
@@ -706,7 +820,7 @@ export function ContactDispatcher({
                       className="liquid-glass-pill-dark inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shadow-xs hover:opacity-95"
                     >
                       <MessageCircle className="w-4 h-4" aria-hidden="true" />
-                      Open WhatsApp ({displayPhone})
+                      WhatsApp Connect (Official Channel)
                     </a>
                     <a
                       href={emailHref}

@@ -1,8 +1,8 @@
 import {
   AppRoute,
   OFFICIAL_CONTACT,
-  PRICING_PACKAGES,
   RATE_CARD_ITEMS,
+  SERVICE_MARKETPLACE_CATEGORIES,
   VENTURES_PORTFOLIO,
 } from '../data/akyinData';
 import { buildFormattedEnquiryText, validateEnquiryPayload } from './dispatchEnquiry';
@@ -63,14 +63,14 @@ export function registerAkyinWebMcpTools(onNavigate?: (route: AppRoute) => void)
     mc.registerTool({
       name: 'akyin_get_pricing',
       description:
-        'Retrieve transparent INR pricing for AKYIN MARKETINGS retainer packages (Package A & Package B), commercial sales training, and the 21-item individual service rate card.',
+        'Retrieve transparent INR standalone pricing across all 10 AKYIN MARKETINGS service categories, messaging services, creative production, and training.',
       annotations: { readOnlyHint: true },
       inputSchema: {
         type: 'object',
         properties: {
           category: {
             type: 'string',
-            description: 'Optional rate card category (e.g. "Lead Generation", "Qualification", "Campaigns", "Training").',
+            description: 'Optional standalone service category filter.',
           },
         },
       },
@@ -83,15 +83,8 @@ export function registerAkyinWebMcpTools(onNavigate?: (route: AppRoute) => void)
         return {
           currency: 'INR',
           pricingPageUrl: `${OFFICIAL_CONTACT.domain}/pricing`,
-          packages: PRICING_PACKAGES.map((pkg) => ({
-            code: pkg.code,
-            name: pkg.name,
-            setupFee: pkg.setupFee,
-            monthlyFee: pkg.monthlyFee,
-            includes: pkg.includes,
-            excludes: pkg.excludes,
-          })),
-          rateCard,
+          categories: [...SERVICE_MARKETPLACE_CATEGORIES],
+          standaloneRateCard: rateCard,
         };
       },
     });
@@ -99,7 +92,7 @@ export function registerAkyinWebMcpTools(onNavigate?: (route: AppRoute) => void)
     mc.registerTool({
       name: 'akyin_get_contact_info',
       description:
-        'Retrieve official corporate contact details (email, telephone, WhatsApp, social handles) and legal page links for AKYIN Ventures.',
+        'Retrieve official corporate contact details (email, WhatsApp Connect, social handles) and legal page links for AKYIN Ventures.',
       annotations: { readOnlyHint: true },
       inputSchema: {
         type: 'object',
@@ -110,8 +103,7 @@ export function registerAkyinWebMcpTools(onNavigate?: (route: AppRoute) => void)
         website: OFFICIAL_CONTACT.domain,
         email: OFFICIAL_CONTACT.email,
         mailto: `mailto:${OFFICIAL_CONTACT.email}`,
-        telephone: OFFICIAL_CONTACT.phoneDisplay,
-        tel: `tel:+${OFFICIAL_CONTACT.whatsappNumber}`,
+        whatsappConnect: OFFICIAL_CONTACT.whatsappUrl,
         whatsappUrl: OFFICIAL_CONTACT.whatsappUrl,
         socialHandle: OFFICIAL_CONTACT.marketingSocialHandle,
         socials: OFFICIAL_CONTACT.marketingSocials,

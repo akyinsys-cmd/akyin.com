@@ -5,6 +5,7 @@ import {
   AppRoute,
   EXTERNAL_VERTICAL_URLS,
   IMAGES,
+  OFFICIAL_CONTACT,
   PUBLISHING_LINKS,
   VENTURES_PORTFOLIO,
 } from '../data/akyinData';
@@ -740,7 +741,7 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
                 Transparent Commercial Pricing · INR
               </p>
               <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-[-0.02em] text-[#1D1D1F]">
-                Clear Agency Retainers, Training &amp; Advisory Rates.
+                Transparent Standalone Service Rates &amp; Advisory Fees.
               </h2>
             </div>
             <a
@@ -751,32 +752,60 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
               }}
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1D1D1F] hover:underline whitespace-nowrap"
             >
-              <span>View Full Pricing &amp; 21-Item Rate Card</span>
+              <span>View Full Standalone Pricing &amp; Quotation Builder</span>
               <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </a>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="frosted-glass-card rounded-2xl p-5 space-y-1.5">
-              <p className="text-xs font-semibold text-[#6E6E73]">Package A · Full Growth</p>
-              <p className="font-mono-num text-xl font-bold text-[#1D1D1F]">₹49,999/mo</p>
-              <p className="text-xs text-[#6E6E73]">+ ₹39,999 one-time setup</p>
-            </div>
-            <div className="frosted-glass-card rounded-2xl p-5 space-y-1.5">
-              <p className="text-xs font-semibold text-[#6E6E73]">Package B · Lead Filtering</p>
-              <p className="font-mono-num text-xl font-bold text-[#1D1D1F]">₹19,999/mo</p>
-              <p className="text-xs text-[#6E6E73]">+ ₹14,999 one-time setup</p>
-            </div>
-            <div className="frosted-glass-card rounded-2xl p-5 space-y-1.5">
-              <p className="text-xs font-semibold text-[#6E6E73]">Sales Team Training</p>
-              <p className="font-mono-num text-xl font-bold text-[#1D1D1F]">₹25,000</p>
-              <p className="text-xs text-[#6E6E73]">Per showroom/team session</p>
-            </div>
-            <div className="frosted-glass-card rounded-2xl p-5 space-y-1.5">
-              <p className="text-xs font-semibold text-[#6E6E73]">1-on-1 Advisory</p>
-              <p className="font-mono-num text-xl font-bold text-[#1D1D1F]">₹1,999</p>
-              <p className="text-xs text-[#6E6E73]">30-min IST strategy session</p>
-            </div>
+            <a
+              href="/services/meta-ads-management"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/services/meta-ads-management');
+              }}
+              className="frosted-glass-card rounded-2xl p-5 space-y-1.5 hover:border-[#1D1D1F]/25 transition-colors block"
+            >
+              <p className="text-xs font-semibold text-[#6E6E73]">Meta Ads Management</p>
+              <p className="font-mono-num text-xl font-bold text-[#1D1D1F]">₹40,000/mo</p>
+              <p className="text-xs text-[#6E6E73]">Standalone paid campaigns · Direct ad spend</p>
+            </a>
+            <a
+              href="/services/lead-filtering"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/services/lead-filtering');
+              }}
+              className="frosted-glass-card rounded-2xl p-5 space-y-1.5 hover:border-[#1D1D1F]/25 transition-colors block"
+            >
+              <p className="text-xs font-semibold text-[#6E6E73]">Lead Filtering &amp; Qualification</p>
+              <p className="font-mono-num text-xl font-bold text-[#1D1D1F]">₹24,000/mo</p>
+              <p className="text-xs text-[#6E6E73]">Strict enquiry vetting &amp; Hot/Warm sorting</p>
+            </a>
+            <a
+              href="/services/bulk-sms"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/services/bulk-sms');
+              }}
+              className="frosted-glass-card rounded-2xl p-5 space-y-1.5 hover:border-[#1D1D1F]/25 transition-colors block"
+            >
+              <p className="text-xs font-semibold text-[#6E6E73]">Bulk SMS &amp; WhatsApp Setup</p>
+              <p className="font-mono-num text-xl font-bold text-[#1D1D1F]">₹3,000 / ₹4,999</p>
+              <p className="text-xs text-[#6E6E73]">10k SMS (₹0.30/SMS) · Separate WhatsApp setup</p>
+            </a>
+            <a
+              href="/advisory"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/advisory');
+              }}
+              className="frosted-glass-card rounded-2xl p-5 space-y-1.5 hover:border-[#1D1D1F]/25 transition-colors block"
+            >
+              <p className="text-xs font-semibold text-[#6E6E73]">Training &amp; 1-on-1 Advisory</p>
+              <p className="font-mono-num text-xl font-bold text-[#1D1D1F]">₹50,000 / ₹3,998</p>
+              <p className="text-xs text-[#6E6E73]">Sales workshop (₹50k) · 30-min IST call (₹3,998)</p>
+            </a>
           </div>
 
           <div className="pt-6 border-t border-[#E8E8ED] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -785,8 +814,13 @@ export function HomePage({ onNavigate, onStartEnquiry }: HomePageProps) {
                 connect@akyin.com
               </a>
               <span aria-hidden="true">·</span>
-              <a href="tel:+916395694011" className="font-mono-num font-semibold text-[#1D1D1F] hover:underline">
-                +91 63956 94011
+              <a
+                href={OFFICIAL_CONTACT.whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-[#1D1D1F] hover:text-[#0071E3] hover:underline"
+              >
+                WhatsApp Connect
               </a>
               <span aria-hidden="true">·</span>
               <a

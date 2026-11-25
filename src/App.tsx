@@ -27,13 +27,19 @@ import { MarketingPage } from './pages/MarketingPage';
 import { AutomotiveMarketingPage } from './pages/AutomotiveMarketingPage';
 import { PricingPage } from './pages/PricingPage';
 import { PublishingPage } from './pages/PublishingPage';
+import { QuotePortalPage } from './pages/QuotePortalPage';
+import { ServiceDetailPage } from './pages/ServiceDetailPage';
 import { SitemapPage } from './pages/SitemapPage';
 import { StorePage } from './pages/StorePage';
 import { TermsPage } from './pages/TermsPage';
+import { ToolsPage } from './pages/ToolsPage';
+import { RouteMetaProvider, useRouteMeta } from './context/RouteMetaContext';
 import { SiteConfigProvider } from './context/SiteConfigContext';
 import { registerAkyinWebMcpTools } from './utils/webmcp';
 
-const VALID_ROUTES: AppRoute[] = [
+type StaticRoute = Exclude<AppRoute, `/services/${string}`>;
+
+const VALID_ROUTES: StaticRoute[] = [
   '/',
   '/about',
   '/ventures',
@@ -46,6 +52,8 @@ const VALID_ROUTES: AppRoute[] = [
   '/ventures/biznxt',
   '/ventures/budget-bazaar',
   '/pricing',
+  '/tools',
+  '/quote',
   '/advisory',
   '/insights',
   '/terms',
@@ -63,7 +71,7 @@ export interface RouteMetadata {
   structuredData: Record<string, unknown>;
 }
 
-const ROUTE_META: Record<AppRoute, RouteMetadata> = {
+export const ROUTE_META: Record<StaticRoute, RouteMetadata> = {
   '/': {
     title: 'AKYIN Ventures — Multi-Business Group & Marketing Agency',
     description:
@@ -79,9 +87,8 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
           url: 'https://akyin.com/',
           logo: 'https://akyin.com/assets/aistudio/akyin_logo_clean.png',
           description:
-            'Multi-business parent group and full-service marketing agency overseeing seven operating verticals across publishing, performance marketing, fashion retail, AI utilities, B2B wholesale trade, and business consulting.',
+            'Multi-business parent group and full-service marketing agency operating core ventures in publishing, performance marketing, and fashion retail while supporting 58+ independent client businesses across AI utilities, B2B wholesale trade, automotive growth, and business consulting.',
           email: 'connect@akyin.com',
-          telephone: '+91-6395694011',
           founder: { '@type': 'Person', name: 'Shaikh Nazir' },
           areaServed: ['IN', 'AE'],
           sameAs: [
@@ -99,7 +106,7 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
           contactPoint: [
             {
               '@type': 'ContactPoint',
-              telephone: '+91-6395694011',
+              url: 'https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U',
               contactType: 'customer service',
               email: 'connect@akyin.com',
               availableLanguage: ['English', 'Hindi', 'Telugu'],
@@ -112,7 +119,6 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
           name: 'AKYIN Ventures & Marketing Agency',
           image: 'https://akyin.com/assets/aistudio/akyin_logo_clean.png',
           url: 'https://akyin.com/',
-          telephone: '+91-6395694011',
           email: 'connect@akyin.com',
           priceRange: '₹1,999 - ₹49,999',
           address: {
@@ -141,36 +147,50 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
         },
         {
           '@type': 'Service',
-          name: 'AKYIN Full-Service Growth Marketing & Automotive Retainer',
+          name: 'AKYIN Standalone Marketing, Lead Qualification & Business Services',
           provider: { '@id': 'https://akyin.com/#organization' },
-          serviceType: 'Performance Marketing & Lead Qualification',
+          serviceType: 'Performance Marketing, Creative Design & Lead Qualification',
           areaServed: ['IN', 'AE', 'US', 'GB'],
           offers: [
             {
               '@type': 'Offer',
-              name: 'Package A — Complete Marketing Growth & Lead Qualification',
-              price: '49999',
+              name: 'Meta Ads Management',
+              price: '40000',
               priceCurrency: 'INR',
-              url: 'https://akyin.com/pricing',
+              url: 'https://akyin.com/services/meta-ads-management',
             },
             {
               '@type': 'Offer',
-              name: 'Package B — Lead Filtering & Qualification Only',
-              price: '19999',
+              name: 'Lead Filtering & Qualification',
+              price: '24000',
               priceCurrency: 'INR',
-              url: 'https://akyin.com/pricing',
+              url: 'https://akyin.com/services/lead-filtering',
+            },
+            {
+              '@type': 'Offer',
+              name: 'Bulk SMS Marketing (10,000 Credits)',
+              price: '3000',
+              priceCurrency: 'INR',
+              url: 'https://akyin.com/services/bulk-sms',
+            },
+            {
+              '@type': 'Offer',
+              name: 'WhatsApp Business Messaging Setup (One-Time Setup)',
+              price: '4999',
+              priceCurrency: 'INR',
+              url: 'https://akyin.com/services/whatsapp-business-setup',
             },
             {
               '@type': 'Offer',
               name: 'Commercial & Dealership Sales Training Workshop',
-              price: '25000',
+              price: '50000',
               priceCurrency: 'INR',
-              url: 'https://akyin.com/pricing',
+              url: 'https://akyin.com/services/commercial-dealership-sales-training',
             },
             {
               '@type': 'Offer',
               name: '1-on-1 Business Advisory Consultation (30 min IST)',
-              price: '1999',
+              price: '3998',
               priceCurrency: 'INR',
               url: 'https://akyin.com/advisory',
             },
@@ -198,23 +218,23 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
               name: 'What businesses operate under AKYIN Ventures?',
               acceptedAnswer: {
                 '@type': 'Answer',
-                text: 'AKYIN Ventures operates seven verticals: AKYIN Publishing, AKYIN MARKETINGS (Agency), AKYIN Store / AKYIN Thrift, AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar.',
+                text: 'AKYIN Ventures operates three core ventures: AKYIN Publishing, AKYIN MARKETINGS (Agency), and AKYIN Store / AKYIN Thrift, while supporting 58+ client businesses including AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar.',
               },
             },
             {
               '@type': 'Question',
-              name: 'How much do AKYIN Marketing retainers and advisory sessions cost?',
+              name: 'Are AKYIN Marketing services offered standalone or as combined packages?',
               acceptedAnswer: {
                 '@type': 'Answer',
-                text: 'Package A is ₹39,999 one-time setup plus ₹49,999/month, Package B (Lead Qualification Only) is ₹14,999 setup plus ₹19,999/month, Sales Training is ₹25,000/session, and 1-on-1 Business Advisory is ₹1,999 per 30-minute IST session.',
+                text: 'Every service across all 10 categories is strictly standalone with zero compulsory bundles—clients can select Meta Ads Management (₹40,000/month), Lead Filtering (₹24,000/month), Logo Design (₹6,000), Bulk SMS (₹3,000 for 10,000 credits), WhatsApp Business Setup (₹4,999 one-time setup), Sales Training (₹50,000/session), or Business Advisory (₹3,998/session) independently.',
               },
             },
             {
               '@type': 'Question',
-              name: 'What are AKYIN Marketing Agency service timelines and deliverables?',
+              name: 'How does ad billing work with AKYIN Marketing?',
               acceptedAnswer: {
                 '@type': 'Answer',
-                text: 'Campaign onboarding and architecture launch within 7 to 14 business days after setup. Deliverables cover Meta and Google ad setup, independent lead filtering and qualification, CRM pipeline tracking, creative assets, and optional sales team training, with media spend paid directly to ad platforms.',
+                text: 'Advertising budgets are paid directly by clients to Meta or Google. AKYIN fees cover strategy, campaign setup, independent lead qualification, creative assets, and optional sales team training.',
               },
             },
           ],
@@ -223,16 +243,16 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/about': {
-    title: 'About AKYIN Ventures — One Vision. Multiple Business Ventures.',
+    title: 'About AKYIN Ventures — Vision, Ventures & Track Record',
     description:
-      'Corporate profile of AKYIN Ventures and its operating divisions across full-service marketing agency services, publishing, fashion retail, digital utilities, and B2B commerce.',
+      'Corporate profile of AKYIN Ventures: 16+ years across marketing, publishing, retail, AI tools, and B2B commerce serving India and UAE businesses.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'AboutPage',
       name: 'About AKYIN Ventures',
       url: 'https://akyin.com/about',
       description:
-        'Corporate profile of AKYIN Ventures and its operating divisions across full-service marketing agency services, publishing, fashion retail, digital utilities, and B2B commerce.',
+        'Corporate profile of AKYIN Ventures: 16+ years across marketing, publishing, retail, AI tools, and B2B commerce serving India and UAE businesses.',
       mainEntity: {
         '@type': 'Corporation',
         name: 'AKYIN Ventures',
@@ -241,15 +261,15 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/ventures': {
-    title: 'Our Businesses — AKYIN Ventures Portfolio',
+    title: 'Our Ventures & Client Ecosystem | AKYIN Ventures',
     description:
-      'Explore Akyin Publishing, Akyin Marketing Agency, Akyin Store (AKYIN THRIFT), AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar.',
+      'Explore AKYIN Publishing, AKYIN Marketing Agency, AKYIN Store, and showcased platforms AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
-      name: 'Our Businesses — AKYIN Ventures Portfolio',
+      name: 'Our Ventures & Client Ecosystem — AKYIN Ventures',
       url: 'https://akyin.com/ventures',
-      description: 'Explore the seven independent business initiatives under AKYIN Ventures.',
+      description: 'Explore core operating ventures under AKYIN Ventures and featured client showcases.',
       mainEntity: {
         '@type': 'ItemList',
         itemListElement: [
@@ -300,9 +320,9 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/ventures/publishing': {
-    title: 'AKYIN Publishing — Ideas That Inspire. Knowledge That Empowers. | akyin.com',
+    title: 'AKYIN Publishing — Books & Digital Guides | AKYIN.com',
     description:
-      'Explore eight books on Amazon and three digital guides & productivity tools published by AKYIN.',
+      'Explore eight published books on Amazon and three digital productivity & finance kits including The Discipline Code and The Money OS by AKYIN Publishing.',
     structuredData: {
       '@context': 'https://schema.org',
       '@graph': [
@@ -406,31 +426,87 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/ventures/marketing': {
-    title: 'AKYIN MARKETINGS — Full-Service Marketing Agency & Growth Solutions',
+    title: 'AKYIN MARKETINGS — Full-Service Growth Marketing Agency',
     description:
-      'Full-service digital marketing agency delivering Meta lead generation, brand campaigns, AI-assisted lead qualification, and commercial sales training across retail, B2B, services, and automotive.',
+      'Full-service digital marketing agency delivering Meta & Google lead generation, AI-assisted lead qualification, creative suites, and showroom sales training.',
     structuredData: {
       '@context': 'https://schema.org',
-      '@type': 'ProfessionalService',
-      name: 'AKYIN Marketing Agency',
-      alternateName: 'AKYIN MARKETINGS',
-      url: 'https://akyin.com/ventures/marketing',
-      parentOrganization: { '@type': 'Corporation', name: 'AKYIN Ventures' },
-      description:
-        'Full-service digital marketing agency delivering Meta lead generation, brand campaigns, AI-assisted lead qualification, and commercial sales training across retail, B2B, services, and automotive.',
-      priceRange: '$$',
-      areaServed: ['IN', 'AE', 'US', 'GB'],
-      telephone: '+91-6395694011',
-      email: 'connect@akyin.com',
+      '@graph': [
+        {
+          '@type': 'ProfessionalService',
+          '@id': 'https://akyin.com/ventures/marketing#service',
+          name: 'AKYIN Marketing Agency',
+          alternateName: 'AKYIN MARKETINGS',
+          url: 'https://akyin.com/ventures/marketing',
+          parentOrganization: { '@type': 'Corporation', name: 'AKYIN Ventures' },
+          description:
+            'Full-service digital marketing agency delivering Meta & Google lead generation, AI-assisted lead qualification, creative suites, and showroom sales training.',
+          priceRange: '$$',
+          areaServed: ['IN', 'AE', 'US', 'GB'],
+          email: 'connect@akyin.com',
+        },
+        {
+          '@type': 'FAQPage',
+          '@id': 'https://akyin.com/ventures/marketing#agency-faq',
+          name: 'AKYIN MARKETINGS — Agency Services, Messaging & Pricing FAQ',
+          mainEntity: [
+            {
+              '@type': 'Question',
+              name: 'What marketing services does AKYIN MARKETINGS provide?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'AKYIN MARKETINGS provides 26 standalone agency and business-support services across Meta and Google lead generation, independent lead filtering and qualification, AI-assisted outbound calling, Bulk SMS Marketing, WhatsApp Business Messaging Setup, local SEO, influencer coordination, commercial sales training, and Business Creative & Documentation Services.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'How are Lead Generation and Lead Filtering & Qualification separated?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Lead Generation and Lead Filtering & Qualification are strictly standalone deliverables. Lead Generation focuses on acquiring fresh buyer enquiries through targeted Meta and Google campaigns, while Lead Filtering & Qualification vets existing inbound enquiries via AI-assisted and human follow-up to deliver prioritized buyer sheets.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'How are standalone agency services and advertising budgets billed?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Clients pay Meta and Google advertising spend directly from their own billing accounts. Agency fees apply independently per chosen service—for example Meta Ads Management is ₹40,000/month, Lead Filtering is ₹24,000/month, and Commercial Sales Training is ₹50,000 per session (applicable GST extra).',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'How are Bulk SMS Marketing and WhatsApp Business Messaging priced?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Bulk SMS Marketing is offered as a ₹3,000 package including 10,000 SMS credits (₹0.30 effective per SMS, with additional credits billed at the admin-configured rate). WhatsApp Business Messaging separates the ₹4,999 one-time setup fee from per-message usage billed at ₹1.50 per message. Messaging rates are subject to provider charges, applicable taxes, message category, destination, and delivery conditions confirmed in the written quotation.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'Can small businesses order creative and documentation services without an agency retainer?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Yes. Every service in Creative and Graphic Design, Business Documents and Presentations, and Excel and Reporting Services—including Logo Design, Thumbnail Design, Script Writing, PowerPoint Presentations, and Excel Reports—is available standalone as either a one-time project or a monthly option.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'Does AKYIN sell standalone CRM software or operate as a managed service?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'AKYIN operates AI-assisted calling, lead qualification, and pipeline tracking internally as a managed agency service tailored to your campaign workflow rather than selling standalone SaaS CRM licenses.',
+              },
+            },
+          ],
+        },
+      ],
     },
   },
   '/marketing/automotive': {
     title: 'Car Dealership Marketing & Test-Drive Leads | AKYIN',
     description:
-      'Book qualified showroom test drives, not cold clicks. Targeted Meta & Google auto ads, lead vetting, and floor sales coaching. Get a quote.',
-    ogTitle: 'More Showroom Test Drives. Zero Cold Leads. | AKYIN',
-    ogDescription:
-      'High-intent Meta & Google auto ads, automated lead vetting, and dealer sales coaching built to fill your showroom floor faster.',
+      'Book qualified showroom test drives, not cold clicks. Targeted Meta & Google auto ads, lead vetting, and floor sales coaching for dealers. Get a quote.',
     structuredData: {
       '@context': 'https://schema.org',
       '@graph': [
@@ -441,10 +517,9 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
           url: 'https://akyin.com/marketing/automotive',
           parentOrganization: { '@type': 'Corporation', name: 'AKYIN Ventures' },
           description:
-            'Book qualified showroom test drives, not cold clicks. Targeted Meta & Google auto ads, lead vetting, and floor sales coaching. Get a quote.',
-          priceRange: '$$',
+            'Book qualified showroom test drives, not cold clicks. Targeted Meta & Google auto ads, lead vetting, and floor sales coaching for dealers. Get a quote.',
+          priceRange: '₹15,000 - ₹50,000',
           areaServed: ['IN', 'AE', 'US', 'GB'],
-          telephone: '+91-6395694011',
           email: 'connect@akyin.com',
         },
         {
@@ -490,9 +565,9 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/ventures/store': {
-    title: 'AKYIN STORE · AKYIN THRIFT — Affordable Fashion. Exceptional Discounts.',
+    title: 'AKYIN Store & AKYIN Thrift — Value Fashion Retail',
     description:
-      'Discover curated men’s and women’s fashion and clothing at exceptional discounted prices through AKYIN THRIFT under AKYIN STORE.',
+      'Shop curated men’s and women’s everyday fashion, apparel, and seasonal wardrobe collections at accessible discounted prices through AKYIN Thrift.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'ClothingStore',
@@ -505,9 +580,9 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/ventures/aicalc': {
-    title: 'AICalc.in — Smart Calculations. Powered by AI. | AKYIN Ventures',
+    title: 'AICalc.in — Smart AI & Manual Calculators | AKYIN',
     description:
-      'AICalc combines natural-language AI calculation queries with traditional manual calculator tools at aicalc.in.',
+      'Explore AICalc.in: combining natural-language AI calculation queries with classic manual financial, business, and everyday calculators online.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
@@ -516,14 +591,14 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'All',
       description:
-        'AICalc combines natural-language AI calculation queries with traditional manual calculator tools at aicalc.in.',
+        'Explore AICalc.in: combining natural-language AI calculation queries with classic manual financial, business, and everyday calculators online.',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     },
   },
   '/ventures/kartigo': {
-    title: 'Kartigo.online — B2B Stock Supply & Commerce | AKYIN Ventures',
+    title: 'Kartigo.online — B2B Stock Supply & Wholesale Trade',
     description:
-      'Connecting businesses with wholesale and commercial stock supply opportunities on Kartigo.online.',
+      'Connect with wholesale commercial inventory, bulk stock lots, and reliable B2B trade distribution opportunities across categories on Kartigo.online.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'WholesaleStore',
@@ -534,9 +609,9 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/ventures/biznxt': {
-    title: 'BizNXT.online — Business Guidance & Consulting | AKYIN Ventures',
+    title: 'BizNXT.online — Business Clarity & Consulting',
     description:
-      'Business clarity, consulting, and opportunity exploration for entrepreneurs at biznxt.online.',
+      'Practical business clarity, commercial feasibility analysis, and structured opportunity exploration for founders and SMEs at BizNXT.online.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'ConsultingService',
@@ -547,9 +622,9 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/ventures/budget-bazaar': {
-    title: 'Budget Bazaar — Affordable Retail & Everyday Goods | AKYIN Ventures',
+    title: 'Budget Bazaar — Everyday Value Retail | AKYIN Ventures',
     description:
-      'Everyday household essentials and value-first consumer retail at budgetbazaar.org.',
+      'Discover affordable household goods, everyday essentials, and value-first consumer retail selections curated at budgetbazaar.org.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'Store',
@@ -560,50 +635,94 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/pricing': {
-    title: 'Pricing & Rate Card — AKYIN Ventures & Marketing Agency',
+    title: 'Standalone Service Pricing & Quotation Builder (INR) | AKYIN Ventures',
     description:
-      'Transparent INR pricing for AKYIN Marketing Agency packages, lead filtering retainers, dealership sales training, and 1-on-1 business advisory.',
+      'Transparent INR pricing across every standalone AKYIN service—digital marketing, lead filtering, design, documents, Excel, Bulk SMS, WhatsApp setup, and training.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'WebPage',
-      name: 'Pricing & Rate Card — AKYIN Ventures',
+      name: 'Standalone Service Pricing & Quotation Builder — AKYIN Ventures',
       url: 'https://akyin.com/pricing',
       mainEntity: {
         '@type': 'OfferCatalog',
-        name: 'AKYIN Ventures Commercial Rate Card',
+        name: 'AKYIN Ventures Commercial Standalone Rate Card',
         itemListElement: [
           {
             '@type': 'Offer',
-            name: 'Package A — Complete Marketing Growth & Lead Qualification',
-            price: '49999',
+            name: 'Meta Ads Management',
+            price: '40000',
             priceCurrency: 'INR',
           },
           {
             '@type': 'Offer',
-            name: 'Package B — Lead Filtering & Qualification Only',
-            price: '19999',
+            name: 'Lead Filtering & Qualification',
+            price: '24000',
+            priceCurrency: 'INR',
+          },
+          {
+            '@type': 'Offer',
+            name: 'Bulk SMS Marketing (10,000 Credits)',
+            price: '3000',
+            priceCurrency: 'INR',
+          },
+          {
+            '@type': 'Offer',
+            name: 'WhatsApp Business Messaging Setup (One-Time Setup)',
+            price: '4999',
             priceCurrency: 'INR',
           },
           {
             '@type': 'Offer',
             name: 'Commercial & Dealership Sales Training',
-            price: '25000',
+            price: '50000',
             priceCurrency: 'INR',
           },
           {
             '@type': 'Offer',
             name: '1-on-1 Business Advisory (30 min IST)',
-            price: '1999',
+            price: '3998',
             priceCurrency: 'INR',
           },
         ],
       },
     },
   },
-  '/advisory': {
-    title: 'Business Advisory & Consultation Booking — AKYIN Ventures',
+  '/tools': {
+    title: '20 Free Business, Marketing & Sales Tools | AKYIN.com',
     description:
-      'Your Business. Your Vision. A Clearer Direction. Schedule a 1-on-1 Business Advisory consultation with AKYIN Ventures.',
+      'Calculate marketing ROI, ROAS, CAC, CPL, break-even, GST, margins, commissions, and campaign quotes with 20 free interactive AKYIN business tools.',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'AKYIN Business, Marketing & Sales Calculators Suite',
+      url: 'https://akyin.com/tools',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'All',
+      description:
+        'Suite of 20 free interactive calculators covering marketing ROI, ROAS, CAC, CPL, conversion rates, profit margins, break-even units, GST, sales commissions, and quotation estimates.',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'INR',
+      },
+      provider: { '@id': 'https://akyin.com/#organization' },
+    },
+  },
+  '/quote': {
+    title: 'Official Quotation & Invoice Portal | AKYIN Ventures',
+    description:
+      'Review your AKYIN Ventures itemized commercial quotation, approve online, print an A4 PDF dossier, and complete verified Razorpay invoice payments.',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'AKYIN Ventures Quotation Portal',
+      url: 'https://akyin.com/quote',
+    },
+  },
+  '/advisory': {
+    title: 'Book 1-on-1 Business Advisory (IST) | AKYIN Ventures',
+    description:
+      'Schedule a private 30-minute IST business advisory consultation with AKYIN Ventures for strategy, unit economics, feasibility, and sales conversion.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'Service',
@@ -613,18 +732,18 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
       serviceType: 'Executive Business Advisory Session',
       description:
         '1-on-1 strategic consultation addressing business feasibility, sales conversion discipline, and venture execution on India Standard Time (Asia/Kolkata).',
-      areaServed: 'Global',
+      areaServed: ['IN', 'AE', 'Global'],
       offers: {
         '@type': 'Offer',
-        price: '1999',
+        price: '3998',
         priceCurrency: 'INR',
       },
     },
   },
   '/insights': {
-    title: 'Insights & Business Philosophy — AKYIN Ventures',
+    title: 'Business Insights & Automotive Trends | AKYIN Ventures',
     description:
-      'Operational perspectives across publishing, full-service agency marketing, automotive dealership growth trends, fashion retail, AI tools, and B2B commerce.',
+      'Read practical perspectives on performance marketing, dealership test-drive conversion, publishing, retail positioning, and digital commerce from AKYIN.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
@@ -635,9 +754,9 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/terms': {
-    title: 'Terms of Service — AKYIN Ventures | akyin.com',
+    title: 'Terms of Service & Billing Policy | AKYIN Ventures',
     description:
-      'Terms of Service, direct ad platform billing rules, service scope separation, and governance policies for AKYIN Ventures.',
+      'Read AKYIN Ventures Terms of Service, direct Meta & Google ad billing transparency, scope separation rules, and international commercial policies.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'WebPage',
@@ -646,9 +765,9 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/privacy': {
-    title: 'Privacy Policy — AKYIN Ventures | akyin.com',
+    title: 'Privacy Policy & Data Protection | AKYIN Ventures',
     description:
-      'Zero-broker data privacy, enquiry validation, and security standards across AKYIN Ventures.',
+      'Learn how AKYIN Ventures protects enquiry data with strict CSP rules, zero data-broker sharing, and verified security standards across akyin.com.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'WebPage',
@@ -657,9 +776,9 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
     },
   },
   '/contact': {
-    title: 'Contact AKYIN Ventures — Let’s Start a Conversation',
+    title: 'Contact AKYIN Ventures — Enquiry & Advisory Desk',
     description:
-      'Direct enquiry desk for AKYIN Ventures, AKYIN Publishing, AKYIN MARKETINGS Agency, AKYIN STORE, AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar.',
+      'Connect directly with AKYIN Ventures for marketing retainers, automotive lead systems, publishing, B2B commerce, and advisory across India and the UAE.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'ContactPage',
@@ -668,15 +787,15 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
       mainEntity: {
         '@type': 'Corporation',
         name: 'AKYIN Ventures',
-        telephone: '+91-6395694011',
+        url: 'https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U',
         email: 'connect@akyin.com',
       },
     },
   },
   '/sitemap': {
-    title: 'Site Map & Directory — AKYIN Ventures | akyin.com',
+    title: 'Site Map & Complete Page Directory | AKYIN Ventures',
     description:
-      'Complete website directory of AKYIN Ventures corporate pages, operating verticals, key sections, and official external platforms.',
+      'Browse all corporate pages, business calculators, operating venture showcases, pricing schedules, and official AKYIN Ventures channels in one directory.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'ItemPage',
@@ -686,7 +805,8 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
   },
   '/admin': {
     title: 'AKYIN Ventures — Admin Management Console',
-    description: 'Restricted operations and calendar administration console for AKYIN Ventures.',
+    description:
+      'Restricted internal CRM, quotation, payment, and operational administration console for authorized AKYIN Ventures personnel.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'WebPage',
@@ -697,8 +817,12 @@ const ROUTE_META: Record<AppRoute, RouteMetadata> = {
 };
 
 function parseRoute(pathname: string): AppRoute {
-  const cleaned = pathname.replace(/\/+$/, '') || '/';
-  if (VALID_ROUTES.includes(cleaned as AppRoute)) {
+  const pathWithoutHash = pathname.split('#')[0];
+  const cleaned = pathWithoutHash.replace(/\/+$/, '') || '/';
+  if (VALID_ROUTES.includes(cleaned as StaticRoute)) {
+    return cleaned as AppRoute;
+  }
+  if (/^\/services\/[a-z0-9-]+$/i.test(cleaned)) {
     return cleaned as AppRoute;
   }
   return '/';
@@ -706,6 +830,7 @@ function parseRoute(pathname: string): AppRoute {
 
 function AppShell() {
   const shouldReduceMotion = useReducedMotion();
+  const { routeMetaMap } = useRouteMeta();
   const [currentRoute, setCurrentRoute] = useState<AppRoute>(() =>
     typeof window !== 'undefined' ? parseRoute(window.location.pathname) : '/'
   );
@@ -793,7 +918,10 @@ function AppShell() {
   }, [currentRoute]);
 
   useEffect(() => {
-    const meta = ROUTE_META[currentRoute];
+    const meta = !currentRoute.startsWith('/services/')
+      ? (routeMetaMap[currentRoute] ?? ROUTE_META[currentRoute as StaticRoute])
+      : null;
+
     if (meta) {
       document.title = meta.title;
 
@@ -814,24 +942,94 @@ function AppShell() {
       }
       descTag.setAttribute('content', meta.description);
 
-      // Update OpenGraph & Twitter tags
-      const ogTitleValue = meta.ogTitle || meta.title;
-      const ogDescValue = meta.ogDescription || meta.description;
+      // Enforce index/noindex directives per route
+      const isPrivateRoute = currentRoute === '/admin' || currentRoute === '/quote';
+      const robotsContent = isPrivateRoute
+        ? 'noindex, nofollow'
+        : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+      let robotsTag = document.querySelector('meta[name="robots"]');
+      if (!robotsTag) {
+        robotsTag = document.createElement('meta');
+        robotsTag.setAttribute('name', 'robots');
+        document.head.appendChild(robotsTag);
+      }
+      robotsTag.setAttribute('content', robotsContent);
 
+      // Update OpenGraph & Twitter tags (strictly keep og:title identical to <title>)
+      const ogTitleValue = meta.title;
+      const ogDescValue = meta.ogDescription || meta.description;
+      const ogTypeValue = currentRoute === '/insights' ? 'article' : 'website';
+
+      const ogType = document.querySelector('meta[property="og:type"]');
+      if (ogType) ogType.setAttribute('content', ogTypeValue);
       const ogTitle = document.querySelector('meta[property="og:title"]');
       if (ogTitle) ogTitle.setAttribute('content', ogTitleValue);
       const ogDesc = document.querySelector('meta[property="og:description"]');
       if (ogDesc) ogDesc.setAttribute('content', ogDescValue);
       const ogUrl = document.querySelector('meta[property="og:url"]');
       if (ogUrl) ogUrl.setAttribute('content', canonicalUrl);
+      const ogImgAlt = document.querySelector('meta[property="og:image:alt"]');
+      if (ogImgAlt) ogImgAlt.setAttribute('content', ogTitleValue);
 
       const twTitle = document.querySelector('meta[name="twitter:title"]');
       if (twTitle) twTitle.setAttribute('content', ogTitleValue);
       const twDesc = document.querySelector('meta[name="twitter:description"]');
       if (twDesc) twDesc.setAttribute('content', ogDescValue);
+      const twImgAlt = document.querySelector('meta[name="twitter:image:alt"]');
+      if (twImgAlt) twImgAlt.setAttribute('content', ogTitleValue);
 
-      // Inject / update Schema.org structured data (JSON-LD)
+      // Inject / update Schema.org structured data (JSON-LD) with automatic BreadcrumbList for sub-routes
       if (meta.structuredData) {
+        let finalSchema: Record<string, unknown> = meta.structuredData;
+        if (currentRoute !== '/' && currentRoute !== '/admin') {
+          const segments = currentRoute.split('/').filter(Boolean);
+          const breadcrumbItems = [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'Home',
+              item: 'https://akyin.com/',
+            },
+            ...segments.map((seg, idx) => {
+              const segPath = `/${segments.slice(0, idx + 1).join('/')}`;
+              const label =
+                segPath === '/marketing'
+                  ? 'AKYIN Marketing'
+                  : segPath === '/ventures'
+                    ? 'Our Ventures'
+                    : meta.title.split('—')[0].split('|')[0].trim();
+              return {
+                '@type': 'ListItem',
+                position: idx + 2,
+                name: idx === segments.length - 1 ? meta.title.split('—')[0].split('|')[0].trim() : label,
+                item: `https://akyin.com${segPath === '/marketing' ? '/ventures/marketing' : segPath}`,
+              };
+            }),
+          ];
+          const breadcrumbNode = {
+            '@type': 'BreadcrumbList',
+            itemListElement: breadcrumbItems,
+          };
+          if (Array.isArray((meta.structuredData as { '@graph'?: unknown[] })['@graph'])) {
+            finalSchema = {
+              '@context': 'https://schema.org',
+              '@graph': [
+                ...((meta.structuredData as { '@graph': unknown[] })['@graph'] || []),
+                breadcrumbNode,
+              ],
+            };
+          } else {
+            const { ['@context']: _ctx, ...primaryNode } = meta.structuredData as Record<
+              string,
+              unknown
+            >;
+            finalSchema = {
+              '@context': 'https://schema.org',
+              '@graph': [primaryNode, breadcrumbNode],
+            };
+          }
+        }
+
         let scriptTag = document.getElementById('akyin-schema-jsonld') as HTMLScriptElement | null;
         if (!scriptTag) {
           scriptTag = document.createElement('script');
@@ -839,17 +1037,31 @@ function AppShell() {
           scriptTag.type = 'application/ld+json';
           document.head.appendChild(scriptTag);
         }
-        scriptTag.textContent = JSON.stringify(meta.structuredData);
+        scriptTag.textContent = JSON.stringify(finalSchema);
       }
     }
-  }, [currentRoute]);
+  }, [currentRoute, routeMetaMap]);
 
   const navigate = useCallback((route: AppRoute) => {
-    setCurrentRoute(route);
-    if (window.location.pathname !== route || window.location.hash) {
-      window.history.pushState({}, '', route);
+    const [rawPath, hashPart] = route.split('#');
+    const parsed = parseRoute(rawPath || '/');
+    setCurrentRoute(parsed);
+    const fullTarget = hashPart ? `${parsed}#${hashPart}` : parsed;
+    if (window.location.pathname !== parsed || (hashPart && window.location.hash !== `#${hashPart}`) || (!hashPart && window.location.hash)) {
+      window.history.pushState({}, '', fullTarget);
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (hashPart) {
+      window.setTimeout(() => {
+        const targetEl = document.getElementById(hashPart);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 120);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }, []);
 
   useEffect(() => {
@@ -881,6 +1093,11 @@ function AppShell() {
   }
 
   const renderPage = () => {
+    if (currentRoute.startsWith('/services/')) {
+      const slug = currentRoute.slice('/services/'.length);
+      return <ServiceDetailPage slug={slug} onNavigate={navigate} />;
+    }
+
     switch (currentRoute) {
       case '/':
         return <HomePage onNavigate={navigate} onStartEnquiry={handleStartEnquiry} />;
@@ -908,6 +1125,10 @@ function AppShell() {
         return <BudgetBazaarPage />;
       case '/pricing':
         return <PricingPage onNavigate={navigate} onStartEnquiry={handleStartEnquiry} />;
+      case '/tools':
+        return <ToolsPage onNavigate={navigate} />;
+      case '/quote':
+        return <QuotePortalPage onNavigate={navigate} />;
       case '/advisory':
         return <AdvisoryPage onNavigate={navigate} />;
       case '/insights':
@@ -979,7 +1200,9 @@ function AppShell() {
 export default function App() {
   return (
     <SiteConfigProvider>
-      <AppShell />
+      <RouteMetaProvider defaultRouteMeta={ROUTE_META}>
+        <AppShell />
+      </RouteMetaProvider>
     </SiteConfigProvider>
   );
 }

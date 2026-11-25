@@ -15,6 +15,7 @@ import {
   EcosystemRelationshipType,
 } from '../data/ecosystemConfig';
 import { sanitizeHref } from '../utils/security';
+import { suiteApi } from '../services/suiteApi';
 import { EditorialReveal } from './EditorialReveal';
 import { GlassPanel } from './liquid-glass';
 
@@ -317,6 +318,10 @@ function useIntersectionVisible(ref: React.RefObject<HTMLDivElement | null>) {
 
 export function EcosystemSection({ onNavigate }: EcosystemSectionProps) {
   const [activeFilter, setActiveFilter] = useState<RelationshipFilter>('all');
+  const [liveTickerClients, setLiveTickerClients] = useState<EcosystemBrandEntry[]>(
+    ECOSYSTEM_CLIENTS_TICKER
+  );
+  const [reportedClientsCount, setReportedClientsCount] = useState<number>(58);
   const brandRowRef = useRef<HTMLDivElement>(null);
   const categoryRowRef = useRef<HTMLDivElement>(null);
   const platformRowRef = useRef<HTMLDivElement>(null);
@@ -324,6 +329,31 @@ export function EcosystemSection({ onNavigate }: EcosystemSectionProps) {
   const brandVis = useIntersectionVisible(brandRowRef);
   const categoryVis = useIntersectionVisible(categoryRowRef);
   const platformVis = useIntersectionVisible(platformRowRef);
+
+  useEffect(() => {
+    let active = true;
+    suiteApi
+      .fetchPublicTicker()
+      .then((res) => {
+        if (!active || !res?.clients) return;
+        setReportedClientsCount(res.reportedClientsHandled || 58);
+        setLiveTickerClients(
+          res.clients.map((c) => ({
+            id: c.id,
+            name: c.name,
+            relationshipLabel: 'Client',
+            category: 'client',
+            externalUrl: c.websiteUrl && c.websiteUrl.startsWith('http') ? c.websiteUrl : undefined,
+            internalRoute: (c.internalShowcaseRoute || undefined) as AppRoute | undefined,
+            wordmarkStyle: c.wordmarkStyle || 'sans',
+          }))
+        );
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const filteredRecords = useMemo(() => {
     if (activeFilter === 'all') return CLIENT_ECOSYSTEM_RECORDS;
@@ -364,11 +394,11 @@ export function EcosystemSection({ onNavigate }: EcosystemSectionProps) {
             <div className="lg:col-span-4">
               <GlassPanel className="rounded-3xl p-5 sm:p-6 border border-[#E8E8ED] space-y-1.5">
                 <div className="flex items-baseline justify-between gap-3">
-                  <span className="font-mono-num text-3xl sm:text-4xl font-bold tracking-tight text-[#1D1D1F]">
-                    {ECOSYSTEM_STATS.clientsHandledCount}
+                  <span className="font-mono-num text-2xl sm:text-3xl font-bold tracking-tight text-[#1D1D1F]">
+                    {reportedClientsCount} Clients Currently Handled
                   </span>
-                  <span className="text-xs font-semibold text-[#0071E3]">
-                    Verified Portfolio &amp; Client Metric
+                  <span className="text-xs font-semibold text-[#0071E3] whitespace-nowrap">
+                    Verified Portfolio
                   </span>
                 </div>
                 <p className="font-display text-sm font-bold text-[#1D1D1F]">
@@ -446,7 +476,7 @@ export function EcosystemSection({ onNavigate }: EcosystemSectionProps) {
                   Category B · OUR CLIENTS (Independent Businesses Supported for Growth)
                 </span>
                 <span className="text-[11px] font-semibold text-[#0071E3]">
-                  58 Clients Portfolio
+                  {reportedClientsCount} Clients Currently Handled · {liveTickerClients.length} Shown
                 </span>
               </div>
 
@@ -454,13 +484,13 @@ export function EcosystemSection({ onNavigate }: EcosystemSectionProps) {
                 aria-label="Category B — AKYIN Client Relationships Ticker"
                 className="akyin-marquee-container relative overflow-x-auto sm:overflow-hidden py-1.5 [mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent)]"
               >
-                {brandVis.hasIntersected && (
+                {brandVis.hasIntersected && liveTickerClients.length > 0 && (
                   <div
                     className="akyin-marquee-track-right"
                     style={brandVis.isVisible ? undefined : { animationPlayState: 'paused' }}
                   >
                     <div className="flex items-center motion-reduce:flex-wrap motion-reduce:gap-y-3">
-                      {ECOSYSTEM_CLIENTS_TICKER.map((entry) => (
+                      {liveTickerClients.map((entry) => (
                         <GenericBrandTickerCard
                           key={`cli-a-${entry.id}`}
                           entry={entry}
@@ -469,7 +499,7 @@ export function EcosystemSection({ onNavigate }: EcosystemSectionProps) {
                       ))}
                     </div>
                     <div className="flex items-center motion-reduce:hidden" aria-hidden="true">
-                      {ECOSYSTEM_CLIENTS_TICKER.map((entry) => (
+                      {liveTickerClients.map((entry) => (
                         <GenericBrandTickerCard
                           key={`cli-b-${entry.id}`}
                           entry={entry}

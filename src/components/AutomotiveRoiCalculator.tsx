@@ -61,7 +61,7 @@ const VEHICLE_CLASSES: VehicleClassConfig[] = [
 ];
 
 const MEDIA_BUDGET_PRESETS = [50000, 100000, 200000, 350000, 500000];
-const AKYIN_MONTHLY_RETAINER_INR = 49999;
+const AKYIN_MONTHLY_RETAINER_INR = 99998;
 
 interface AutomotiveRoiCalculatorProps {
   onApplyPlan?: (summaryText: string) => void;
@@ -322,7 +322,7 @@ export function AutomotiveRoiCalculator({ onApplyPlan }: AutomotiveRoiCalculator
                     {metrics.marginRoiMultiple}x
                   </motion.p>
                   <p className="text-xs text-[#6E6E73] mt-1">
-                    ~{formatCompactInr(metrics.estGrossMargin)} est. dealer margin vs. media + ₹49,999 fee
+                    ~{formatCompactInr(metrics.estGrossMargin)} est. dealer margin vs. media + ₹99,998 fee
                   </p>
                 </GlassCard>
               </div>

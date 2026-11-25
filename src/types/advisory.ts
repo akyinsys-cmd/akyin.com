@@ -221,8 +221,8 @@ export const DEFAULT_WEBSITE_SETTINGS: WebsiteSettingsMap = {
   advisoryMaxBookings: '2',
   notificationEmail: 'connect@akyin.com',
   contactEmail: 'connect@akyin.com',
-  contactPhone: '+91 63956 94011',
-  whatsappNumber: '916395694011',
+  contactPhone: '',
+  whatsappNumber: '',
   heroHeadline: 'Building Ideas Into Businesses.',
   heroSubheadline:
     'AKYIN Ventures brings together diverse business initiatives across publishing, marketing, retail, digital technology, B2B commerce and business consulting.',

@@ -660,7 +660,7 @@ export function AutomotiveDealershipDossier({
         <div className="dossier-print-footer">
           <div>
             <strong>AKYIN Ventures · Automotive Marketing</strong>
-            <span>Shaikh Nazir · +91-6395694011 · akyinsys@gmail.com</span>
+            <span>Shaikh Nazir · connect@akyin.com · WhatsApp Connect</span>
           </div>
           <div className="dossier-print-footer-meta-qr">
             <div className="dossier-print-footer-right">

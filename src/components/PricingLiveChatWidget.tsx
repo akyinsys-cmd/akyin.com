@@ -44,40 +44,40 @@ interface QuickIntentOption {
 
 const QUICK_INTENTS: QuickIntentOption[] = [
   {
-    id: 'pkg-compare',
-    label: 'Compare Package A vs B',
+    id: 'meta-ads',
+    label: 'Meta & Google Ads Management',
     reply:
-      'Package A (₹39,999 setup + ₹49,999/mo) covers full Meta & Google ad management plus lead filtering. Package B (₹14,999 setup + ₹19,999/mo) filters & qualifies your existing inbound leads without ad management. Share your details below for a custom scope note:',
-    enquiryType: ENQUIRY_TYPE_OPTIONS[0],
+      'Meta lead generation management is priced standalone at ₹40,000/month (with optional ₹79,998 onboarding setup; ad spend paid directly to Meta/Google). Share your details below to receive a customized standalone proposal:',
+    enquiryType: 'Meta Ads Management',
     vertical: 'Akyin Marketing',
-    defaultNote: 'Interested in comparing Package A vs Package B for our business.',
+    defaultNote: 'Interested in standalone Meta & Google Ads management.',
   },
   {
-    id: 'auto-growth',
-    label: 'Automotive Dealership Quote',
+    id: 'lead-filtering',
+    label: 'Lead Filtering & Qualification',
     reply:
-      'Our Automotive Marketing team structures dedicated test-drive campaigns, AI-assisted buyer screening, and showroom sales coaching with transparent platform billing. Complete the quick enquiry below to receive a dealership rollout plan:',
-    enquiryType: ENQUIRY_TYPE_OPTIONS[1] || ENQUIRY_TYPE_OPTIONS[0],
+      'Lead Filtering & Qualification (₹24,000/month, strictly separate from ad generation) vets existing enquiries into Hot, Warm, and Follow-up priorities. Complete the quick enquiry below for workflow details:',
+    enquiryType: 'Lead Filtering & Qualification',
     vertical: 'Akyin Marketing',
-    defaultNote: 'Looking for an automotive dealership lead generation & test-drive growth proposal.',
+    defaultNote: 'Looking for standalone Lead Filtering & Qualification support.',
+  },
+  {
+    id: 'sms-whatsapp',
+    label: 'Bulk SMS & WhatsApp Setup',
+    reply:
+      'Bulk SMS Marketing starts at ₹3,000 for 10,000 SMS (₹0.30/SMS). WhatsApp Business Messaging Setup is ₹4,999 one-time setup with ₹1.50/message usage billed separately. Submit below to configure your quote:',
+    enquiryType: 'Bulk SMS Marketing',
+    vertical: 'Akyin Marketing',
+    defaultNote: 'Enquiring about Bulk SMS (₹3,000) / WhatsApp Business Setup (₹4,999 + usage separate).',
   },
   {
     id: 'sales-training',
-    label: 'Sales Team Training (₹25,000)',
+    label: 'Sales Team Training (₹50,000)',
     reply:
-      'On-site & live floor sales training workshops are priced at ₹25,000 per session. Enter your city and team size below so our team can confirm available dates:',
-    enquiryType: ENQUIRY_TYPE_OPTIONS[2] || ENQUIRY_TYPE_OPTIONS[0],
+      'On-site & live floor sales training workshops are priced at ₹50,000 per session. Enter your city and team size below so our team can confirm available dates:',
+    enquiryType: 'Commercial & Dealership Sales Training Workshop',
     vertical: 'Akyin Marketing',
-    defaultNote: 'Enquiring about Commercial / Dealership Sales Training (₹25,000 per session).',
-  },
-  {
-    id: 'custom-rate',
-    label: 'Custom Rate Card Bundle',
-    reply:
-      'We can bundle individual services from our 21-item rate card (from ₹2,000/creative to CRM setup & performance retainers). Let us know which deliverables you need below:',
-    enquiryType: ENQUIRY_TYPE_OPTIONS[0],
-    vertical: 'Akyin Marketing',
-    defaultNote: 'Requesting a custom service bundle quote from the 21-item INR rate card.',
+    defaultNote: 'Enquiring about Commercial / Dealership Sales Training (₹50,000 per session).',
   },
 ];
 
@@ -90,7 +90,7 @@ export function PricingLiveChatWidget({ onStartEnquiry }: PricingLiveChatWidgetP
     {
       id: 'welcome',
       sender: 'agent',
-      text: 'Welcome to the AKYIN Commercial Desk. Need help choosing Package A (₹49,999/mo), Package B (₹19,999/mo), or a custom dealership quote? Pick a topic or send a message to start your enquiry.',
+      text: 'Welcome to the AKYIN Commercial Desk. All services are 100% standalone—choose a service below (Meta Ads, Lead Filtering, Bulk SMS ₹3,000, WhatsApp Setup ₹4,999, Sales Training ₹50,000) or ask for a tailored quotation.',
     },
   ]);
 
@@ -480,7 +480,7 @@ export function PricingLiveChatWidget({ onStartEnquiry }: PricingLiveChatWidgetP
         className="liquid-glass-pill-dark inline-flex items-center gap-2.5 px-4 py-3 rounded-full text-white text-xs sm:text-sm font-semibold shadow-[0_14px_34px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:-translate-y-0.5 cursor-pointer"
       >
         <MessageSquare className="w-4 h-4" aria-hidden="true" />
-        <span>{isOpen ? 'Close Concierge' : `Pricing Chat · ${OFFICIAL_CONTACT.phoneDisplay}`}</span>
+        <span>{isOpen ? 'Close Concierge' : 'Pricing Chat · WhatsApp Connect'}</span>
       </button>
     </div>
   );

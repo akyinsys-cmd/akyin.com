@@ -5,6 +5,7 @@ import {
   BookOpen,
   Briefcase,
   FileText,
+  Layers,
   Search,
   X,
 } from 'lucide-react';
@@ -15,9 +16,10 @@ import {
   PUBLISHING_BOOKS,
   VENTURES_PORTFOLIO,
 } from '../data/akyinData';
+import { SuiteServiceItem, suiteApi } from '../services/suiteApi';
 import { sanitizeHref } from '../utils/security';
 
-type SearchCategory = 'all' | 'venture' | 'page' | 'book';
+type SearchCategory = 'all' | 'service' | 'venture' | 'page' | 'book';
 
 interface SearchEntry {
   id: string;
@@ -69,21 +71,30 @@ const CORPORATE_SEARCH_ENTRIES: SearchEntry[] = [
   },
   {
     id: 'page-pricing',
-    title: 'Pricing & 21-Item Rate Card',
-    subtitle: 'Transparent INR retainers (Package A & B), sales training & advisory fees',
+    title: 'Standalone Pricing & Quotation Builder',
+    subtitle: 'Transparent standalone INR rates, Bulk SMS, WhatsApp setup & custom quotes',
     category: 'page',
     categoryLabel: 'Pricing',
     route: '/pricing',
-    keywords: 'pricing rate card cost fees package a package b 49999 19999 25000 razorpay payment',
+    keywords: 'pricing rate card cost fees standalone bulk sms whatsapp setup 40000 24000 50000 3998 3000 4999 razorpay quotation',
+  },
+  {
+    id: 'page-tools',
+    title: 'Business & Marketing Calculators (20 Tools)',
+    subtitle: 'ROI, ROAS, CAC, CPL, break-even, GST, margin, commission & quotation tools',
+    category: 'page',
+    categoryLabel: 'Tools Suite',
+    route: '/tools',
+    keywords: 'tools calculators roi roas cac cpl conversion funnel break even gst discount margin commission proposal booking',
   },
   {
     id: 'page-advisory',
     title: 'Business Advisory Booking',
-    subtitle: 'Schedule a 1-on-1 30-minute IST strategy consultation (₹1,999)',
+    subtitle: 'Schedule a 1-on-1 30-minute IST strategy consultation (₹3,998)',
     category: 'page',
     categoryLabel: 'Consultation',
     route: '/advisory',
-    keywords: 'business advisory booking consultation schedule calendar 1-on-1 ist strategy',
+    keywords: 'business advisory booking consultation schedule calendar 1-on-1 ist strategy 3998',
   },
   {
     id: 'page-insights',
@@ -97,11 +108,11 @@ const CORPORATE_SEARCH_ENTRIES: SearchEntry[] = [
   {
     id: 'page-contact',
     title: 'Contact AKYIN Ventures',
-    subtitle: 'Shaikh Nazir · connect@akyin.com · +91 63956 94011 (India & UAE)',
+    subtitle: 'Shaikh Nazir · connect@akyin.com · WhatsApp Connect (India & UAE)',
     category: 'page',
     categoryLabel: 'Contact',
     route: '/contact',
-    keywords: 'contact enquiry email phone shaikh nazir india uae 63956 94011 connect',
+    keywords: 'contact enquiry email whatsapp connect shaikh nazir india uae',
   },
   {
     id: 'page-terms',
@@ -180,6 +191,7 @@ const QUICK_FEATURED_IDS = [
 
 const CATEGORY_TABS: { id: SearchCategory; label: string }[] = [
   { id: 'all', label: 'All' },
+  { id: 'service', label: 'Services' },
   { id: 'venture', label: 'Ventures' },
   { id: 'page', label: 'Info Pages' },
   { id: 'book', label: 'Books' },
@@ -196,7 +208,42 @@ export function HeaderSearch({ open, onClose, onNavigate }: HeaderSearchProps) {
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<SearchCategory>('all');
   const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const [liveServices, setLiveServices] = useState<SuiteServiceItem[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!open || liveServices.length > 0) return;
+    let active = true;
+    suiteApi
+      .fetchPublicServices()
+      .then((res) => {
+        if (!active) return;
+        setLiveServices((res.services || []).filter((s) => s.active && Boolean(s.slug)));
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [open, liveServices.length]);
+
+  const serviceSearchEntries = useMemo<SearchEntry[]>(
+    () =>
+      liveServices.map((srv) => ({
+        id: `srv-${srv.id}`,
+        title: srv.name,
+        subtitle: `${srv.category} — ${srv.description}`,
+        category: 'service',
+        categoryLabel: srv.category,
+        route: `/services/${srv.slug}` as AppRoute,
+        keywords: `${srv.name} ${srv.slug} ${srv.category} ${srv.description} ${(srv.deliverables || []).join(' ')}`.toLowerCase(),
+      })),
+    [liveServices]
+  );
+
+  const combinedEntries = useMemo(
+    () => [...serviceSearchEntries, ...ALL_SEARCH_ENTRIES],
+    [serviceSearchEntries]
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -223,13 +270,13 @@ export function HeaderSearch({ open, onClose, onNavigate }: HeaderSearchProps) {
 
     const pool =
       activeCategory === 'all'
-        ? ALL_SEARCH_ENTRIES
-        : ALL_SEARCH_ENTRIES.filter((entry) => entry.category === activeCategory);
+        ? combinedEntries
+        : combinedEntries.filter((entry) => entry.category === activeCategory);
 
     if (!trimmed) {
       if (activeCategory === 'all') {
         return QUICK_FEATURED_IDS.map((id) =>
-          ALL_SEARCH_ENTRIES.find((item) => item.id === id)
+          combinedEntries.find((item) => item.id === id)
         ).filter((item): item is SearchEntry => Boolean(item));
       }
       return pool.slice(0, 8);
@@ -257,9 +304,9 @@ export function HeaderSearch({ open, onClose, onNavigate }: HeaderSearchProps) {
       })
       .filter((item): item is { entry: SearchEntry; score: number } => item !== null)
       .sort((a, b) => b.score - a.score)
-      .slice(0, 10)
+      .slice(0, 12)
       .map((item) => item.entry);
-  }, [query, activeCategory]);
+  }, [query, activeCategory, combinedEntries]);
 
   useEffect(() => {
     setHighlightedIndex(0);
@@ -292,6 +339,9 @@ export function HeaderSearch({ open, onClose, onNavigate }: HeaderSearchProps) {
   };
 
   const renderIcon = (category: Exclude<SearchCategory, 'all'>) => {
+    if (category === 'service') {
+      return <Layers className="w-4 h-4 text-[#0071E3]" aria-hidden="true" />;
+    }
     if (category === 'venture') {
       return <Briefcase className="w-4 h-4 text-[#0071E3]" aria-hidden="true" />;
     }

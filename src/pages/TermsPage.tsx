@@ -1,4 +1,4 @@
-import { ArrowRight, FileCheck2, Lock, Mail, Phone, ShieldCheck } from 'lucide-react';
+import { ArrowRight, FileCheck2, Lock, Mail, MessageCircle, ShieldCheck } from 'lucide-react';
 import { AppRoute, OFFICIAL_CONTACT } from '../data/akyinData';
 import { EditorialReveal } from '../components/EditorialReveal';
 import { GlassButton, GlassPanel } from '../components/liquid-glass';
@@ -45,11 +45,13 @@ export function TermsPage({ onNavigate, section = 'terms' }: TermsPageProps) {
             </a>
             <span aria-hidden="true" className="text-[#A1A1A6]">·</span>
             <a
-              href={`tel:+${OFFICIAL_CONTACT.whatsappNumber}`}
-              className="inline-flex items-center gap-1.5 font-mono-num font-semibold text-[#1D1D1F] hover:underline"
+              href={OFFICIAL_CONTACT.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 font-semibold text-[#1D1D1F] hover:text-[#0071E3] hover:underline"
             >
-              <Phone className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>{OFFICIAL_CONTACT.phoneDisplay}</span>
+              <MessageCircle className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>WhatsApp Connect</span>
             </a>
           </div>
         </div>
@@ -91,7 +93,7 @@ export function TermsPage({ onNavigate, section = 'terms' }: TermsPageProps) {
                 <strong className="text-[#1D1D1F]">Strict Service Separation:</strong> Lead Generation (acquiring new buyer enquiries) and Lead Filtering &amp; Qualification (screening existing inbound enquiries) are independent deliverables. AI-assisted calling and CRM pipeline tracking are operated internally by AKYIN as a managed service—not sold as standalone SaaS software.
               </p>
               <p>
-                <strong className="text-[#1D1D1F]">Pricing &amp; Taxes:</strong> Published INR fees (Package A ₹39,999 setup / ₹49,999 monthly; Package B ₹14,999 setup / ₹19,999 monthly; Sales Training ₹25,000/session) are indicative and subject to a mutually approved written proposal prior to kickoff. Applicable GST is extra.
+                <strong className="text-[#1D1D1F]">Pricing &amp; Taxes:</strong> Published standalone INR fees (from ₹3,000 for 10,000 Bulk SMS credits and ₹4,999 one-time WhatsApp Business setup up to ₹50,000 per sales training session and ₹79,998 onboarding setup) are indicative and subject to a mutually approved written proposal prior to kickoff. Applicable GST is extra.
               </p>
             </div>
           </GlassPanel>
@@ -117,9 +119,14 @@ export function TermsPage({ onNavigate, section = 'terms' }: TermsPageProps) {
                   <a href={`mailto:${OFFICIAL_CONTACT.email}`} className="font-semibold text-[#1D1D1F] underline">
                     {OFFICIAL_CONTACT.email}
                   </a>{' '}
-                  or call{' '}
-                  <a href={`tel:+${OFFICIAL_CONTACT.whatsappNumber}`} className="font-mono-num font-semibold text-[#1D1D1F] underline">
-                    {OFFICIAL_CONTACT.phoneDisplay}
+                  or reach us via{' '}
+                  <a
+                    href={OFFICIAL_CONTACT.whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-[#1D1D1F] underline"
+                  >
+                    WhatsApp Connect
                   </a>.
                 </p>
               </div>

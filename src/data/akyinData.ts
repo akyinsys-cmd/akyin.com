@@ -16,8 +16,11 @@ export type AppRoute =
   | '/terms'
   | '/privacy'
   | '/contact'
+  | '/tools'
+  | '/quote'
   | '/sitemap'
-  | '/admin';
+  | '/admin'
+  | `/services/${string}`;
 
 export interface VentureOverview {
   id: string;
@@ -39,7 +42,8 @@ export type ServiceCategory =
   | 'lead-crm'
   | 'creative-media'
   | 'campaigns-local'
-  | 'sales-training';
+  | 'sales-training'
+  | 'creative-docs';
 
 export interface MarketingService {
   id: string;
@@ -82,15 +86,29 @@ export interface RateCardItem {
   notes: string;
 }
 
+export const SERVICE_MARKETPLACE_CATEGORIES = [
+  'Automotive Marketing',
+  'Digital Marketing',
+  'Social Media Management',
+  'Creative and Graphic Design',
+  'Video and Content Services',
+  'Business Documents and Presentations',
+  'Excel and Reporting Services',
+  'Messaging and Communication',
+  'Lead Management and CRM',
+  'Business Consulting and Training',
+] as const;
+
+export const MESSAGING_DISCLAIMER =
+  'Messaging rates are subject to provider charges, applicable taxes, message category, destination and delivery conditions. Final charges are confirmed in the quotation.';
+
 export const OFFICIAL_CONTACT = {
   parentBrand: 'AKYIN VENTURES',
   contactName: 'Shaikh Nazir',
   domain: 'https://akyin.com',
   websiteLabel: 'akyin.com',
   email: 'connect@akyin.com',
-  phoneDisplay: '+91 63956 94011',
-  phoneHref: 'tel:+916395694011',
-  whatsappNumber: '916395694011',
+  whatsappLabel: 'WhatsApp Connect',
   whatsappChannelUrl: 'https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U',
   whatsappUrl: 'https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U',
   internationalPositioning: 'Building Businesses. Creating Opportunities.',
@@ -428,38 +446,34 @@ export const ECOSYSTEM_VENTURES_TICKER: EcosystemBrandEntry[] = [
 
 export const ECOSYSTEM_CLIENTS_TICKER: EcosystemBrandEntry[] = [
   {
-    id: 'eco-aicalc',
-    name: 'AICalc',
+    id: 'eco-biznxt',
+    name: 'BizNXT.online',
     relationshipLabel: 'Client',
     category: 'client',
-    externalUrl: 'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/aicalc',
-    internalRoute: '/ventures/aicalc',
-    wordmarkStyle: 'mono',
+    internalRoute: '/ventures/biznxt',
+    wordmarkStyle: 'sans',
   },
   {
     id: 'eco-kartigo',
-    name: 'Kartigo',
+    name: 'Kartigo.online',
     relationshipLabel: 'Client',
     category: 'client',
-    externalUrl: 'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/kartigo',
     internalRoute: '/ventures/kartigo',
     wordmarkStyle: 'sans',
   },
   {
-    id: 'eco-biznxt',
-    name: 'BizNXT',
+    id: 'eco-thrift-store',
+    name: 'Thrift Store',
     relationshipLabel: 'Client',
     category: 'client',
-    externalUrl: 'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/biznxt',
-    internalRoute: '/ventures/biznxt',
-    wordmarkStyle: 'sans',
+    internalRoute: '/ventures/store',
+    wordmarkStyle: 'serif',
   },
   {
     id: 'eco-budget-bazaar',
     name: 'Budget Bazaar',
     relationshipLabel: 'Client',
     category: 'client',
-    externalUrl: 'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/budget-bazaar',
     internalRoute: '/ventures/budget-bazaar',
     wordmarkStyle: 'sans',
   },
@@ -504,6 +518,14 @@ export const ECOSYSTEM_CLIENTS_TICKER: EcosystemBrandEntry[] = [
     relationshipLabel: 'Client',
     category: 'client',
     wordmarkStyle: 'sans',
+  },
+  {
+    id: 'eco-aicalc',
+    name: 'AICalc',
+    relationshipLabel: 'Client',
+    category: 'client',
+    internalRoute: '/ventures/aicalc',
+    wordmarkStyle: 'mono',
   },
 ];
 
@@ -599,11 +621,12 @@ export const ABOUT_PILLARS = [
 ];
 
 export const SERVICE_CATEGORIES: { id: ServiceCategory; label: string }[] = [
-  { id: 'all', label: 'All Services (18)' },
+  { id: 'all', label: 'All Services (26)' },
   { id: 'lead-crm', label: 'Lead Gen, Filtering & CRM' },
   { id: 'creative-media', label: 'Creative, Video & Social' },
   { id: 'campaigns-local', label: 'Campaigns & Local Growth' },
   { id: 'sales-training', label: 'Sales Training & Coaching' },
+  { id: 'creative-docs', label: 'Creative & Documentation' },
 ];
 
 export const MARKETING_SERVICES: MarketingService[] = [
@@ -873,7 +896,7 @@ export const MARKETING_SERVICES: MarketingService[] = [
     title: 'Sales Team & Showroom Training',
     category: 'sales-training',
     categoryLabel: '16 Years Commercial Pedigree',
-    scopeNote: '₹25,000 per session · Scope, duration & location agreed before booking',
+    scopeNote: '₹50,000 per session · Scope, duration & location agreed before booking',
     summary:
       'Practical frontline sales and retail coaching backed by 16 years of high-trust selling experience from Maruti Suzuki to Audi.',
     deliverables: [
@@ -890,7 +913,7 @@ export const MARKETING_SERVICES: MarketingService[] = [
     title: 'Personality Development',
     category: 'sales-training',
     categoryLabel: 'Executive Readiness',
-    scopeNote: '₹25,000 per session · Tailored for customer-facing teams',
+    scopeNote: '₹50,000 per session · Tailored for customer-facing teams',
     summary:
       'Dedicated grooming, communication clarity, body language, and executive presence workshops for client-facing sales and advisory staff.',
     deliverables: [
@@ -900,6 +923,155 @@ export const MARKETING_SERVICES: MarketingService[] = [
       'Consistent team-wide brand representation standards',
     ],
     rateCardMatch: 'Personality development training',
+  },
+  {
+    id: 'bulk-sms-marketing',
+    number: '19',
+    title: 'Bulk SMS Marketing',
+    category: 'campaigns-local',
+    categoryLabel: 'Direct Messaging Campaigns',
+    scopeNote:
+      'Package price: ₹3,000 · Included credits: 10,000 SMS · Effective rate: ₹0.30 per SMS (Provider API pending credential setup)',
+    summary:
+      'High-throughput promotional and provider-supported transactional SMS campaign management with upload, scheduling, usage tracking, and additional credits calculated at admin-configured rates.',
+    deliverables: [
+      'Bulk promotional SMS',
+      'Transactional SMS, if supported by the selected provider',
+      'Contact list upload',
+      'Campaign scheduling',
+      'Delivery reports, where supported',
+      'SMS credit usage tracking',
+      'Campaign history',
+    ],
+    rateCardMatch: 'Bulk SMS Marketing (10,000 SMS Package)',
+  },
+  {
+    id: 'whatsapp-business-messaging-setup',
+    number: '20',
+    title: 'WhatsApp Business Messaging Setup',
+    category: 'lead-crm',
+    categoryLabel: 'WhatsApp Business Onboarding',
+    scopeNote:
+      'One-time setup fee: ₹4,999 (separate from Messaging charge: ₹1.50 per message · Provider API pending credential setup)',
+    summary:
+      'Structured WhatsApp Business setup assistance, profile configuration, and messaging workflow design. One-time onboarding setup fee is billed strictly separate from per-message usage charges.',
+    deliverables: [
+      'WhatsApp Business setup assistance',
+      'Business profile configuration',
+      'Messaging workflow setup',
+      'Customer communication setup',
+      'Campaign and message tracking, where supported',
+      'Usage and billing reports',
+    ],
+    rateCardMatch: 'WhatsApp Business Messaging Setup (One-Time Fee)',
+  },
+  {
+    id: 'logo-branding-design',
+    number: '21',
+    title: 'Logo and Branding Design',
+    category: 'creative-docs',
+    categoryLabel: 'Business Creative & Documentation Services',
+    scopeNote: 'Standalone project: ₹6,000 · Monthly retainer option: ₹10,000/mo',
+    summary:
+      'Distinctive corporate identity and vector logo development with variations, typography pairing, brand color guidance, and export-ready files.',
+    deliverables: [
+      'Business logo design',
+      'Logo variations',
+      'Basic brand identity',
+      'Brand colour and typography suggestions',
+      'Export-ready files',
+    ],
+    rateCardMatch: 'Logo and Branding Design (Standalone Project)',
+  },
+  {
+    id: 'social-media-thumbnail-design',
+    number: '22',
+    title: 'Social Media Thumbnail Design',
+    category: 'creative-docs',
+    categoryLabel: 'Business Creative & Documentation Services',
+    scopeNote: 'Starter 5-pack: ₹3,000 · Monthly retainer option: ₹8,000/mo',
+    summary:
+      'High-CTR visual thumbnails and promotional creatives engineered to capture attention across YouTube, Instagram, and Facebook feeds.',
+    deliverables: [
+      'YouTube thumbnails',
+      'Instagram promotional thumbnails',
+      'Facebook creatives',
+      'Advertising creatives',
+      'Custom promotional graphics',
+    ],
+    rateCardMatch: 'Social Media Thumbnail Design (5-Pack)',
+  },
+  {
+    id: 'script-writing',
+    number: '23',
+    title: 'Script Writing',
+    category: 'creative-docs',
+    categoryLabel: 'Business Creative & Documentation Services',
+    scopeNote: 'Standalone 3-pack: ₹4,000 · Monthly retainer option: ₹12,000/mo',
+    summary:
+      'Strategic video, reel, and commercial scriptwriting designed to communicate business value clearly and prompt viewer conversion.',
+    deliverables: [
+      'Promotional video scripts',
+      'Reels and short-video scripts',
+      'YouTube scripts',
+      'Advertisement scripts',
+      'Business presentation scripts',
+    ],
+    rateCardMatch: 'Script Writing (3-Pack)',
+  },
+  {
+    id: 'powerpoint-presentation',
+    number: '24',
+    title: 'PowerPoint Presentation',
+    category: 'creative-docs',
+    categoryLabel: 'Business Creative & Documentation Services',
+    scopeNote: 'Standalone 12-slide deck: ₹6,000 · Monthly retainer option: ₹14,000/mo',
+    summary:
+      'Polished executive presentations, sales pitch decks, investor overviews, and company profiles with clear visual storytelling.',
+    deliverables: [
+      'Business presentations',
+      'Sales presentations',
+      'Company profiles',
+      'Pitch decks',
+      'Marketing presentations',
+    ],
+    rateCardMatch: 'PowerPoint Presentation (12 Slides)',
+  },
+  {
+    id: 'excel-reports',
+    number: '25',
+    title: 'Excel Reports',
+    category: 'creative-docs',
+    categoryLabel: 'Business Creative & Documentation Services',
+    scopeNote: 'Custom automated model: ₹5,000 · Monthly maintenance: ₹10,000/mo',
+    summary:
+      'Clean spreadsheet architecture, sales performance dashboards, inventory logs, and automated mathematical calculation formulas.',
+    deliverables: [
+      'Business data sheets',
+      'Sales tracking templates',
+      'Lead management sheets',
+      'Inventory tracking sheets',
+      'Custom automated calculation formulas',
+    ],
+    rateCardMatch: 'Excel Reports (Custom Automated Sheet)',
+  },
+  {
+    id: 'additional-business-support',
+    number: '26',
+    title: 'Additional Business Support',
+    category: 'creative-docs',
+    categoryLabel: 'Business Creative & Documentation Services',
+    scopeNote: 'Standalone 10-hour sprint: ₹4,000 · Monthly 25-hour retainer: ₹8,000/mo',
+    summary:
+      'Reliable commercial assistance for business data hygiene, document formatting, customer enquiry sorting, and ad-hoc documentation.',
+    deliverables: [
+      'Data entry',
+      'Document formatting',
+      'Basic customer enquiry handling',
+      'Basic CRM data entry',
+      'Custom business documentation',
+    ],
+    rateCardMatch: 'Additional Business Support (Task Sprint)',
   },
 ];
 
@@ -961,63 +1133,12 @@ export const TRAINING_CURRICULUM = [
   'Confident booking & closing techniques',
 ];
 
-export const PRICING_PACKAGES: PricingPackage[] = [
-  {
-    id: 'package-a',
-    code: 'PACKAGE A',
-    name: 'Full-Service Growth Marketing & Lead Management',
-    subtitle:
-      'Complete end-to-end digital customer acquisition paired with managed AI-assisted calling and enquiry qualification.',
-    setupFee: '₹39,999',
-    monthlyFee: '₹49,999',
-    featured: true,
-    includes: [
-      'Meta ads management & campaign optimization',
-      'Lead generation forms & conversion creatives',
-      'AI-assisted calling up to 1,000 mins/month (subject to vendor plan)',
-      'Structured lead filtering & buyer intent capture',
-      'Hot / Warm / Future Follow-up / Unreachable / Not Interested classification',
-      'Daily Excel enquiry reports & monthly performance review',
-    ],
-    excludes: [
-      'Meta ad spend (paid directly to Meta by client)',
-      'Extra AI calling minutes beyond 1,000 mins/month',
-      'Influencer / creator fees',
-      'Special on-location video shoots & third-party production',
-    ],
-    enquiryServiceValue: 'Package A — Full-Service Growth Marketing & Lead Management',
-  },
-  {
-    id: 'package-b',
-    code: 'PACKAGE B',
-    name: 'Lead Filtering & Qualification Only',
-    subtitle:
-      'Dedicated managed calling and classification for businesses that already receive incoming enquiries and need disciplined qualification.',
-    setupFee: '₹14,999',
-    monthlyFee: '₹19,999',
-    featured: false,
-    includes: [
-      'AI-assisted calling of existing inbound enquiries (up to 1,000 mins/month)',
-      'Requirement, budget, timeline & appointment intent capture',
-      'Hot / Warm / Future Follow-up / Unreachable / Not Interested classification',
-      'Daily Excel qualification sheets & call summaries',
-      'Monthly qualification & conversion insight report',
-    ],
-    excludes: [
-      'Meta advertising & paid campaign management',
-      'New lead generation (qualifies existing enquiries only)',
-      'Extra AI calling minutes beyond 1,000 mins/month',
-    ],
-    enquiryServiceValue: 'Package B — Lead Filtering & Qualification Only',
-  },
-];
-
 export const RATE_CARD_ITEMS: RateCardItem[] = [
   {
     id: 'rc-1',
     service: 'Meta lead generation management',
     category: 'Lead Generation',
-    fee: '₹20,000',
+    fee: '₹40,000',
     unit: '/month',
     notes: 'Campaign strategy, ad setup & optimization (ad spend extra)',
   },
@@ -1025,7 +1146,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-2',
     service: 'Lead filtering and qualification',
     category: 'Qualification',
-    fee: '₹12,000',
+    fee: '₹24,000',
     unit: '/month',
     notes: 'Existing enquiry calling & Hot/Warm/Future classification',
   },
@@ -1033,7 +1154,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-3',
     service: 'AI calling workflow management',
     category: 'Qualification',
-    fee: '₹5,000',
+    fee: '₹10,000',
     unit: '/month',
     notes: 'Managed internally by AKYIN (not standalone software)',
   },
@@ -1041,7 +1162,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-4',
     service: 'CRM and lead pipeline management',
     category: 'Operations',
-    fee: '₹5,000',
+    fee: '₹10,000',
     unit: '/month',
     notes: 'Pipeline hygiene, status tracking & Excel/summary reporting',
   },
@@ -1049,7 +1170,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-5',
     service: 'Social media management',
     category: 'Creative & Social',
-    fee: '₹8,000',
+    fee: '₹16,000',
     unit: '/month',
     notes: 'Scheduled brand content & page hygiene',
   },
@@ -1057,7 +1178,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-6',
     service: '8 promotional reels',
     category: 'Creative & Social',
-    fee: '₹10,000',
+    fee: '₹20,000',
     unit: '/month',
     notes: 'Edited vertical reels from client or curated footage',
   },
@@ -1065,7 +1186,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-7',
     service: '10 graphic creatives',
     category: 'Creative & Social',
-    fee: '₹4,000',
+    fee: '₹8,000',
     unit: '/month',
     notes: 'Static offer, product highlight & festive templates',
   },
@@ -1073,7 +1194,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-8',
     service: 'Influencer campaign coordination',
     category: 'Influencer',
-    fee: '₹2,500',
+    fee: '₹5,000',
     unit: '/campaign',
     notes: 'Creator shortlisting, brief & shoot scheduling',
   },
@@ -1081,7 +1202,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-9',
     service: 'Influencer video and upload',
     category: 'Influencer',
-    fee: '₹6,000',
+    fee: '₹12,000',
     unit: '/creator',
     notes: 'Coordination & content publishing workflow (creator fees separate)',
   },
@@ -1089,7 +1210,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-10',
     service: 'Product / model launch campaign',
     category: 'Campaigns',
-    fee: '₹10,000',
+    fee: '₹20,000',
     unit: '/campaign',
     notes: 'Dedicated new product/model unveiling & booking promotion',
   },
@@ -1097,7 +1218,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-11',
     service: 'Demo / visit booking campaign',
     category: 'Campaigns',
-    fee: '₹7,500',
+    fee: '₹15,000',
     unit: '/campaign',
     notes: 'Targeted local appointment, demo or test-drive booking drive',
   },
@@ -1105,7 +1226,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-12',
     service: 'Upgrade / exchange event campaign',
     category: 'Campaigns',
-    fee: '₹10,000',
+    fee: '₹20,000',
     unit: '/campaign',
     notes: 'Promotional weekend event & upgrade valuation push',
   },
@@ -1113,7 +1234,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-13',
     service: 'Festive campaign',
     category: 'Campaigns',
-    fee: '₹10,000',
+    fee: '₹20,000',
     unit: '/campaign',
     notes: 'Seasonal offer rollout & customer footfall drive',
   },
@@ -1121,7 +1242,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-14',
     service: 'Catalog & stock rotation marketing',
     category: 'Campaigns',
-    fee: '₹8,000',
+    fee: '₹16,000',
     unit: '/month',
     notes: 'Specialty inventory & pre-owned stock promotion',
   },
@@ -1129,7 +1250,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-15',
     service: 'Google Business Profile management',
     category: 'Local Search',
-    fee: '₹3,000',
+    fee: '₹6,000',
     unit: '/month',
     notes: 'Listing hygiene, updates & local Maps discovery',
   },
@@ -1137,7 +1258,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-16',
     service: 'Local SEO management',
     category: 'Local Search',
-    fee: '₹6,000',
+    fee: '₹12,000',
     unit: '/month',
     notes: 'Catchment keyword & regional search visibility',
   },
@@ -1145,7 +1266,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-17',
     service: 'Customer retention campaign',
     category: 'Retention',
-    fee: '₹8,000',
+    fee: '₹16,000',
     unit: '/month',
     notes: 'Repeat customer & service centre booking outreach',
   },
@@ -1153,7 +1274,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-18',
     service: 'Corporate / B2B campaign',
     category: 'B2B / Institutional',
-    fee: '₹10,000',
+    fee: '₹20,000',
     unit: '/campaign',
     notes: 'Institutional, corporate & commercial buyer acquisition',
   },
@@ -1161,7 +1282,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-19',
     service: 'Product & pitch presentation PPT',
     category: 'Sales Enablement',
-    fee: '₹3,000',
+    fee: '₹6,000',
     unit: '/presentation',
     notes: 'Structured offering, product & pricing sales deck',
   },
@@ -1169,7 +1290,7 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-20',
     service: 'Sales training',
     category: 'Training',
-    fee: '₹25,000',
+    fee: '₹50,000',
     unit: '/session',
     notes: 'Product presentation, objection handling & deal closing',
   },
@@ -1177,9 +1298,137 @@ export const RATE_CARD_ITEMS: RateCardItem[] = [
     id: 'rc-21',
     service: 'Personality development training',
     category: 'Training',
-    fee: '₹25,000',
+    fee: '₹50,000',
     unit: '/session',
     notes: 'Grooming, communication & executive frontline etiquette',
+  },
+  {
+    id: 'rc-22',
+    service: 'Bulk SMS Marketing (10,000 SMS Package)',
+    category: 'Direct Messaging',
+    fee: '₹3,000',
+    unit: '/10,000 SMS (₹0.30/SMS)',
+    notes: 'Promotional/provider-supported transactional SMS; additional credits billed at admin-configured rate',
+  },
+  {
+    id: 'rc-23',
+    service: 'Additional Bulk SMS Credits',
+    category: 'Direct Messaging',
+    fee: '₹0.30',
+    unit: '/SMS (admin configurable)',
+    notes: 'Calculated using admin-configured per-SMS rate; subject to provider & DLT conditions',
+  },
+  {
+    id: 'rc-24',
+    service: 'WhatsApp Business Messaging Setup (One-Time Fee)',
+    category: 'WhatsApp Messaging',
+    fee: '₹4,999',
+    unit: '/one-time setup',
+    notes: 'Setup & workflow configuration ONLY — strictly separate from per-message usage charges',
+  },
+  {
+    id: 'rc-25',
+    service: 'WhatsApp Business Message Usage',
+    category: 'WhatsApp Messaging',
+    fee: '₹1.50',
+    unit: '/message (billed separately)',
+    notes: 'Metered per message according to configured billing unit; provider API activated per client credentials',
+  },
+  {
+    id: 'rc-26',
+    service: 'Logo and Branding Design (Standalone Project)',
+    category: 'Creative & Documentation',
+    fee: '₹6,000',
+    unit: '/project',
+    notes: 'Vector logo, mark variations, palette & high-res production files',
+  },
+  {
+    id: 'rc-27',
+    service: 'Logo and Branding Design (Monthly Retainer)',
+    category: 'Creative & Documentation',
+    fee: '₹10,000',
+    unit: '/month',
+    notes: 'Continuous brand collateral, graphic asset updates & guidelines',
+  },
+  {
+    id: 'rc-28',
+    service: 'Social Media Thumbnail Design (5-Pack)',
+    category: 'Creative & Documentation',
+    fee: '₹3,000',
+    unit: '/pack (5 creatives)',
+    notes: 'High-CTR YouTube, Instagram & Facebook promotional creatives',
+  },
+  {
+    id: 'rc-29',
+    service: 'Social Media Thumbnail Retainer',
+    category: 'Creative & Documentation',
+    fee: '₹8,000',
+    unit: '/month (15 creatives)',
+    notes: 'Monthly continuous video thumbnail and social asset production',
+  },
+  {
+    id: 'rc-30',
+    service: 'Script Writing (3-Pack)',
+    category: 'Creative & Documentation',
+    fee: '₹4,000',
+    unit: '/pack (3 scripts)',
+    notes: 'Commercial video, reels, explainer & presentation scripts',
+  },
+  {
+    id: 'rc-31',
+    service: 'Script Writing Retainer',
+    category: 'Creative & Documentation',
+    fee: '₹12,000',
+    unit: '/month (12 scripts)',
+    notes: 'Ongoing monthly video scripts, ad copy & commercial scripting',
+  },
+  {
+    id: 'rc-32',
+    service: 'PowerPoint Presentation (12 Slides)',
+    category: 'Creative & Documentation',
+    fee: '₹6,000',
+    unit: '/presentation',
+    notes: 'Company profiles, pitch decks, sales presentations & proposals',
+  },
+  {
+    id: 'rc-33',
+    service: 'PowerPoint Deck Maintenance Retainer',
+    category: 'Creative & Documentation',
+    fee: '₹14,000',
+    unit: '/month',
+    notes: 'Monthly presentation updates, client pitch decks & revision support',
+  },
+  {
+    id: 'rc-34',
+    service: 'Excel Reports (Custom Automated Sheet)',
+    category: 'Creative & Documentation',
+    fee: '₹5,000',
+    unit: '/report sheet',
+    notes: 'Custom sales tracking, lead pipeline & inventory formula sheets',
+  },
+  {
+    id: 'rc-35',
+    service: 'Excel Reporting Retainer',
+    category: 'Creative & Documentation',
+    fee: '₹10,000',
+    unit: '/month',
+    notes: 'Weekly data refresh, automated models & custom business calculations',
+  },
+  {
+    id: 'rc-36',
+    service: 'Additional Business Support (Task Sprint)',
+    category: 'Creative & Documentation',
+    fee: '₹4,000',
+    unit: '/10-hour sprint',
+    notes: 'Data entry, document formatting, CRM hygiene & customer enquiry sorting',
+  },
+  {
+    id: 'rc-37',
+    service: 'Additional Business Support Retainer',
+    category: 'Creative & Documentation',
+    fee: '₹8,000',
+    unit: '/month (25 hours)',
+    notes: 'Dedicated monthly operational and administrative business assistance',
   },
 ];
 
@@ -1208,8 +1457,15 @@ export const BUSINESS_VERTICAL_OPTIONS = [
 
 export const ENQUIRY_TYPE_OPTIONS: string[] = [
   'General Consultation / Proposal',
-  'Package A — Full-Service Growth Marketing & Lead Management',
-  'Package B — Lead Filtering & Qualification Only',
+  'Automotive Dealership Marketing & Sales Strategy',
+  'Meta Ads Management',
+  'Online Lead Generation Campaigns',
+  'Lead Filtering & Qualification',
+  'Bulk SMS Marketing',
+  'WhatsApp Business Messaging Setup',
+  'Logo Design',
+  'PowerPoint Presentation Design',
+  'Excel Reports & Automation',
   ...RATE_CARD_ITEMS.map((item) => item.service),
   'Book Distribution / Publishing Rights',
   'AKYIN THRIFT Wholesale / Shopping Enquiry',

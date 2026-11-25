@@ -41,7 +41,7 @@ const SCALE_PRESETS: Record<DealershipScaleId, ScalePreset> = {
     id: 'single',
     label: 'Single Showroom',
     rooftops: '1 Rooftop · Compact Team',
-    akyinTierName: 'Growth Dealership Retainer',
+    akyinTierName: 'Single-Showroom Modular Scope',
     akyinMonthlyRetainer: 55000,
     defaultStaff: {
       mediaBuyerSalary: 55000,
@@ -67,7 +67,7 @@ const SCALE_PRESETS: Record<DealershipScaleId, ScalePreset> = {
     id: 'enterprise',
     label: 'Enterprise Auto Group',
     rooftops: '5+ Showrooms · Multi-Brand',
-    akyinTierName: 'Enterprise Group Partnership',
+    akyinTierName: 'Multi-Brand Modular Scope',
     akyinMonthlyRetainer: 155000,
     defaultStaff: {
       mediaBuyerSalary: 140000,

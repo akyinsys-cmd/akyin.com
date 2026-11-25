@@ -125,8 +125,6 @@ export function AdvisoryBookingForm() {
   const [createdCalendarLink, setCreatedCalendarLink] = useState('');
 
   const feeDisplay = settings.consultationFee || 'Contact Us for Consultation Fee.';
-  const contactPhone = settings.contactPhone || OFFICIAL_CONTACT.phoneDisplay;
-  const whatsappNumber = settings.whatsappNumber || OFFICIAL_CONTACT.whatsappNumber;
 
   useEffect(() => {
     const unsub = initWorkspaceAuth(
@@ -220,7 +218,7 @@ export function AdvisoryBookingForm() {
       }
       const created = await createCalendarEvent(token, 'primary', {
         summary: `AKYIN Business Advisory (${confirmation.bookingId})`,
-        description: `Business Advisory consultation request (${confirmation.bookingId}). Status: ${confirmation.bookingStatus} · ${confirmation.paymentStatus}. Contact: connect@akyin.com / ${contactPhone}`,
+        description: `Business Advisory consultation request (${confirmation.bookingId}). Status: ${confirmation.bookingStatus} · ${confirmation.paymentStatus}. Contact: connect@akyin.com · WhatsApp Connect`,
         startDateTime: `${confirmation.appointmentDate}T${confirmation.startTime}:00+05:30`,
         endDateTime: `${confirmation.appointmentDate}T${confirmation.endTime}:00+05:30`,
         timeZone: 'Asia/Kolkata',
@@ -434,7 +432,7 @@ export function AdvisoryBookingForm() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <p className="text-xs font-bold text-[#1D1D1F]">
-                Complete Consultation Fee Online (Razorpay · ₹1,999)
+                Complete Consultation Fee Online (Razorpay · ₹3,998)
               </p>
               <p className="text-[11px] text-[#6E6E73]">
                 Pay via UPI, Card, or NetBanking to fast-track your slot confirmation for reference{' '}
@@ -444,11 +442,11 @@ export function AdvisoryBookingForm() {
                 .
               </p>
             </div>
-            <span className="font-mono-num text-sm font-bold text-[#1D1D1F]">₹1,999</span>
+            <span className="font-mono-num text-sm font-bold text-[#1D1D1F]">₹3,998</span>
           </div>
           <RazorpayCheckoutButton
             sku="advisory-session"
-            label="Pay ₹1,999 Consultation Fee via Razorpay"
+            label="Pay ₹3,998 Consultation Fee via Razorpay"
             variant="primary"
             size="md"
             referenceId={confirmation.bookingId}
@@ -469,19 +467,14 @@ export function AdvisoryBookingForm() {
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <GlassButton
-            href={sanitizeHref(
-              `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-                `Hello AKYIN Ventures, I submitted Business Advisory request ${confirmation.bookingId} for ${confirmation.appointmentDate} (${confirmation.slotLabel})${razorpayPaymentId ? ` · Razorpay Payment ID: ${razorpayPaymentId}` : ''}.`
-              )}`,
-              OFFICIAL_CONTACT.whatsappUrl
-            )}
+            href={sanitizeHref(OFFICIAL_CONTACT.whatsappUrl, OFFICIAL_CONTACT.whatsappChannelUrl)}
             target="_blank"
             rel="noopener noreferrer"
             variant="subtle"
             size="md"
           >
             <MessageCircle className="w-4 h-4" aria-hidden="true" />
-            <span>Follow Up on WhatsApp ({contactPhone})</span>
+            <span>Follow Up via WhatsApp Connect</span>
           </GlassButton>
           {createdCalendarLink ? (
             <GlassButton

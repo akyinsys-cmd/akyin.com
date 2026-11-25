@@ -4,7 +4,6 @@ import {
   Globe,
   Mail,
   MessageCircle,
-  Phone,
   X,
 } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
@@ -99,18 +98,6 @@ export function FloatingContactWidget({
             </div>
 
             <div className="space-y-1.5 text-xs">
-              <a
-                href={OFFICIAL_CONTACT.phoneHref}
-                className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-2xl bg-white/85 hover:bg-white border border-[#E8E8ED]/80 text-[#1D1D1F] transition-colors"
-              >
-                <span className="inline-flex items-center gap-2.5 font-semibold">
-                  <Phone className="w-4 h-4 text-[#0071E3]" aria-hidden="true" />
-                  <span>Call AKYIN</span>
-                </span>
-                <span className="font-mono-num text-[11px] text-[#6E6E73]">
-                  {OFFICIAL_CONTACT.phoneDisplay}
-                </span>
-              </a>
 
               <a
                 href={`mailto:${OFFICIAL_CONTACT.email}`}
@@ -181,7 +168,7 @@ export function FloatingContactWidget({
               >
                 <span className="inline-flex items-center gap-2.5 font-semibold">
                   <MessageCircle className="w-4 h-4 text-white" aria-hidden="true" />
-                  <span>Join WhatsApp Channel</span>
+                  <span>WhatsApp Connect</span>
                 </span>
                 <ArrowUpRight className="w-3.5 h-3.5 text-white/80" aria-hidden="true" />
               </a>
@@ -197,7 +184,7 @@ export function FloatingContactWidget({
         aria-label={open ? 'Close quick contact widget' : 'Open quick contact widget'}
         className="h-11 px-4 rounded-full liquid-glass-cta border border-white/95 text-[#1D1D1F] text-xs font-semibold inline-flex items-center gap-2 shadow-[0_14px_34px_rgba(0,0,0,0.12)] hover:-translate-y-0.5 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071E3]"
       >
-        <Phone className="w-3.5 h-3.5 text-[#0071E3]" aria-hidden="true" />
+        <MessageCircle className="w-3.5 h-3.5 text-[#0071E3]" aria-hidden="true" />
         <span>Connect</span>
       </button>
     </div>

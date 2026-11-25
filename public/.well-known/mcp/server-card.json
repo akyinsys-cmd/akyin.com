@@ -18,7 +18,7 @@
   "websiteUrl": "https://akyin.com",
   "contact": {
     "email": "connect@akyin.com",
-    "telephone": "+91-6395694011"
+    "whatsappConnect": "https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U"
   },
   "capabilities": {
     "tools": {
@@ -43,20 +43,20 @@
     },
     {
       "name": "get_marketing_pricing",
-      "description": "Retrieve AKYIN MARKETINGS retainer packages (Package A & Package B), sales training fee, and the 21-item rate card in INR.",
+      "description": "Retrieve AKYIN MARKETINGS standalone service catalogue, categories, and transparent INR pricing.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "category": {
             "type": "string",
-            "description": "Optional rate card category filter."
+            "description": "Optional standalone service category filter."
           }
         }
       }
     },
     {
       "name": "get_contact_channels",
-      "description": "Retrieve verified corporate email, telephone, WhatsApp, legal links, and social profiles for AKYIN Ventures.",
+      "description": "Retrieve verified corporate email, WhatsApp Connect, legal links, and social profiles for AKYIN Ventures.",
       "inputSchema": {
         "type": "object",
         "properties": {}

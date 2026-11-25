@@ -262,7 +262,7 @@ export function AutomotiveQuickQuoteFab() {
     const payload: EnquiryPayload = {
       category: 'Marketing Services Enquiry',
       vertical: 'Akyin Marketing',
-      enquiryType: 'Package A — Full-Service Growth Marketing & Lead Management',
+      enquiryType: 'Automotive Dealership Marketing & Sales Strategy',
       name: `${data.dealershipName} Manager`,
       company: data.dealershipName,
       email: isEmail ? data.contactDetail : settings.officialEmail || OFFICIAL_CONTACT.email,

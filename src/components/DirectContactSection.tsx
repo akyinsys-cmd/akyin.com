@@ -1,4 +1,4 @@
-import { ArrowRight, Globe, Mail, Phone, UserCheck } from 'lucide-react';
+import { ArrowRight, Globe, Mail, MessageCircle, UserCheck } from 'lucide-react';
 import { AppRoute, OFFICIAL_CONTACT } from '../data/akyinData';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { sanitizeHref } from '../utils/security';
@@ -17,8 +17,7 @@ export function DirectContactSection({
 }: DirectContactSectionProps) {
   const { settings } = useSiteConfig();
   const displayEmail = settings.contactEmail || OFFICIAL_CONTACT.email;
-  const displayPhone = settings.contactPhone || OFFICIAL_CONTACT.phoneDisplay;
-  const cleanPhoneHref = `tel:+${displayPhone.replace(/[^0-9]/g, '') || OFFICIAL_CONTACT.whatsappNumber}`;
+  const whatsappHref = sanitizeHref(OFFICIAL_CONTACT.whatsappUrl, OFFICIAL_CONTACT.whatsappChannelUrl);
   const mailHref = sanitizeHref(`mailto:${displayEmail}`, `mailto:${OFFICIAL_CONTACT.email}`, true);
 
   return (
@@ -42,7 +41,7 @@ export function DirectContactSection({
               </h2>
 
               <p className="text-base text-[#6E6E73] leading-relaxed max-w-xl">
-                Have a business idea, need marketing support or want to explore a partnership? Reach out to our team.
+                Have a business idea, need marketing support or want to explore a partnership? Reach out to our team via WhatsApp Connect or email.
               </p>
 
               <p className="text-xs font-medium text-[#6E6E73]">
@@ -54,10 +53,12 @@ export function DirectContactSection({
                 <GlassButton
                   variant="primary"
                   size="md"
-                  href={cleanPhoneHref}
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <Phone className="w-4 h-4" aria-hidden="true" />
-                  <span>Call Us</span>
+                  <MessageCircle className="w-4 h-4" aria-hidden="true" />
+                  <span>WhatsApp Connect</span>
                 </GlassButton>
 
                 <GlassButton
@@ -98,14 +99,16 @@ export function DirectContactSection({
 
               <div className="rounded-2xl bg-[#FFFFFF] border border-[#E8E8ED] p-4 shadow-2xs space-y-1">
                 <div className="flex items-center gap-2 text-xs text-[#6E6E73]">
-                  <Phone className="w-3.5 h-3.5 text-[#0071E3]" aria-hidden="true" />
-                  <span>Phone</span>
+                  <MessageCircle className="w-3.5 h-3.5 text-[#0071E3]" aria-hidden="true" />
+                  <span>WhatsApp Connect</span>
                 </div>
                 <a
-                  href={cleanPhoneHref}
-                  className="block font-mono-num text-base font-semibold text-[#1D1D1F] hover:text-[#0071E3] transition-colors"
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-base font-semibold text-[#1D1D1F] hover:text-[#0071E3] transition-colors"
                 >
-                  {displayPhone}
+                  Official AKYIN Channel
                 </a>
               </div>
 

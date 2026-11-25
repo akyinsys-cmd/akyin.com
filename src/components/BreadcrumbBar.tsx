@@ -42,6 +42,8 @@ const ROUTE_BREADCRUMBS: Record<Exclude<AppRoute, '/'>, BreadcrumbItem[]> = {
     { label: 'Budget Bazaar' },
   ],
   '/pricing': [{ label: 'Pricing & Rate Card' }],
+  '/tools': [{ label: 'Business Tools (20 Calculators)' }],
+  '/quote': [{ label: 'Quotation Portal' }],
   '/advisory': [{ label: 'Business Advisory' }],
   '/insights': [{ label: 'Insights' }],
   '/terms': [{ label: 'Terms of Service' }],
@@ -68,7 +70,21 @@ export function BreadcrumbBar({
     return null;
   }
 
-  const trail = ROUTE_BREADCRUMBS[currentRoute];
+  let trail = ROUTE_BREADCRUMBS[currentRoute as Exclude<keyof typeof ROUTE_BREADCRUMBS, '/'>];
+  if (!trail && currentRoute.startsWith('/services/')) {
+    const slugLabel = currentRoute
+      .slice('/services/'.length)
+      .split('-')
+      .map((part) => (part ? part[0].toUpperCase() + part.slice(1) : ''))
+      .join(' ');
+    trail = [
+      { label: 'Services', route: '/ventures/marketing' },
+      { label: slugLabel || 'Service Details' },
+    ];
+  }
+  if (!trail) {
+    trail = [{ label: 'Page' }];
+  }
 
   return (
       <div className="pt-14 lg:pt-16 liquid-glass-nav border-b border-white/80 print:hidden">

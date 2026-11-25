@@ -174,25 +174,25 @@ function buildDossierPages(): string[] {
     });
   });
 
-  // Page 3: Support Tiers & 90-Day Dealership Deployment Roadmap
+  // Page 3: Modular Automotive Engagements & 90-Day Dealership Deployment Roadmap
   const page3Lines: PdfLine[] = [
-    { text: 'Support Tiers & 90-Day Showroom Rollout', x: 48, y: 744, size: 18, bold: true },
+    { text: 'Standalone Modules & 90-Day Showroom Rollout', x: 48, y: 744, size: 18, bold: true },
     {
-      text: 'Structured engagement options for single showrooms, multi-city groups, and enterprise dealers.',
+      text: 'Modular standalone engagements for single showrooms, multi-city groups, and regional dealers.',
       x: 48,
       y: 724,
       size: 10,
       color: [0.35, 0.35, 0.38],
     },
 
-    { text: 'SUPPORT TIER COMPARISON', x: 48, y: 682, size: 11, bold: true, color: [0.49, 0.23, 0.93] },
-    { text: 'Tier 1: Starter Showroom (Single Location)', x: 48, y: 660, size: 10.5, bold: true },
-    { text: '* Geo-fenced Meta & Google lead generation + basic lead filtering + monthly ROI reporting.', x: 58, y: 644, size: 9.5, color: [0.35, 0.35, 0.38] },
-    { text: 'Tier 2: Dealership Accelerator (Recommended - Multi-Channel)', x: 48, y: 618, size: 10.5, bold: true },
-    { text: '* Full two-tier lead qualification, creative/Reels production, Google Local, test-drive', x: 58, y: 602, size: 9.5, color: [0.35, 0.35, 0.38] },
-    { text: '  automation, and bi-weekly sales team coaching workshops.', x: 58, y: 588, size: 9.5, color: [0.35, 0.35, 0.38] },
-    { text: 'Tier 3: Enterprise Dealer Group (Regional Dominance)', x: 48, y: 562, size: 10.5, bold: true },
-    { text: '* Full 16-service suite, custom Leads & Targets app, fleet/pre-owned funnels, and dedicated studio.', x: 58, y: 546, size: 9.5, color: [0.35, 0.35, 0.38] },
+    { text: 'STANDALONE AUTOMOTIVE TRACKS (SELECT INDIVIDUALLY)', x: 48, y: 682, size: 11, bold: true, color: [0.49, 0.23, 0.93] },
+    { text: 'Track 1: Showroom Test-Drive & Local Acquisition', x: 48, y: 660, size: 10.5, bold: true },
+    { text: '* Geo-fenced Meta & Google test-drive lead generation with transparent client ad billing.', x: 58, y: 644, size: 9.5, color: [0.35, 0.35, 0.38] },
+    { text: 'Track 2: Dedicated Enquiry Qualification & CRM Filtering', x: 48, y: 618, size: 10.5, bold: true },
+    { text: '* Independent telephonic & AI-assisted buyer screening, budget/timeline vetting, and', x: 58, y: 602, size: 9.5, color: [0.35, 0.35, 0.38] },
+    { text: '  daily Excel qualification reports without interfering with your existing ad agency.', x: 58, y: 588, size: 9.5, color: [0.35, 0.35, 0.38] },
+    { text: 'Track 3: Showroom Launch, Exchange Camps & Floor Coaching', x: 48, y: 562, size: 10.5, bold: true },
+    { text: '* Standalone launch/exchange event campaigns and on-site dealership sales training.', x: 58, y: 546, size: 9.5, color: [0.35, 0.35, 0.38] },
 
     { text: '90-DAY IMPLEMENTATION CADENCE', x: 48, y: 498, size: 11, bold: true, color: [0.49, 0.23, 0.93] },
     { text: 'Days 1 - 15: Showroom Audit, Pixel & CRM Hygiene, Google Business & Landing Page Setup.', x: 48, y: 474, size: 9.8 },

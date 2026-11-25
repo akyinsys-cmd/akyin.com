@@ -1,4 +1,4 @@
-import { ArrowUp, ArrowUpRight, Globe, Mail, Phone } from 'lucide-react';
+import { ArrowUp, ArrowUpRight, Globe, Mail, MessageCircle } from 'lucide-react';
 import { AppRoute, OFFICIAL_CONTACT } from '../data/akyinData';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { sanitizeHref } from '../utils/security';
@@ -21,8 +21,7 @@ interface FooterProps {
 export function Footer({ onNavigate }: FooterProps) {
   const { settings } = useSiteConfig();
   const displayEmail = settings.contactEmail || OFFICIAL_CONTACT.email;
-  const displayPhone = settings.contactPhone || OFFICIAL_CONTACT.phoneDisplay;
-  const cleanPhoneHref = `tel:+${displayPhone.replace(/[^0-9]/g, '') || OFFICIAL_CONTACT.whatsappNumber}`;
+  const whatsappHref = sanitizeHref(OFFICIAL_CONTACT.whatsappUrl, OFFICIAL_CONTACT.whatsappChannelUrl);
   const safeEmailHref = sanitizeHref(`mailto:${displayEmail}`, `mailto:${OFFICIAL_CONTACT.email}`, true);
   const footerDescription =
     settings.footerTagline ||
@@ -267,6 +266,15 @@ export function Footer({ onNavigate }: FooterProps) {
                     1-on-1 Business Advisory
                   </a>
                 </li>
+                <li>
+                  <a
+                    href="/tools"
+                    onClick={(e) => handleLink(e, '/tools')}
+                    className="hover:text-[#0071E3] transition-colors"
+                  >
+                    Business Tools (20 Calculators)
+                  </a>
+                </li>
                 <li className="pt-2 border-t border-[#E8E8ED]">
                   <a
                     href="/pricing"
@@ -288,11 +296,14 @@ export function Footer({ onNavigate }: FooterProps) {
                 <ul className="space-y-2.5 text-sm">
                   <li>
                     <a
-                      href={cleanPhoneHref}
-                      className="inline-flex items-center gap-2 font-mono-num text-[#1D1D1F] hover:text-[#0071E3] transition-colors font-medium"
+                      href={whatsappHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-[#1D1D1F] hover:text-[#0071E3] transition-colors font-medium"
                     >
-                      <Phone className="w-3.5 h-3.5 text-[#0071E3] shrink-0" aria-hidden="true" />
-                      <span>{displayPhone}</span>
+                      <MessageCircle className="w-3.5 h-3.5 text-[#0071E3] shrink-0" aria-hidden="true" />
+                      <span>WhatsApp Connect</span>
+                      <ArrowUpRight className="w-3.5 h-3.5 text-[#A1A1A6]" aria-hidden="true" />
                     </a>
                   </li>
                   <li>
@@ -335,7 +346,7 @@ export function Footer({ onNavigate }: FooterProps) {
           </p>
 
           <p className="hidden print:block text-[#1D1D1F]">
-            https://akyin.com · {displayEmail} · {displayPhone}
+            https://akyin.com · {displayEmail} · WhatsApp Connect
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 print:hidden">

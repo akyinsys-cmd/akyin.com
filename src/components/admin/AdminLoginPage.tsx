@@ -1,75 +1,70 @@
 import { useState } from 'react';
-import { ArrowLeft, Eye, EyeOff, Lock, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Lock, ShieldCheck, UserPlus } from 'lucide-react';
 import { AppRoute } from '../../data/akyinData';
-import { akyinApiClient } from '../../utils/AkyinApiClient';
+import { PublicSuiteUser, suiteApi } from '../../services/suiteApi';
 import { AkyinLogo } from '../AkyinLogo';
 import { GlassButton, GlassPanel } from '../liquid-glass';
 
 interface AdminLoginPageProps {
-  passwordConfigured: boolean;
-  isLiveBackend: boolean;
+  configured: boolean;
   checkingStatus: boolean;
   onNavigate: (route: AppRoute) => void;
-  onAuthenticated: () => void;
-  onEndpointUpdated: () => Promise<void>;
+  onAuthenticated: (user: PublicSuiteUser) => void;
 }
 
 export function AdminLoginPage({
-  passwordConfigured,
-  isLiveBackend,
+  configured,
   checkingStatus,
   onNavigate,
   onAuthenticated,
-  onEndpointUpdated,
 }: AdminLoginPageProps) {
+  const [nameInput, setNameInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
 
-  const [endpointDraft, setEndpointDraft] = useState<string>(() =>
-    akyinApiClient.getEndpointUrl()
-  );
-  const [endpointStatus, setEndpointStatus] = useState('');
-
-  const handleSaveEndpoint = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setEndpointStatus('');
-    setAuthError('');
-    try {
-      akyinApiClient.setEndpointUrl(endpointDraft);
-      await onEndpointUpdated();
-      setEndpointStatus(
-        endpointDraft.trim()
-          ? 'Connected Apps Script Web App URL. Please sign in or initialize your owner password.'
-          : 'Cleared custom URL — operating in local preview mode.'
-      );
-    } catch (err) {
-      setAuthError(err instanceof Error ? err.message : 'Invalid URL.');
-    }
-  };
-
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
-    if (passwordInput.length < 8) {
-      setAuthError('Administrator password must be at least 8 characters long.');
+
+    const cleanEmail = emailInput.trim();
+    if (!cleanEmail) {
+      setAuthError('Please enter your administrator email address.');
       return;
     }
+    if (passwordInput.length < 8) {
+      setAuthError('Password must be at least 8 characters long.');
+      return;
+    }
+
     setAuthLoading(true);
     try {
-      if (!passwordConfigured) {
+      if (!configured) {
+        if (nameInput.trim().length < 2) {
+          throw new Error('Please enter the Super Admin full name.');
+        }
         if (passwordInput !== confirmPasswordInput) {
           throw new Error('Passwords do not match.');
         }
-        await akyinApiClient.setupAdminPassword(passwordInput);
+        const res = await suiteApi.setupInitialAdmin({
+          name: nameInput.trim(),
+          email: cleanEmail,
+          password: passwordInput,
+        });
+        setPasswordInput('');
+        setConfirmPasswordInput('');
+        onAuthenticated(res.user);
       } else {
-        await akyinApiClient.loginAdmin(passwordInput);
+        const res = await suiteApi.login({
+          email: cleanEmail,
+          password: passwordInput,
+        });
+        setPasswordInput('');
+        onAuthenticated(res.user);
       }
-      setPasswordInput('');
-      setConfirmPasswordInput('');
-      onAuthenticated();
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : 'Authentication failed.');
     } finally {
@@ -77,9 +72,12 @@ export function AdminLoginPage({
     }
   };
 
+  const inputCls =
+    'w-full rounded-xl border border-white/85 bg-white/75 backdrop-blur-sm px-3.5 py-2.5 text-sm text-[#1D1D1F] focus:outline-none focus:bg-white focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/15';
+
   return (
     <div className="min-h-screen surface-silver-gradient text-[#1D1D1F] flex flex-col justify-between p-4 sm:p-8">
-      <div className="max-w-7xl w-full mx-auto flex items-center justify-between">
+      <div className="max-w-7xl w-full mx-auto flex items-center justify-between gap-4">
         <button
           type="button"
           onClick={() => onNavigate('/')}
@@ -89,7 +87,7 @@ export function AdminLoginPage({
           Return to AKYIN.com
         </button>
         <span className="font-mono-num text-[11px] font-semibold text-[#6E6E73]">
-          {isLiveBackend ? 'Google Apps Script Live Mode' : 'Local Preview Mode'}
+          No Public Registration · Internal Team Access Only
         </span>
       </div>
 
@@ -99,31 +97,76 @@ export function AdminLoginPage({
             <div className="flex items-center justify-between gap-3">
               <AkyinLogo size="sm" />
               <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1D1D1F]">
-                <Lock className="w-3.5 h-3.5" aria-hidden="true" />
-                <span>Restricted Console</span>
+                {configured ? (
+                  <Lock className="w-3.5 h-3.5 text-[#0071E3]" aria-hidden="true" />
+                ) : (
+                  <UserPlus className="w-3.5 h-3.5 text-[#0071E3]" aria-hidden="true" />
+                )}
+                <span>{configured ? 'Suite Sign In' : 'Initial Super Admin Setup'}</span>
               </div>
             </div>
             <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-[-0.02em] text-[#1D1D1F]">
               {checkingStatus
-                ? 'Validating Admin Session...'
-                : passwordConfigured
-                  ? 'Owner Sign In'
-                  : 'One-Time Owner Setup'}
+                ? 'Checking Suite Status...'
+                : configured
+                  ? 'AKYIN Business Suite'
+                  : 'Create Super Admin Account'}
             </h1>
             <p className="text-xs text-[#6E6E73] leading-relaxed">
-              {passwordConfigured
-                ? 'Enter your administrator password to issue a short-lived expiring session token and access the management dashboard.'
-                : 'Create your initial administrator password (min 8 characters). Stored as a salted cryptographic hash inside Google Apps Script PropertiesService.'}
+              {configured
+                ? 'Sign in with your team email and password to access CRM, quotations, Razorpay settlements, and executive revenue reporting.'
+                : 'One-time initialization: create the first Super Admin account. Public sign-up is permanently disabled once configured.'}
             </p>
           </div>
 
           <form onSubmit={handleAuthSubmit} className="space-y-4">
+            {!configured && (
+              <div>
+                <label
+                  htmlFor="admin-name"
+                  className="block text-xs font-semibold text-[#1D1D1F] mb-1.5"
+                >
+                  Super Admin Full Name
+                </label>
+                <input
+                  id="admin-name"
+                  type="text"
+                  required
+                  minLength={2}
+                  autoComplete="name"
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  placeholder="e.g. Akyin"
+                  className={inputCls}
+                />
+              </div>
+            )}
+
+            <div>
+              <label
+                htmlFor="admin-email"
+                className="block text-xs font-semibold text-[#1D1D1F] mb-1.5"
+              >
+                Administrator Email
+              </label>
+              <input
+                id="admin-email"
+                type="email"
+                required
+                autoComplete="email"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                placeholder="connect@akyin.com"
+                className={inputCls}
+              />
+            </div>
+
             <div>
               <label
                 htmlFor="admin-password"
                 className="block text-xs font-semibold text-[#1D1D1F] mb-1.5"
               >
-                Administrator Password
+                Password
               </label>
               <div className="relative">
                 <input
@@ -131,11 +174,11 @@ export function AdminLoginPage({
                   type={showPassword ? 'text' : 'password'}
                   required
                   minLength={8}
-                  autoComplete="current-password"
+                  autoComplete={configured ? 'current-password' : 'new-password'}
                   value={passwordInput}
                   onChange={(e) => setPasswordInput(e.target.value)}
                   placeholder="Enter password (min 8 characters)"
-                  className="w-full rounded-xl border border-white/85 bg-white/75 backdrop-blur-sm pl-3.5 pr-10 py-2.5 text-sm text-[#1D1D1F] focus:outline-none focus:bg-white focus:border-[#1D1D1F]/50 focus:ring-2 focus:ring-[#1D1D1F]/15"
+                  className="w-full rounded-xl border border-white/85 bg-white/75 backdrop-blur-sm pl-3.5 pr-10 py-2.5 text-sm text-[#1D1D1F] focus:outline-none focus:bg-white focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/15"
                 />
                 <button
                   type="button"
@@ -152,13 +195,13 @@ export function AdminLoginPage({
               </div>
             </div>
 
-            {!passwordConfigured && (
+            {!configured && (
               <div>
                 <label
                   htmlFor="admin-password-confirm"
                   className="block text-xs font-semibold text-[#1D1D1F] mb-1.5"
                 >
-                  Confirm Initial Password
+                  Confirm Password
                 </label>
                 <input
                   id="admin-password-confirm"
@@ -168,8 +211,8 @@ export function AdminLoginPage({
                   autoComplete="new-password"
                   value={confirmPasswordInput}
                   onChange={(e) => setConfirmPasswordInput(e.target.value)}
-                  placeholder="Re-enter initial password"
-                  className="w-full rounded-xl border border-white/85 bg-white/75 backdrop-blur-sm px-3.5 py-2.5 text-sm text-[#1D1D1F] focus:outline-none focus:bg-white focus:border-[#1D1D1F]/50 focus:ring-2 focus:ring-[#1D1D1F]/15"
+                  placeholder="Re-enter password"
+                  className={inputCls}
                 />
               </div>
             )}
@@ -188,45 +231,24 @@ export function AdminLoginPage({
               className="w-full"
             >
               {authLoading
-                ? 'Verifying...'
-                : passwordConfigured
-                  ? 'Sign In to Admin Dashboard'
-                  : 'Initialize Owner Password'}
+                ? 'Authenticating...'
+                : configured
+                  ? 'Sign In to Business Suite'
+                  : 'Initialize Super Admin & Sign In'}
             </GlassButton>
           </form>
 
-          <div className="flex items-start gap-2 rounded-2xl bg-[#FFFFFF]/80 border border-[#E8E8ED] p-3.5 text-[11px] text-[#6E6E73]">
-            <ShieldCheck className="w-4 h-4 text-[#1D1D1F] shrink-0 mt-0.5" aria-hidden="true" />
+          <div className="flex items-start gap-2.5 rounded-2xl bg-[#FFFFFF]/80 border border-[#E8E8ED] p-3.5 text-[11px] text-[#6E6E73]">
+            <ShieldCheck className="w-4 h-4 text-[#0071E3] shrink-0 mt-0.5" aria-hidden="true" />
             <span>
-              Sessions use short-lived expiring tokens (30-minute window) verified via AkyinApiClient before dashboard access is granted.
+              Protected by scrypt password hashing, SHA-256 server session hashes, and RBAC permission guards. Session tokens reside strictly in JavaScript memory (no browser storage persistence).
             </span>
-          </div>
-
-          <div className="pt-4 border-t border-[#E8E8ED] space-y-3">
-            <p className="text-[11px] font-semibold text-[#6E6E73]">
-              Google Apps Script Web App Endpoint (/exec URL)
-            </p>
-            <form onSubmit={handleSaveEndpoint} className="flex flex-col sm:flex-row gap-2">
-              <input
-                type="url"
-                value={endpointDraft}
-                onChange={(e) => setEndpointDraft(e.target.value)}
-                placeholder="https://script.google.com/macros/s/.../exec"
-                className="flex-1 rounded-xl border border-[#E8E8ED] bg-[#FFFFFF] px-3 py-2 text-xs font-mono-num text-[#1D1D1F] focus:outline-none focus:border-[#1D1D1F]"
-              />
-              <GlassButton type="submit" variant="subtle" size="sm">
-                Bind URL
-              </GlassButton>
-            </form>
-            {endpointStatus && (
-              <p className="text-[11px] font-semibold text-[#1D1D1F]">{endpointStatus}</p>
-            )}
           </div>
         </GlassPanel>
       </div>
 
       <p className="text-center text-[11px] text-[#6E6E73]">
-        AKYIN Ventures Operations Portal · Protected Route (/admin)
+        AKYIN.com Business Management Suite · Protected Route (/admin)
       </p>
     </div>
   );

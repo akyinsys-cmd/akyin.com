@@ -1,24 +1,19 @@
 import 'dotenv/config';
-import crypto from 'crypto';
 import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { GoogleGenAI, ThinkingLevel } from '@google/genai';
-import { z } from 'zod';
+import type { GoogleGenAI } from '@google/genai';
 import { buildMarkdownForRoute } from './src/utils/agentMarkdown';
 import {
   OFFICIAL_CONTACT,
-  PRICING_PACKAGES,
-  RATE_CARD_ITEMS,
   VENTURES_PORTFOLIO,
 } from './src/data/akyinData';
-import {
-  PAYMENT_CATALOG_BY_SKU,
-  PAYMENT_CATALOG_LIST,
-  PaymentSku,
-} from './src/data/paymentCatalog';
+import { handleRazorpayWebhook, registerSuiteRoutes } from './server/routes';
+import { readDb } from './server/storage';
+import { buildDynamicSitemapXml, renderSeoHtml } from './server/seoRenderer';
+import { startSubscriptionReminderScheduler } from './server/scheduler';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,83 +44,11 @@ const TOPIC_PROMPTS: Record<string, string> = {
     'latest automotive dealership CRM automation, AI lead qualification, WhatsApp showroom follow-up, and automotive sales training trends in 2025 and 2026',
 };
 
-const ROUTE_SEO_META: Record<
-  string,
-  { title: string; description: string; ogTitle?: string; ogDescription?: string }
-> = {
-  '/': {
-    title: 'AKYIN Ventures — Multi-Business Group & Marketing Agency',
-    description:
-      'AKYIN Ventures is a diversified multi-business group and marketing agency spanning publishing, automotive growth, retail, AI tools, B2B trade, and advisory.',
-  },
-  '/about': {
-    title: 'About AKYIN Ventures — One Vision. Multiple Business Ventures.',
-    description:
-      'Corporate profile of AKYIN Ventures and its seven operating divisions across publishing, performance marketing, retail, AI tools, and B2B commerce.',
-  },
-  '/ventures': {
-    title: 'Our Businesses — AKYIN Ventures Portfolio',
-    description:
-      'Explore Akyin Publishing, Akyin Marketing Agency, Akyin Store, AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar.',
-  },
-  '/ventures/publishing': {
-    title: 'AKYIN Publishing — Ideas That Inspire. Knowledge That Empowers. | akyin.com',
-    description:
-      'Explore eight books on Amazon and three digital guides & productivity tools published by AKYIN.',
-  },
-  '/ventures/marketing': {
-    title: 'AKYIN MARKETINGS — Full-Service Marketing Agency & Growth Solutions',
-    description:
-      'Full-service digital marketing agency delivering Meta lead generation, brand campaigns, AI-assisted lead qualification, and commercial sales training.',
-  },
-  '/marketing/automotive': {
-    title: 'Car Dealership Marketing & Test-Drive Leads | AKYIN',
-    description:
-      'Book qualified showroom test drives, not cold clicks. Targeted Meta & Google auto ads, lead vetting, and floor sales coaching. Get a quote.',
-    ogTitle: 'More Showroom Test Drives. Zero Cold Leads. | AKYIN',
-    ogDescription:
-      'High-intent Meta & Google auto ads, automated lead vetting, and dealer sales coaching built to fill your showroom floor faster.',
-  },
-  '/pricing': {
-    title: 'Pricing & Rate Card — AKYIN Ventures & Marketing Agency',
-    description:
-      'Transparent INR pricing for AKYIN Marketing Agency packages, lead filtering retainers, dealership sales training, and 1-on-1 business advisory.',
-  },
-  '/advisory': {
-    title: 'Business Advisory & Consultation Booking — AKYIN Ventures',
-    description:
-      'Schedule a 1-on-1 30-minute IST Business Advisory consultation with AKYIN Ventures.',
-  },
-  '/terms': {
-    title: 'Terms of Service — AKYIN Ventures | akyin.com',
-    description:
-      'Terms of Service, direct ad platform billing rules, service scope separation, and governance policies for AKYIN Ventures.',
-  },
-  '/privacy': {
-    title: 'Privacy Policy — AKYIN Ventures | akyin.com',
-    description:
-      'Zero-broker data privacy, enquiry validation, and security standards across AKYIN Ventures.',
-  },
-  '/contact': {
-    title: 'Contact AKYIN Ventures — Let’s Start a Conversation',
-    description:
-      'Direct enquiry desk for AKYIN Ventures and all seven operating verticals.',
-  },
-};
-
-function escapeHtmlAttr(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
 type GeminiClientResult =
-  | { client: GoogleGenAI; reason: null }
-  | { client: null; reason: 'API_KEY_MISSING' | 'API_KEY_INVALID_FORMAT' };
+  | { client: GoogleGenAI; ThinkingLevel: typeof import('@google/genai').ThinkingLevel; reason: null }
+  | { client: null; ThinkingLevel: null; reason: 'API_KEY_MISSING' | 'API_KEY_INVALID_FORMAT' };
 
-function createGeminiClient(): GeminiClientResult {
+async function createGeminiClient(): Promise<GeminiClientResult> {
   let apiKey = (process.env.GEMINI_API_KEY ?? '')
     .trim()
     .replace(/^(['"])(.*)\1$/, '$2')
@@ -138,16 +61,17 @@ function createGeminiClient(): GeminiClientResult {
     apiKey === 'MY_GEMINI_API_KEY' ||
     /^(your_|replace_|test_|changeme|<.*>)/i.test(apiKey)
   ) {
-    return { client: null, reason: 'API_KEY_MISSING' };
+    return { client: null, ThinkingLevel: null, reason: 'API_KEY_MISSING' };
   }
 
   // OAuth access tokens (ya29.*) or tokens with whitespace are rejected by x-goog-api-key
   if (/\s/.test(apiKey) || apiKey.startsWith('ya29.')) {
-    return { client: null, reason: 'API_KEY_INVALID_FORMAT' };
+    return { client: null, ThinkingLevel: null, reason: 'API_KEY_INVALID_FORMAT' };
   }
 
+  const { GoogleGenAI: GenAIClient, ThinkingLevel } = await import('@google/genai');
   return {
-    client: new GoogleGenAI({
+    client: new GenAIClient({
       apiKey,
       httpOptions: {
         headers: {
@@ -155,6 +79,7 @@ function createGeminiClient(): GeminiClientResult {
         },
       },
     }),
+    ThinkingLevel,
     reason: null,
   };
 }
@@ -244,94 +169,7 @@ function classifyGeminiError(err: unknown): ClassifiedGeminiError {
   };
 }
 
-function getRazorpayCredentials(): { keyId: string; keySecret: string } | null {
-  const keyId = process.env.RAZORPAY_KEY_ID?.trim();
-  const keySecret = process.env.RAZORPAY_KEY_SECRET?.trim();
-  if (
-    !keyId ||
-    !keySecret ||
-    keyId === 'MY_RAZORPAY_KEY_ID' ||
-    keySecret === 'MY_RAZORPAY_KEY_SECRET'
-  ) {
-    return null;
-  }
-  return { keyId, keySecret };
-}
 
-const createOrderBodySchema = z
-  .object({
-    sku: z.enum([
-      'advisory-session',
-      'package-a-setup',
-      'package-b-setup',
-      'sales-training',
-    ]),
-    customerName: z.string().trim().max(120).optional().default(''),
-    customerEmail: z
-      .union([z.string().trim().email().max(160), z.literal('')])
-      .optional()
-      .default(''),
-    customerPhone: z
-      .string()
-      .trim()
-      .max(30)
-      .refine((val) => val === '' || /^[+\d\s\-()]{6,30}$/.test(val), 'Invalid phone format.')
-      .optional()
-      .default(''),
-    referenceId: z.string().trim().max(80).optional().default(''),
-  })
-  .strict();
-
-const verifyPaymentBodySchema = z
-  .object({
-    razorpay_order_id: z.string().trim().min(4).max(100),
-    razorpay_payment_id: z.string().trim().min(4).max(100),
-    razorpay_signature: z
-      .string()
-      .trim()
-      .regex(/^[a-f0-9]{64}$/i, 'Invalid Razorpay signature format.'),
-    sku: z
-      .enum([
-        'advisory-session',
-        'package-a-setup',
-        'package-b-setup',
-        'sales-training',
-      ])
-      .optional(),
-  })
-  .strict();
-
-function stripDangerousControls(value: string): string {
-  return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '').trim();
-}
-
-const leadSubmissionBodySchema = z
-  .object({
-    fullName: z.string().trim().min(2, 'Full name is required.').max(100),
-    businessName: z.string().trim().min(2, 'Business name is required.').max(120),
-    mobileNumber: z
-      .string()
-      .trim()
-      .min(7, 'Please provide a valid mobile number.')
-      .max(28)
-      .refine((val) => /^[+\d\s\-()]{7,28}$/.test(val), 'Enter a valid mobile number with country or area code.'),
-    email: z.string().trim().email('Enter a valid email address.').max(160),
-    city: z.string().trim().min(2, 'City is required.').max(80),
-    country: z.string().trim().min(2, 'Country is required.').max(80),
-    requiredService: z.string().trim().min(2, 'Please select a required service.').max(140),
-    monthlyMarketingBudget: z
-      .string()
-      .trim()
-      .min(2, 'Please select a monthly marketing budget range.')
-      .max(80),
-    message: z.string().trim().min(8, 'Please enter a brief requirement summary (at least 8 characters).').max(1500),
-    consentAccepted: z
-      .boolean()
-      .refine((val) => val === true, 'Please accept the privacy consent before submitting.'),
-    honeypot: z.string().max(60).optional().default(''),
-    source: z.string().trim().max(80).optional().default('Interactive Lead Enquiry Widget'),
-  })
-  .strict();
 
 function extractJsonArray(rawText: string): NewsArticle[] {
   const cleaned = rawText
@@ -456,7 +294,7 @@ async function startServer() {
   app.disable('x-powered-by');
   app.set('trust proxy', 1);
 
-  // Baseline security & agent Content-Signal headers (preserve AI Studio iframe compatibility)
+  // Baseline security, robots & agent Content-Signal headers (preserve AI Studio iframe compatibility)
   app.use((req: Request, res: Response, next: NextFunction) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -466,6 +304,15 @@ async function startServer() {
     );
     res.setHeader('Content-Signal', 'search=yes, ai-input=yes, ai-train=no');
     if (
+      req.path.startsWith('/api/') ||
+      req.path === '/admin' ||
+      req.path.startsWith('/admin/') ||
+      req.path === '/quote' ||
+      req.path.startsWith('/quote/')
+    ) {
+      res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+    }
+    if (
       process.env.NODE_ENV === 'production' &&
       (req.secure || req.headers['x-forwarded-proto'] === 'https')
     ) {
@@ -474,7 +321,16 @@ async function startServer() {
     next();
   });
 
-  app.use(express.json({ limit: '64kb' }));
+  // Raw body route for Razorpay Webhooks MUST execute before express.json()
+  app.post(
+    '/api/razorpay/webhook',
+    express.raw({ type: 'application/json', limit: '256kb' }),
+    (req: Request, res: Response) => {
+      void handleRazorpayWebhook(req, res);
+    }
+  );
+
+  app.use(express.json({ limit: '128kb' }));
   app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
     if (err instanceof SyntaxError && 'status' in err && (err as { status?: number }).status === 400) {
       res.status(400).json({ error: 'Invalid JSON request payload.', code: 'INVALID_JSON' });
@@ -490,32 +346,11 @@ async function startServer() {
     message: 'Too many MCP requests. Please wait a minute before retrying.',
   });
 
-  const paymentOrderRateLimiter = createRateLimiter({
-    windowMs: 60_000,
-    max: 20,
-    code: 'PAYMENT_RATE_LIMITED',
-    message: 'Too many checkout requests from this network. Please wait a minute and retry.',
-  });
-
-  const paymentVerifyRateLimiter = createRateLimiter({
-    windowMs: 60_000,
-    max: 30,
-    code: 'PAYMENT_VERIFY_RATE_LIMITED',
-    message: 'Too many verification attempts. Please wait a minute and retry.',
-  });
-
   const newsRateLimiter = createRateLimiter({
     windowMs: 60_000,
     max: 20,
     code: 'NEWS_RATE_LIMITED',
     message: 'Too many headline sync requests. Please wait a minute before refreshing.',
-  });
-
-  const leadRateLimiter = createRateLimiter({
-    windowMs: 60_000,
-    max: 12,
-    code: 'LEAD_RATE_LIMITED',
-    message: 'Too many enquiry submissions. Please wait a minute before trying again.',
   });
 
   // Explicit agent discovery endpoints (works identically in dev and prod)
@@ -527,7 +362,7 @@ async function startServer() {
     }
     res
       .type('text/plain; charset=utf-8')
-      .send('User-agent: *\nAllow: /\nDisallow: /admin\nContent-Signal: search=yes, ai-input=yes, ai-train=no\nSitemap: https://akyin.com/sitemap.xml\n');
+      .send('User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /quote\nDisallow: /api/\nContent-Signal: search=yes, ai-input=yes, ai-train=no\nSitemap: https://akyin.com/sitemap.xml\n');
   });
 
   app.get('/llms.txt', (_req: Request, res: Response) => {
@@ -540,12 +375,18 @@ async function startServer() {
   });
 
   app.get('/sitemap.xml', (_req: Request, res: Response) => {
-    const file = resolvePublicOrDistFile('sitemap.xml');
-    if (file) {
-      res.type('application/xml; charset=utf-8').sendFile(file);
-      return;
+    try {
+      const db = readDb();
+      const xml = buildDynamicSitemapXml(db);
+      res.type('application/xml; charset=utf-8').send(xml);
+    } catch {
+      const file = resolvePublicOrDistFile('sitemap.xml');
+      if (file) {
+        res.type('application/xml; charset=utf-8').sendFile(file);
+        return;
+      }
+      res.status(404).send('Sitemap not found.');
     }
-    res.status(404).send('Sitemap not found.');
   });
 
   app.get('/.well-known/mcp/server-card.json', (_req: Request, res: Response) => {
@@ -653,7 +494,7 @@ async function startServer() {
             {
               name: 'get_marketing_pricing',
               description:
-                'Retrieve transparent INR pricing for AKYIN MARKETINGS retainers (Package A & B), sales training, and the 21-item rate card.',
+                'Retrieve transparent INR standalone service catalogue and pricing across all 10 AKYIN MARKETINGS categories.',
               inputSchema: {
                 type: 'object',
                 properties: {
@@ -664,7 +505,7 @@ async function startServer() {
             {
               name: 'get_contact_channels',
               description:
-                'Get official corporate email, telephone, WhatsApp, legal links, and social handles for AKYIN Ventures.',
+                'Get official corporate email, WhatsApp Connect, legal links, and social handles for AKYIN Ventures.',
               inputSchema: {
                 type: 'object',
                 properties: {},
@@ -717,10 +558,23 @@ async function startServer() {
       }
 
       if (toolName === 'get_marketing_pricing') {
+        const db = readDb();
         const cat = typeof args.category === 'string' ? args.category.trim().toLowerCase() : '';
-        const items = cat
-          ? RATE_CARD_ITEMS.filter((i) => i.category.toLowerCase().includes(cat))
-          : RATE_CARD_ITEMS;
+        const activeServices = db.services
+          .filter((s) => s.active)
+          .filter((s) => !cat || s.category.toLowerCase().includes(cat))
+          .sort((a, b) => (a.menuOrder ?? a.sortOrder) - (b.menuOrder ?? b.sortOrder))
+          .map((s) => ({
+            id: s.id,
+            slug: s.slug,
+            name: s.name,
+            category: s.category,
+            pricingModel: s.pricingModel,
+            oneTimePrice: s.oneTimePrice,
+            monthlyPrice: s.monthlyPrice,
+            billingCycle: s.billingCycle,
+            url: `${OFFICIAL_CONTACT.domain}/services/${s.slug}`,
+          }));
 
         res.json({
           jsonrpc: '2.0',
@@ -733,8 +587,8 @@ async function startServer() {
                   {
                     currency: 'INR',
                     pricingUrl: `${OFFICIAL_CONTACT.domain}/pricing`,
-                    packages: PRICING_PACKAGES,
-                    rateCard: items,
+                    categories: (db.serviceCategories || []).filter((c) => c.active).map((c) => c.name),
+                    services: activeServices,
                   },
                   null,
                   2
@@ -758,7 +612,7 @@ async function startServer() {
                   {
                     organization: OFFICIAL_CONTACT.parentBrand,
                     email: OFFICIAL_CONTACT.email,
-                    telephone: OFFICIAL_CONTACT.phoneDisplay,
+                    whatsappConnect: OFFICIAL_CONTACT.whatsappUrl,
                     whatsappUrl: OFFICIAL_CONTACT.whatsappUrl,
                     socials: OFFICIAL_CONTACT.marketingSocials,
                     termsUrl: `${OFFICIAL_CONTACT.domain}/terms`,
@@ -811,257 +665,10 @@ async function startServer() {
     });
   });
 
-  // Razorpay Payment Gateway Endpoints (Server-Side Secret & Pricing Authority)
-  app.get('/api/razorpay/config', (_req: Request, res: Response) => {
-    const creds = getRazorpayCredentials();
-    res.json({
-      configured: Boolean(creds),
-      keyId: creds ? creds.keyId : null,
-      currency: 'INR',
-      catalog: PAYMENT_CATALOG_LIST,
-    });
-  });
-
-  app.post('/api/razorpay/create-order', paymentOrderRateLimiter, async (req: Request, res: Response) => {
-    const creds = getRazorpayCredentials();
-    if (!creds) {
-      res.status(503).json({
-        error:
-          'Online Razorpay checkout requires RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to be configured in Settings > Secrets.',
-        code: 'RAZORPAY_NOT_CONFIGURED',
-      });
-      return;
-    }
-
-    const parsed = createOrderBodySchema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({
-        error: 'Invalid payment order request parameters.',
-        code: 'INVALID_REQUEST',
-        issues: parsed.error.issues.map((i) => i.message),
-      });
-      return;
-    }
-
-    const sku: PaymentSku = parsed.data.sku;
-    const item = PAYMENT_CATALOG_BY_SKU[sku];
-    if (!item) {
-      res.status(404).json({
-        error: 'Selected payment item was not found in catalog.',
-        code: 'SKU_NOT_FOUND',
-      });
-      return;
-    }
-
-    const receiptSuffix = parsed.data.referenceId
-      ? parsed.data.referenceId.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 16)
-      : Date.now().toString(36);
-    const receipt = `akyin_${sku.replace(/[^a-z0-9]/g, '').slice(0, 10)}_${receiptSuffix}`.slice(
-      0,
-      40
-    );
-
-    try {
-      const authHeader = Buffer.from(`${creds.keyId}:${creds.keySecret}`).toString('base64');
-      const rzpResponse = await fetch('https://api.razorpay.com/v1/orders', {
-        method: 'POST',
-        headers: {
-          Authorization: `Basic ${authHeader}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: item.amountPaise,
-          currency: 'INR',
-          receipt,
-          notes: {
-            sku: item.sku,
-            title: item.shortLabel,
-            referenceId: parsed.data.referenceId || 'direct-web',
-            customerName: parsed.data.customerName || 'Guest',
-            customerEmail: parsed.data.customerEmail || '',
-          },
-        }),
-      });
-
-      const rzpBody = (await rzpResponse.json().catch(() => ({}))) as {
-        id?: string;
-        amount?: number;
-        currency?: string;
-        receipt?: string;
-        error?: { description?: string };
-      };
-
-      if (!rzpResponse.ok || !rzpBody.id) {
-        const msg =
-          rzpBody?.error?.description || 'Razorpay refused order creation. Verify API credentials.';
-        res.status(502).json({
-          error: msg,
-          code: 'RAZORPAY_UPSTREAM_ERROR',
-        });
-        return;
-      }
-
-      res.json({
-        orderId: rzpBody.id,
-        amount: item.amountPaise,
-        currency: 'INR',
-        keyId: creds.keyId,
-        sku: item.sku,
-        title: item.title,
-        displayPrice: item.displayPrice,
-        description: item.description,
-        receipt: rzpBody.receipt || receipt,
-      });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Unable to reach Razorpay Orders API.';
-      console.error('[/api/razorpay/create-order] Error:', msg);
-      res.status(502).json({
-        error: 'Unable to reach Razorpay gateway right now. Please try again shortly.',
-        code: 'RAZORPAY_NETWORK_ERROR',
-      });
-    }
-  });
-
-  app.post('/api/razorpay/verify-payment', paymentVerifyRateLimiter, (req: Request, res: Response) => {
-    const creds = getRazorpayCredentials();
-    if (!creds) {
-      res.status(503).json({
-        verified: false,
-        error:
-          'Razorpay verification requires RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in Settings > Secrets.',
-        code: 'RAZORPAY_NOT_CONFIGURED',
-      });
-      return;
-    }
-
-    const parsed = verifyPaymentBodySchema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({
-        verified: false,
-        error: 'Invalid payment verification payload.',
-        code: 'INVALID_VERIFICATION_PAYLOAD',
-      });
-      return;
-    }
-
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, sku } = parsed.data;
-    const expectedHex = crypto
-      .createHmac('sha256', creds.keySecret)
-      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-      .digest('hex');
-
-    const expectedBuf = Buffer.from(expectedHex, 'hex');
-    const actualBuf = Buffer.from(razorpay_signature.toLowerCase(), 'hex');
-
-    if (expectedBuf.length !== actualBuf.length || !crypto.timingSafeEqual(expectedBuf, actualBuf)) {
-      res.status(400).json({
-        verified: false,
-        error: 'Payment signature mismatch. Please contact connect@akyin.com if your account was debited.',
-        code: 'SIGNATURE_MISMATCH',
-      });
-      return;
-    }
-
-    const item = sku ? PAYMENT_CATALOG_BY_SKU[sku] : undefined;
-    res.json({
-      verified: true,
-      orderId: razorpay_order_id,
-      paymentId: razorpay_payment_id,
-      sku: sku || null,
-      title: item?.title || 'AKYIN Commercial Payment',
-      displayPrice: item?.displayPrice || null,
-      verifiedAt: new Date().toISOString(),
-    });
-  });
-
-  // Server-Validated Lead Enquiry Submission (stored outside public/ and dist/; never exposed via GET)
-  app.post('/api/leads', leadRateLimiter, (req: Request, res: Response) => {
-    const parsed = leadSubmissionBodySchema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({
-        ok: false,
-        error: parsed.error.issues[0]?.message || 'Invalid lead enquiry submission.',
-        code: 'INVALID_LEAD_PAYLOAD',
-        issues: parsed.error.issues.map((issue) => issue.message),
-      });
-      return;
-    }
-
-    const data = parsed.data;
-    if (data.honeypot && data.honeypot.trim().length > 0) {
-      res.status(400).json({
-        ok: false,
-        error: 'Submission rejected.',
-        code: 'INVALID_LEAD_PAYLOAD',
-      });
-      return;
-    }
-
-    const leadId = `AKY-LEAD-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
-    const receivedAt = new Date().toISOString();
-
-    const record = {
-      leadId,
-      receivedAt,
-      fullName: stripDangerousControls(data.fullName),
-      businessName: stripDangerousControls(data.businessName),
-      mobileNumber: stripDangerousControls(data.mobileNumber),
-      email: stripDangerousControls(data.email),
-      city: stripDangerousControls(data.city),
-      country: stripDangerousControls(data.country),
-      requiredService: stripDangerousControls(data.requiredService),
-      monthlyMarketingBudget: stripDangerousControls(data.monthlyMarketingBudget),
-      message: stripDangerousControls(data.message),
-      consentAccepted: true,
-      source: stripDangerousControls(data.source || 'Interactive Lead Enquiry Widget'),
-    };
-
-    try {
-      const dataDir = path.resolve(__dirname, '.akyin-data');
-      const leadsFile = path.join(dataDir, 'leads.json');
-      fs.mkdirSync(dataDir, { recursive: true });
-
-      let existing: unknown[] = [];
-      if (fs.existsSync(leadsFile)) {
-        try {
-          const raw = fs.readFileSync(leadsFile, 'utf8');
-          const parsedFile = JSON.parse(raw) as unknown;
-          if (Array.isArray(parsedFile)) {
-            existing = parsedFile;
-          }
-        } catch {
-          existing = [];
-        }
-      }
-
-      existing.unshift(record);
-      const tempFile = path.join(dataDir, `leads.${process.pid}.${Date.now()}.tmp`);
-      fs.writeFileSync(tempFile, JSON.stringify(existing.slice(0, 1000), null, 2), 'utf8');
-      fs.renameSync(tempFile, leadsFile);
-
-      res.status(201).json({
-        ok: true,
-        leadId,
-        receivedAt,
-      });
-    } catch (err: unknown) {
-      console.error('[/api/leads] Failed to persist submission:', err instanceof Error ? err.message : err);
-      res.status(500).json({
-        ok: false,
-        error: 'Unable to record enquiry right now. Please contact connect@akyin.com directly.',
-        code: 'LEAD_STORAGE_ERROR',
-      });
-    }
-  });
-
-  app.get('/api/leads', (_req: Request, res: Response) => {
-    res.setHeader('Allow', 'POST');
-    res.status(405).json({
-      ok: false,
-      error: 'Method not allowed. Lead enquiries must be submitted via POST.',
-      code: 'METHOD_NOT_ALLOWED',
-    });
-  });
+  // Mount AKYIN Business Management Suite routes (CRM, Clients, Services, Quotations, Invoices, Razorpay, Reports, Appointments, Auth & Audit)
+  registerSuiteRoutes(app);
+  // Start background cron-like scheduler for upcoming monthly subscription renewal SMTP reminders
+  startSubscriptionReminderScheduler();
 
   app.get('/api/automotive-news', newsRateLimiter, async (req: Request, res: Response) => {
     const topicKey =
@@ -1075,8 +682,8 @@ async function startServer() {
       return;
     }
 
-    const { client: ai, reason } = createGeminiClient();
-    if (!ai) {
+    const { client: ai, ThinkingLevel, reason } = await createGeminiClient();
+    if (!ai || !ThinkingLevel) {
       res.status(503).json({
         error:
           reason === 'API_KEY_INVALID_FORMAT'
@@ -1212,57 +819,56 @@ Return ONLY a valid JSON array (no extra commentary) where each object contains:
         res.status(404).send('Build output not found.');
         return;
       }
-      const cleaned = req.path.replace(/\/+$/, '') || '/';
-      const routeMeta = ROUTE_SEO_META[cleaned];
-      if (!routeMeta) {
-        res.type('text/html; charset=utf-8').send(cachedIndexHtml);
-        return;
-      }
-
-      const canonicalUrl = `https://akyin.com${cleaned === '/' ? '/' : cleaned}`;
-      const ogTitleValue = routeMeta.ogTitle || routeMeta.title;
-      const ogDescValue = routeMeta.ogDescription || routeMeta.description;
-      let html = cachedIndexHtml;
-      html = html
-        .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtmlAttr(routeMeta.title)}</title>`)
-        .replace(
-          /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i,
-          `<meta name="description" content="${escapeHtmlAttr(routeMeta.description)}" />`
-        )
-        .replace(
-          /<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>/i,
-          `<link rel="canonical" href="${escapeHtmlAttr(canonicalUrl)}" />`
-        )
-        .replace(
-          /<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i,
-          `<meta property="og:title" content="${escapeHtmlAttr(ogTitleValue)}" />`
-        )
-        .replace(
-          /<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i,
-          `<meta property="og:description" content="${escapeHtmlAttr(ogDescValue)}" />`
-        )
-        .replace(
-          /<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/i,
-          `<meta property="og:url" content="${escapeHtmlAttr(canonicalUrl)}" />`
-        )
-        .replace(
-          /<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i,
-          `<meta name="twitter:title" content="${escapeHtmlAttr(ogTitleValue)}" />`
-        )
-        .replace(
-          /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/i,
-          `<meta name="twitter:description" content="${escapeHtmlAttr(ogDescValue)}" />`
-        );
+      const renderedHtml = renderSeoHtml(cachedIndexHtml, req.path, readDb());
       res.setHeader('Vary', 'Accept');
-      res.type('text/html; charset=utf-8').send(html);
+      res.type('text/html; charset=utf-8').send(renderedHtml);
     });
   } else {
-    const { createServer: createViteServer } = await import('vite');
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
+    const vitePromise = import('vite')
+      .then(({ createServer: createViteServer }) =>
+        createViteServer({
+          server: {
+            middlewareMode: true,
+            hmr: false,
+            watch: null,
+          },
+          appType: 'spa',
+        })
+      );
+    vitePromise.catch((err) => {
+      console.error('[Vite initialization error]', err);
     });
-    app.use(vite.middlewares);
+    const devIndexPath = path.resolve(__dirname, 'index.html');
+
+    app.use(async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const vite = await vitePromise;
+        const reqPath = req.path || '/';
+        const isPageNavigation =
+          (req.method === 'GET' || req.method === 'HEAD') &&
+          !reqPath.startsWith('/api/') &&
+          !reqPath.startsWith('/assets/') &&
+          !reqPath.startsWith('/downloads/') &&
+          !reqPath.startsWith('/@') &&
+          !reqPath.startsWith('/src/') &&
+          !reqPath.startsWith('/node_modules/') &&
+          !reqPath.startsWith('/.well-known/') &&
+          !/\.[a-z0-9]{1,8}$/i.test(reqPath);
+
+        if (isPageNavigation && fs.existsSync(devIndexPath)) {
+          const baseTemplate = fs.readFileSync(devIndexPath, 'utf8');
+          const ssrHtml = renderSeoHtml(baseTemplate, req.originalUrl, readDb());
+          const transformedHtml = await vite.transformIndexHtml(req.originalUrl, ssrHtml);
+          res.setHeader('Vary', 'Accept');
+          res.status(200).type('text/html; charset=utf-8').end(transformedHtml);
+          return;
+        }
+
+        vite.middlewares(req, res, next);
+      } catch (err) {
+        next(err);
+      }
+    });
   }
 
   app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {

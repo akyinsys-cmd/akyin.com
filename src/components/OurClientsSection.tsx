@@ -38,7 +38,7 @@ export function OurClientsSection({
     clientSupportTextDisplay || CLIENT_STATS.clientSupportText;
 
   const categories = [
-    { id: 'all', label: 'All Clients (10)' },
+    { id: 'all', label: `All Clients (${AKYIN_CLIENTS.length})` },
     { id: 'featured-four', label: 'Featured Growth Clients (4)' },
     { id: 'retail-trade', label: 'Retail, Trade & Commerce' },
     { id: 'tech-advisory', label: 'Tech & Advisory' },
@@ -52,6 +52,7 @@ export function OurClientsSection({
     if (activeCategoryFilter === 'retail-trade') {
       return [
         'kartigo',
+        'thrift-store',
         'budget-bazaar',
         'mei-cosmetics',
         'krutika-cosmetics',

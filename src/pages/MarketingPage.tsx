@@ -1,9 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowRight,
   CheckCircle2,
   Search,
-  ShieldAlert,
   X,
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
@@ -12,14 +11,12 @@ import {
   AppRoute,
   EXPERIENCE_MILESTONES,
   IMAGES,
-  MARKETING_SERVICES,
   OFFICIAL_CONTACT,
-  PRICING_PACKAGES,
   RATE_CARD_ITEMS,
-  SERVICE_CATEGORIES,
-  ServiceCategory,
+  SERVICE_MARKETPLACE_CATEGORIES,
   TRAINING_CURRICULUM,
 } from '../data/akyinData';
+import { SuiteServiceItem, suiteApi } from '../services/suiteApi';
 import { ClientSuccessCarousel } from '../components/ClientSuccessCarousel';
 import { ContactDispatcher } from '../components/ContactDispatcher';
 import { EditorialReveal } from '../components/EditorialReveal';
@@ -37,6 +34,7 @@ import {
 } from '../components/liquid-glass';
 import { PresentationDeckViewer } from '../components/PresentationDeckViewer';
 import { ResilientImage } from '../components/ResilientImage';
+import { ServiceBillingDisclaimer } from '../components/ServiceBillingDisclaimer';
 import { SocialLinks } from '../components/SocialLinks';
 import { ALL_BUSINESSES_DECK, AUTOMOTIVE_DECK } from '../data/presentationDecks';
 
@@ -44,14 +42,66 @@ interface MarketingPageProps {
   onNavigate?: (route: AppRoute) => void;
 }
 
+function formatStandalonePriceSummary(svc: SuiteServiceItem): string {
+  if (svc.id === 'srv-bulk-sms') {
+    return `₹${(svc.packagePrice || 3000).toLocaleString('en-IN')} / ${(svc.includedUnits || 10000).toLocaleString('en-IN')} SMS (₹${(svc.unitRate ?? 0.3).toFixed(2)}/SMS)`;
+  }
+  if (svc.id === 'srv-whatsapp-messaging') {
+    return `Setup ₹${(svc.whatsappSetupFee ?? svc.setupFee ?? 4999).toLocaleString('en-IN')} · ₹${(svc.whatsappPerMessageRate ?? svc.unitRate ?? 1.5).toFixed(2)}/msg separate`;
+  }
+  const oneTime = svc.oneTimePrice || svc.setupFee || 0;
+  const monthly = svc.monthlyPrice || svc.recurringFee || 0;
+  if (svc.pricingModel === 'custom' || (oneTime <= 0 && monthly <= 0)) {
+    return 'Custom Quote on Request';
+  }
+  const parts: string[] = [];
+  if (oneTime > 0) parts.push(`₹${oneTime.toLocaleString('en-IN')} ${svc.billingCycle === 'one-time' ? 'project' : 'setup'}`);
+  if (monthly > 0) parts.push(`₹${monthly.toLocaleString('en-IN')}/mo`);
+  return parts.join(' · ');
+}
+
 export function MarketingPage({ onNavigate }: MarketingPageProps) {
   const shouldReduceMotion = useReducedMotion();
-  const [activeCategory, setActiveCategory] = useState<ServiceCategory>('all');
+  const [activeCategory, setActiveCategory] = useState<string>('ALL');
+  const [serviceSearch, setServiceSearch] = useState('');
+  const [liveCategories, setLiveCategories] = useState<string[]>([...SERVICE_MARKETPLACE_CATEGORIES]);
+  const [liveServices, setLiveServices] = useState<SuiteServiceItem[]>([]);
+  const [loadingCatalogue, setLoadingCatalogue] = useState(true);
   const [rateSearch, setRateSearch] = useState('');
   const [widgetTab, setWidgetTab] = useState<BusinessWidgetTabId>('roi');
   const [selectedEnquiryType, setSelectedEnquiryType] = useState(
-    'Package A — Full-Service Growth Marketing & Lead Management'
+    'Automotive Dealership Marketing & Sales Strategy'
   );
+
+  useEffect(() => {
+    let active = true;
+    suiteApi
+      .fetchPublicServices()
+      .then((res) => {
+        if (!active) return;
+        if (Array.isArray(res.categories) && res.categories.length > 0) {
+          setLiveCategories(res.categories);
+        }
+        const seen = new Set<string>();
+        const deduped: SuiteServiceItem[] = [];
+        for (const s of res.services || []) {
+          const key = s.name.trim().toLowerCase();
+          if (!s.active || seen.has(key)) continue;
+          seen.add(key);
+          deduped.push(s);
+        }
+        setLiveServices(deduped);
+      })
+      .catch(() => {
+        if (active) setLiveServices([]);
+      })
+      .finally(() => {
+        if (active) setLoadingCatalogue(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const safeNavigate = (route: AppRoute) => {
     if (onNavigate) {
@@ -71,9 +121,18 @@ export function MarketingPage({ onNavigate }: MarketingPageProps) {
   };
 
   const filteredServices = useMemo(() => {
-    if (activeCategory === 'all') return MARKETING_SERVICES;
-    return MARKETING_SERVICES.filter((svc) => svc.category === activeCategory);
-  }, [activeCategory]);
+    const q = serviceSearch.trim().toLowerCase();
+    return liveServices.filter((svc) => {
+      if (activeCategory !== 'ALL' && svc.category !== activeCategory) return false;
+      if (!q) return true;
+      return (
+        svc.name.toLowerCase().includes(q) ||
+        svc.category.toLowerCase().includes(q) ||
+        svc.description.toLowerCase().includes(q) ||
+        (svc.deliverables || []).some((d) => d.toLowerCase().includes(q))
+      );
+    });
+  }, [liveServices, activeCategory, serviceSearch]);
 
   const filteredRates = useMemo(() => {
     const q = rateSearch.trim().toLowerCase();
@@ -124,7 +183,7 @@ export function MarketingPage({ onNavigate }: MarketingPageProps) {
                 variant="glass"
                 size="lg"
                 onClick={() =>
-                  handleEnquireItem('Package A — Full-Service Growth Marketing & Lead Management')
+                  handleEnquireItem('Automotive Dealership Marketing & Sales Strategy')
                 }
               >
                 Request an Agency Proposal
@@ -214,131 +273,241 @@ export function MarketingPage({ onNavigate }: MarketingPageProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {ABOUT_PILLARS.map((pillar) => (
-              <GlassCard key={pillar.number} interactive className="p-7 sm:p-8 space-y-4">
-                <div className="flex items-center gap-2 text-xs font-medium text-[#6E6E73]">
-                  <span className="font-mono-num font-bold text-[#1D1D1F]">
-                    {pillar.number}
-                  </span>
-                  <span aria-hidden="true">·</span>
-                  <span>{pillar.meta}</span>
-                </div>
-                <h3 className="font-display text-xl font-bold text-[#1D1D1F]">
-                  {pillar.title}
-                </h3>
-                <p className="text-sm text-[#6E6E73] leading-relaxed">
-                  {pillar.description}
-                </p>
-              </GlassCard>
+            {ABOUT_PILLARS.map((pillar, index) => (
+              <motion.div
+                key={pillar.number}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.12 }}
+                transition={{
+                  duration: 0.45,
+                  delay: shouldReduceMotion ? 0 : index * 0.06,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+              >
+                <GlassCard interactive className="h-full p-7 sm:p-8 space-y-4">
+                  <div className="flex items-center gap-2 text-xs font-medium text-[#6E6E73]">
+                    <span className="font-mono-num font-bold text-[#1D1D1F]">
+                      {pillar.number}
+                    </span>
+                    <span aria-hidden="true">·</span>
+                    <span>{pillar.meta}</span>
+                  </div>
+                  <h3 className="font-display text-xl font-bold text-[#1D1D1F]">
+                    {pillar.title}
+                  </h3>
+                  <p className="text-sm text-[#6E6E73] leading-relaxed">
+                    {pillar.description}
+                  </p>
+                </GlassCard>
+              </motion.div>
             ))}
           </div>
         </EditorialReveal>
       </section>
 
-      {/* 3. Complete 18-Service Catalogue */}
+      {/* 3. Standalone 10-Category Service Marketplace */}
       <section
         id="marketing-services"
         className="py-20 lg:py-24 bg-[#FFFFFF] border-t border-[#E8E8ED]"
       >
-        <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <EditorialReveal className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div className="max-w-2xl space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-                Complete Agency Service Catalogue · 18 Services
+                Standalone Service Marketplace · {liveCategories.length} Specialised Categories
               </p>
               <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F] text-balance">
-                Full-Service Marketing, Lead Qualification &amp; Commercial Training.
+                Every Service Standalone. Zero Forced Bundles.
               </h2>
               <p className="text-sm sm:text-base text-[#6E6E73] leading-relaxed">
+                Select any individual marketing, creative, messaging, CRM, or commercial training service independently.{' '}
                 <span className="font-semibold text-[#1D1D1F]">Lead Generation</span> and{' '}
                 <span className="font-semibold text-[#1D1D1F]">Lead Filtering &amp; Qualification</span>{' '}
-                are strictly distinct services. AKYIN manages AI calling and pipeline workflows internally and does not sell standalone CRM software.
+                remain strictly separate deliverables.
               </p>
             </div>
 
-            <div
-              role="tablist"
-              aria-label="Filter marketing services"
-              className="flex flex-wrap gap-1.5 p-1.5 liquid-glass-nav rounded-2xl"
+            <div className="relative w-full lg:w-80 shrink-0">
+              <Search
+                className="w-4 h-4 text-[#A1A1A6] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                aria-hidden="true"
+              />
+              <input
+                type="text"
+                maxLength={80}
+                value={serviceSearch}
+                onChange={(e) => setServiceSearch(e.target.value)}
+                placeholder="Filter standalone services..."
+                aria-label="Filter standalone services"
+                className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[#F5F5F7] border border-[#E8E8ED] text-sm text-[#1D1D1F] placeholder:text-[#A1A1A6] focus:outline-none focus:bg-white focus:border-[#1D1D1F]"
+              />
+              {serviceSearch && (
+                <button
+                  type="button"
+                  aria-label="Clear service search"
+                  onClick={() => setServiceSearch('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#6E6E73] hover:text-[#1D1D1F] cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </EditorialReveal>
+
+          {/* 10 Category Filter Tabs */}
+          <div
+            role="tablist"
+            aria-label="Filter standalone marketing services by category"
+            className="flex flex-wrap gap-1.5 p-2 liquid-glass-nav rounded-2xl"
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeCategory === 'ALL'}
+              onClick={() => setActiveCategory('ALL')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+                activeCategory === 'ALL'
+                  ? 'bg-[#1D1D1F] text-white shadow-xs'
+                  : 'text-[#1D1D1F] hover:bg-white/80'
+              }`}
             >
-              {SERVICE_CATEGORIES.map((tab) => {
-                const isActive = activeCategory === tab.id;
+              All Categories ({liveServices.length})
+            </button>
+            {liveCategories.map((cat) => {
+              const isActive = activeCategory === cat;
+              const count = liveServices.filter((s) => s.category === cat).length;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+                    isActive
+                      ? 'bg-[#1D1D1F] text-white shadow-xs'
+                      : 'text-[#1D1D1F] hover:bg-white/80'
+                  }`}
+                >
+                  {cat} {count > 0 ? `(${count})` : ''}
+                </button>
+              );
+            })}
+          </div>
+
+          {loadingCatalogue ? (
+            <div className="liquid-glass-card rounded-2xl p-10 text-center text-sm text-[#6E6E73]">
+              Loading standalone service catalogue...
+            </div>
+          ) : filteredServices.length === 0 ? (
+            <div className="liquid-glass-card rounded-2xl p-10 text-center space-y-3">
+              <p className="text-sm font-semibold text-[#1D1D1F]">
+                No standalone services matched your current filter.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveCategory('ALL');
+                  setServiceSearch('');
+                }}
+                className="text-xs font-semibold text-[#0071E3] hover:underline cursor-pointer"
+              >
+                Show all standalone services
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredServices.map((svc, index) => {
+                const priceSummary = formatStandalonePriceSummary(svc);
                 return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={isActive}
-                    onClick={() => setActiveCategory(tab.id)}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
-                      isActive
-                        ? 'bg-[#1D1D1F] text-white shadow-xs'
-                        : 'text-[#1D1D1F] hover:bg-white/80'
-                    }`}
+                  <motion.article
+                    key={svc.id}
+                    initial={shouldReduceMotion ? false : { opacity: 0, y: 22 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    whileHover={shouldReduceMotion ? undefined : { y: -3 }}
+                    viewport={{ once: true, amount: 'some', margin: '0px 0px -24px 0px' }}
+                    transition={{
+                      duration: 0.45,
+                      delay: shouldReduceMotion ? 0 : Math.min((index % 3) * 0.06, 0.18),
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                    className="liquid-glass-card rounded-2xl p-6 sm:p-7 flex flex-col justify-between space-y-5 transition-shadow duration-200 hover:shadow-[0_14px_34px_-14px_rgba(0,0,0,0.12)]"
                   >
-                    {tab.label}
-                  </button>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-2 text-xs text-[#6E6E73]">
+                        <span className="font-semibold text-[#0071E3] truncate">
+                          {svc.category}
+                        </span>
+                        <span className="font-mono-num text-[11px] font-semibold text-[#1D1D1F] shrink-0">
+                          {svc.deliveryPeriod}
+                        </span>
+                      </div>
+                      <h3 className="font-display text-xl font-bold text-[#1D1D1F]">
+                        <a
+                          href={`/services/${svc.slug}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            safeNavigate(`/services/${svc.slug}` as AppRoute);
+                          }}
+                          className="hover:text-[#0071E3] transition-colors"
+                        >
+                          {svc.name}
+                        </a>
+                      </h3>
+                      <p className="text-sm text-[#6E6E73] leading-relaxed">
+                        {svc.description}
+                      </p>
+                      <ul className="space-y-1.5 pt-1 text-xs text-[#1D1D1F]/85">
+                        {(svc.deliverables || []).slice(0, 4).map((d) => (
+                          <li key={d} className="flex items-start gap-2">
+                            <CheckCircle2
+                              className="w-3.5 h-3.5 text-[#1D1D1F] shrink-0 mt-0.5"
+                              aria-hidden="true"
+                            />
+                            <span>{d}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="pt-4 border-t border-[#1D1D1F]/8 space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[11px] text-[#6E6E73] font-medium">
+                          Standalone Fee
+                        </span>
+                        <span className="font-mono-num text-xs font-bold text-[#1D1D1F] text-right">
+                          {priceSummary}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <GlassButton
+                          href={`/services/${svc.slug}`}
+                          variant="primary"
+                          size="sm"
+                          onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            safeNavigate(`/services/${svc.slug}` as AppRoute);
+                          }}
+                        >
+                          <span>View Details</span>
+                          <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                        </GlassButton>
+                        <button
+                          type="button"
+                          onClick={() => handleEnquireItem(svc.name)}
+                          className="text-xs font-semibold text-[#1D1D1F] hover:text-[#0071E3] px-2.5 py-1.5 rounded-lg hover:bg-[#F5F5F7] transition-colors cursor-pointer"
+                        >
+                          Request Quote
+                        </button>
+                      </div>
+                    </div>
+                  </motion.article>
                 );
               })}
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredServices.map((svc) => (
-              <article
-                key={svc.id}
-                className="liquid-glass-card rounded-2xl p-6 sm:p-7 flex flex-col justify-between space-y-5 transition-all duration-200"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2 text-xs text-[#6E6E73]">
-                    <span>
-                      <span className="font-mono-num font-bold text-[#1D1D1F]">
-                        {svc.number}
-                      </span>{' '}
-                      <span aria-hidden="true">·</span> {svc.categoryLabel}
-                    </span>
-                  </div>
-                  <h3 className="font-display text-xl font-bold text-[#1D1D1F]">
-                    {svc.title}
-                  </h3>
-                  {svc.scopeNote && (
-                    <p className="text-xs font-semibold text-[#3A3A3F] leading-snug">
-                      {svc.scopeNote}
-                    </p>
-                  )}
-                  <p className="text-sm text-[#6E6E73] leading-relaxed">
-                    {svc.summary}
-                  </p>
-                  <ul className="space-y-1.5 pt-1 text-xs text-[#1D1D1F]/85">
-                    {svc.deliverables.map((d) => (
-                      <li key={d} className="flex items-start gap-2">
-                        <CheckCircle2
-                          className="w-3.5 h-3.5 text-[#1D1D1F] shrink-0 mt-0.5"
-                          aria-hidden="true"
-                        />
-                        <span>{d}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="pt-4 border-t border-[#1D1D1F]/8 flex items-center justify-between gap-3">
-                  <span className="text-xs text-[#6E6E73] truncate">
-                    {svc.rateCardMatch}
-                  </span>
-                  <GlassButton
-                    variant="primary"
-                    size="sm"
-                    onClick={() => handleEnquireItem(svc.rateCardMatch)}
-                  >
-                    <span>Enquire</span>
-                    <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                  </GlassButton>
-                </div>
-              </article>
-            ))}
-          </div>
-        </EditorialReveal>
+          )}
+        </div>
       </section>
 
       {/* 4. 16 Years of Multi-Industry & Automotive Commercial Experience */}
@@ -373,26 +542,37 @@ export function MarketingPage({ onNavigate }: MarketingPageProps) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {EXPERIENCE_MILESTONES.map((milestone) => (
-              <GlassCard
+            {EXPERIENCE_MILESTONES.map((milestone, index) => (
+              <motion.div
                 key={milestone.number}
-                interactive
-                className="p-6 sm:p-7 space-y-3"
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{
+                  duration: 0.45,
+                  delay: shouldReduceMotion ? 0 : Math.min((index % 3) * 0.06, 0.18),
+                  ease: [0.16, 1, 0.3, 1],
+                }}
               >
-                <div className="flex items-center gap-2 text-xs text-[#6E6E73]">
-                  <span className="font-mono-num font-bold text-[#1D1D1F]">
-                    {milestone.number}
-                  </span>
-                  <span aria-hidden="true">·</span>
-                  <span>{milestone.spectrum}</span>
-                </div>
-                <h3 className="font-display text-lg font-bold text-[#1D1D1F]">
-                  {milestone.title}
-                </h3>
-                <p className="text-sm text-[#6E6E73] leading-relaxed">
-                  {milestone.description}
-                </p>
-              </GlassCard>
+                <GlassCard
+                  interactive
+                  className="h-full p-6 sm:p-7 space-y-3"
+                >
+                  <div className="flex items-center gap-2 text-xs text-[#6E6E73]">
+                    <span className="font-mono-num font-bold text-[#1D1D1F]">
+                      {milestone.number}
+                    </span>
+                    <span aria-hidden="true">·</span>
+                    <span>{milestone.spectrum}</span>
+                  </div>
+                  <h3 className="font-display text-lg font-bold text-[#1D1D1F]">
+                    {milestone.title}
+                  </h3>
+                  <p className="text-sm text-[#6E6E73] leading-relaxed">
+                    {milestone.description}
+                  </p>
+                </GlassCard>
+              </motion.div>
             ))}
           </div>
         </EditorialReveal>
@@ -434,7 +614,7 @@ export function MarketingPage({ onNavigate }: MarketingPageProps) {
                 <div>
                   <p className="text-xs font-medium text-[#6E6E73]">Training Session Fee</p>
                   <p className="font-mono-num text-2xl sm:text-3xl font-bold text-[#1D1D1F] mt-0.5">
-                    ₹25,000 <span className="text-sm font-medium text-[#6E6E73]">per session</span>
+                    ₹50,000 <span className="text-sm font-medium text-[#6E6E73]">per session</span>
                   </p>
                 </div>
                 <GlassButton
@@ -466,120 +646,47 @@ export function MarketingPage({ onNavigate }: MarketingPageProps) {
         </EditorialReveal>
       </section>
 
-      {/* 6. Packages & Complete Searchable Rate Card */}
+      {/* 6. Standalone Service Rate Card & Quotation Access */}
       <section className="py-20 lg:py-24 bg-[#FFFFFF] border-t border-[#E8E8ED]">
-        <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
-          <div className="max-w-2xl space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
-              Transparent Pricing &amp; Commercial Terms
-            </p>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F] text-balance">
-              Retainer Packages &amp; Individual Service Rate Card.
-            </h2>
+        <EditorialReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="max-w-2xl space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
+                Transparent Standalone Pricing &amp; Commercial Terms
+              </p>
+              <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F] text-balance">
+                Standalone Individual Service Rate Card.
+              </h2>
+              <p className="text-sm text-[#6E6E73] leading-relaxed">
+                Every service at AKYIN MARKETINGS is priced and contracted independently. Use our Interactive Quotation Builder to select only the exact services your business needs.
+              </p>
+            </div>
+            <GlassButton
+              href="/pricing#quotation-builder"
+              variant="primary"
+              size="md"
+              onClick={(e: React.MouseEvent) => {
+                e.preventDefault();
+                safeNavigate('/pricing#quotation-builder' as AppRoute);
+              }}
+            >
+              <span>Open Quotation Builder</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
+            </GlassButton>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {PRICING_PACKAGES.map((pkg) => (
-              <div
-                key={pkg.id}
-                className={`rounded-3xl p-7 sm:p-9 flex flex-col justify-between space-y-7 transition-shadow ${
-                  pkg.featured
-                    ? 'liquid-glass-panel border border-[#1D1D1F]/25'
-                    : 'liquid-glass-card'
-                }`}
-              >
-                <div className="space-y-5">
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="font-mono-num text-xs font-bold text-[#1D1D1F]">
-                      {pkg.code}
-                    </span>
-                    <span className="text-xs font-medium text-[#6E6E73]">
-                      Commercial Retainer
-                    </span>
-                  </div>
-
-                  <div>
-                    <h3 className="font-display text-2xl font-bold text-[#1D1D1F]">
-                      {pkg.name}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-[#6E6E73]">
-                      {pkg.subtitle}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 py-4 border-y border-[#1D1D1F]/8">
-                    <div>
-                      <p className="text-xs text-[#6E6E73]">One-time Setup</p>
-                      <p className="font-mono-num text-2xl font-bold text-[#1D1D1F] mt-1">
-                        {pkg.setupFee}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#6E6E73]">Monthly Maintenance</p>
-                      <p className="font-mono-num text-2xl font-bold text-[#1D1D1F] mt-1">
-                        {pkg.monthlyFee}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2.5">
-                    <p className="text-xs font-semibold text-[#1D1D1F]">Included Scope</p>
-                    <ul className="space-y-2 text-sm text-[#1D1D1F]">
-                      {pkg.includes.map((inc) => (
-                        <li key={inc} className="flex items-start gap-2.5">
-                          <CheckCircle2
-                            className="w-4 h-4 text-[#1D1D1F] shrink-0 mt-0.5"
-                            aria-hidden="true"
-                          />
-                          <span>{inc}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="space-y-2 pt-1">
-                    <p className="text-xs font-semibold text-[#6E6E73]">
-                      Explicitly Excluded
-                    </p>
-                    <ul className="space-y-1.5 text-xs text-[#6E6E73]">
-                      {pkg.excludes.map((exc) => (
-                        <li key={exc} className="flex items-start gap-2">
-                          <ShieldAlert
-                            className="w-3.5 h-3.5 shrink-0 mt-0.5 text-[#A1A1A6]"
-                            aria-hidden="true"
-                          />
-                          <span>{exc}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <GlassButton
-                  variant={pkg.featured ? 'primary' : 'subtle'}
-                  size="lg"
-                  className="w-full"
-                  onClick={() => handleEnquireItem(pkg.enquiryServiceValue)}
-                >
-                  <span>Enquire About {pkg.code}</span>
-                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
-                </GlassButton>
-              </div>
-            ))}
-          </div>
-
-          {/* Searchable 21-item Individual Rate Card */}
+          {/* Searchable Individual Rate Card */}
           <div className="rounded-3xl liquid-glass-panel p-6 sm:p-8 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.06em] text-[#6E6E73]">
-                  Individual Service Rate Card
+                  Individual Service Rate Card · {RATE_CARD_ITEMS.length} Standalone Schedules
                 </p>
                 <h3 className="font-display text-2xl font-bold text-[#1D1D1F] mt-1">
                   Searchable Service Fee Schedule
                 </h3>
                 <p className="text-xs text-[#6E6E73] mt-1.5">
-                  Indicative service fees subject to written quotation · Applicable GST extra · External costs (Meta ad spend, extra AI minutes, creator fees, special video shoots) charged separately.
+                  Indicative standalone service fees subject to written quotation · Applicable GST extra · External costs (Meta/Google ad spend, messaging provider charges, creator fees) billed separately.
                 </p>
               </div>
 
@@ -671,6 +778,8 @@ export function MarketingPage({ onNavigate }: MarketingPageProps) {
                 </table>
               </div>
             )}
+
+            <ServiceBillingDisclaimer className="mt-4" />
           </div>
 
           {/* Official @akyinmarketing Social Strip */}

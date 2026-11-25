@@ -565,7 +565,7 @@ export function InteractiveBusinessWidgets({
                   size="md"
                   onClick={() =>
                     openEnquiryPrefilled(
-                      'Package A — Full-Service Growth Marketing & Lead Management',
+                      'Meta Ads Management',
                       `ROI Model Inputs — Monthly Ad Budget: ${formatInr(roiBudget)}, Avg Customer Value: ${formatInr(avgCustomerValue)}, Expected Leads: ${expectedLeads}, Conversion Rate: ${leadConversionRate}%. Requesting campaign feasibility review.`
                     )
                   }
@@ -1031,7 +1031,17 @@ export function InteractiveBusinessWidgets({
                 <div className="rounded-2xl bg-white border border-[#E8E8ED] p-5 space-y-2 text-xs text-[#6E6E73]">
                   <p className="font-semibold text-[#1D1D1F]">Direct Contact Desk</p>
                   <p>Email: <span className="font-semibold text-[#1D1D1F]">{OFFICIAL_CONTACT.email}</span></p>
-                  <p>Phone: <span className="font-mono-num font-semibold text-[#1D1D1F]">{OFFICIAL_CONTACT.phoneDisplay}</span></p>
+                  <p>
+                    WhatsApp:{' '}
+                    <a
+                      href={OFFICIAL_CONTACT.whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-[#1D1D1F] hover:text-[#0071E3] underline"
+                    >
+                      WhatsApp Connect
+                    </a>
+                  </p>
                   <p>Service Regions: <span className="font-semibold text-[#1D1D1F]">{OFFICIAL_CONTACT.regionIndicator}</span></p>
                 </div>
               </div>
@@ -1052,7 +1062,7 @@ export function InteractiveBusinessWidgets({
                     </div>
                     <p className="text-sm text-[#6E6E73] leading-relaxed">
                       Thank you, <strong className="text-[#1D1D1F]">{fullName}</strong>. Our team will review your brief for{' '}
-                      <strong className="text-[#1D1D1F]">{requiredService}</strong> and respond via email or phone.
+                      <strong className="text-[#1D1D1F]">{requiredService}</strong> and respond via WhatsApp Connect or email.
                     </p>
                     <div className="flex flex-wrap items-center gap-3 pt-2">
                       <GlassButton variant="primary" size="sm" onClick={resetLeadForm}>
@@ -1199,14 +1209,20 @@ export function InteractiveBusinessWidgets({
                               {opt.label}
                             </option>
                           ))}
-                          <option value="Package A — Full-Service Growth Marketing & Lead Management">
-                            Package A — Complete Growth Marketing
+                          <option value="Meta Ads Management">
+                            Meta Ads Management
                           </option>
-                          <option value="Package B — Lead Filtering & Qualification Only">
-                            Package B — Lead Filtering Only
+                          <option value="Lead Filtering & Qualification">
+                            Lead Filtering &amp; Qualification
                           </option>
-                          <option value="Digital Marketing Budget Proposal">
-                            Digital Marketing Budget Proposal
+                          <option value="Bulk SMS Marketing">
+                            Bulk SMS Marketing (10,000 Credits)
+                          </option>
+                          <option value="WhatsApp Business Messaging Setup">
+                            WhatsApp Business Messaging Setup
+                          </option>
+                          <option value="Custom Service Quotation">
+                            Custom Standalone Service Quotation
                           </option>
                         </select>
                       </div>

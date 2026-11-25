@@ -1,11 +1,14 @@
-import { ArrowRight, ArrowUpRight, Compass, Globe, Layers, Mail, Phone } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowRight, ArrowUpRight, Compass, Globe, Layers, Mail, MessageCircle } from 'lucide-react';
 import {
   AppRoute,
   EXTERNAL_VERTICAL_URLS,
   OFFICIAL_CONTACT,
   PUBLISHING_LINKS,
+  SERVICE_MARKETPLACE_CATEGORIES,
   VENTURES_PORTFOLIO,
 } from '../data/akyinData';
+import { SuiteServiceItem, suiteApi } from '../services/suiteApi';
 import { EditorialReveal } from '../components/EditorialReveal';
 import { GlassButton } from '../components/liquid-glass';
 import { SocialLinks } from '../components/SocialLinks';
@@ -114,13 +117,24 @@ const CORPORATE_ROUTES: CorporateRouteItem[] = [
   },
   {
     route: '/pricing',
-    title: 'Pricing & Rate Card — Transparent Commercial Terms',
+    title: 'Pricing & Rate Card — Transparent Standalone Commercial Terms',
     description:
-      'Complete INR pricing for AKYIN MARKETINGS retainers, lead filtering, sales coaching workshops, advisory consultations, and 21-item rate card.',
+      'Complete standalone INR pricing for AKYIN MARKETINGS services, sales coaching workshops, advisory consultations, Bulk SMS, WhatsApp setup, and interactive quotation builder.',
     sections: [
-      'Retainer Packages (Package A & Package B)',
-      'Training Workshops & Business Advisory Fees',
-      'Complete 21-Item Individual Service Rate Card',
+      'Standalone Growth, Lead Filtering & Training Settlement',
+      'Bulk SMS (₹3,000) & WhatsApp Setup (₹4,999 + Usage Separate)',
+      'Interactive Standalone Quotation Builder & Complete INR Rate Card',
+    ],
+  },
+  {
+    route: '/tools',
+    title: 'Business Tools — 20 Interactive Calculators & Utilities',
+    description:
+      'Public growth toolkit featuring 7 Marketing, 7 Sales, and 6 Business calculators including GST, Margin, Break-Even, ROI, ROAS, and Quotation Request.',
+    sections: [
+      'Marketing Growth Calculators (7 Tools)',
+      'Sales Conversion & Revenue Calculators (7 Tools)',
+      'Business Operations & Consultation Tools (6 Tools)',
     ],
   },
   {
@@ -180,15 +194,15 @@ const VERTICAL_SECTION_INDEX: VerticalSectionItem[] = [
     code: '02',
     name: 'AKYIN MARKETINGS',
     route: '/ventures/marketing',
-    sector: 'Full-Service Marketing Agency & Growth Solutions',
+    sector: 'Standalone Marketing Service Marketplace',
     keySections: [
       'Full-Service Marketing Agency Hero',
       'About AKYIN MARKETINGS (3 Core Pillars)',
-      'Complete 18-Service Filterable Agency Catalogue',
+      '10-Category Standalone Service Marketplace (/services/:slug)',
       '16 Years of Multi-Industry & Automotive Commercial Experience',
-      'Commercial & Dealership Sales Training (₹25,000 per session)',
-      'Retainer Packages (Package A & Package B) & Searchable 21-Item Rate Card',
-      'Official @akyinmarketing Social Channels & Proposal Dispatcher',
+      'Commercial & Dealership Sales Training (₹50,000 per session)',
+      'Searchable Individual Service Rate Card & Quotation Builder',
+      'Official @akyinventures Social Channels & Proposal Dispatcher',
     ],
   },
   {
@@ -270,6 +284,39 @@ const VERTICAL_SECTION_INDEX: VerticalSectionItem[] = [
 ];
 
 export function SitemapPage({ onNavigate }: SitemapPageProps) {
+  const [services, setServices] = useState<SuiteServiceItem[]>([]);
+  const [categories, setCategories] = useState<string[]>([...SERVICE_MARKETPLACE_CATEGORIES]);
+
+  useEffect(() => {
+    let active = true;
+    suiteApi
+      .fetchPublicServices()
+      .then((res) => {
+        if (!active) return;
+        if (Array.isArray(res.categories) && res.categories.length > 0) {
+          setCategories(res.categories);
+        }
+        setServices((res.services || []).filter((s) => s.active && Boolean(s.slug)));
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const servicesByCategory = useMemo(() => {
+    const map = new Map<string, SuiteServiceItem[]>();
+    for (const cat of categories) {
+      map.set(cat, []);
+    }
+    for (const svc of services) {
+      const list = map.get(svc.category) || [];
+      list.push(svc);
+      map.set(svc.category, list);
+    }
+    return Array.from(map.entries()).filter(([, list]) => list.length > 0);
+  }, [categories, services]);
+
   return (
     <div>
       <section className="surface-silver-gradient text-[#1D1D1F] pt-12 pb-16 lg:pt-16 lg:pb-20 border-b border-[#E8E8ED]">
@@ -284,7 +331,7 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
             A structured overview of all AKYIN Ventures corporate pages, dedicated vertical destinations, key content sections, and verified external platforms.
           </p>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-2 text-xs font-medium text-[#6E6E73]">
-            <span className="font-mono-num font-bold text-[#1D1D1F]">10 Corporate Pages</span>
+            <span className="font-mono-num font-bold text-[#1D1D1F]">11 Corporate Pages</span>
             <span aria-hidden="true">·</span>
             <span className="font-mono-num font-bold text-[#1D1D1F]">
               {VENTURES_PORTFOLIO.length} Operating Verticals
@@ -452,6 +499,59 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
         </div>
       </section>
 
+      {/* Section 2B: 10-Category Standalone Service Pages Directory */}
+      {servicesByCategory.length > 0 && (
+        <section className="py-20 bg-[#F5F5F7] border-t border-[#E8E8ED]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+            <EditorialReveal>
+              <div className="max-w-2xl space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">
+                  Standalone Service Marketplace · {services.length} Dedicated Routes
+                </p>
+                <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1D1D1F]">
+                  Standalone Service Pages (/services/:slug).
+                </h2>
+                <p className="text-sm sm:text-base text-[#6E6E73] leading-relaxed">
+                  Direct index to every individual AKYIN MARKETINGS service organised across {servicesByCategory.length} categories.
+                </p>
+              </div>
+            </EditorialReveal>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {servicesByCategory.map(([catName, catServices]) => (
+                <div
+                  key={catName}
+                  className="bg-white rounded-3xl border border-[#E8E8ED] p-6 space-y-3"
+                >
+                  <h3 className="font-display text-lg font-bold text-[#1D1D1F]">
+                    {catName}
+                  </h3>
+                  <ul className="space-y-1.5">
+                    {catServices.map((svc) => (
+                      <li key={svc.id}>
+                        <a
+                          href={`/services/${svc.slug}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            onNavigate(`/services/${svc.slug}` as AppRoute);
+                          }}
+                          className="inline-flex items-center justify-between w-full text-xs sm:text-sm text-[#1D1D1F] hover:text-[#0071E3] py-1 transition-colors"
+                        >
+                          <span>{svc.name}</span>
+                          <span className="font-mono-num text-[11px] text-[#6E6E73]">
+                            /services/{svc.slug}
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Section 3: External Platforms, Direct Contact & Official Socials */}
       <section className="py-20 surface-silver-gradient border-t border-[#E8E8ED]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
@@ -582,15 +682,17 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
                   </a>
 
                   <a
-                    href={`tel:+${OFFICIAL_CONTACT.whatsappNumber}`}
+                    href={OFFICIAL_CONTACT.whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="rounded-2xl liquid-glass-cta p-4 space-y-1 transition-all"
                   >
                     <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#1D1D1F]">
-                      <Phone className="w-3.5 h-3.5" aria-hidden="true" />
-                      <span>Phone / WhatsApp</span>
+                      <MessageCircle className="w-3.5 h-3.5" aria-hidden="true" />
+                      <span>WhatsApp Connect</span>
                     </div>
-                    <p className="font-mono-num text-sm font-bold text-[#1D1D1F]">
-                      {OFFICIAL_CONTACT.phoneDisplay}
+                    <p className="text-sm font-bold text-[#1D1D1F]">
+                      Official AKYIN Channel
                     </p>
                   </a>
                 </div>

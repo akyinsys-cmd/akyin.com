@@ -364,25 +364,9 @@ export function AdminSettingsSection({
                   className={inputCls}
                 />
               </div>
-              <div>
-                <label className="block font-semibold text-[#1D1D1F] mb-1.5">
-                  Public Phone Display
-                </label>
-                <input
-                  value={draft.contactPhone || '+91 63956 94011'}
-                  onChange={(e) => updateKey('contactPhone', e.target.value)}
-                  className={`${inputCls} font-mono-num`}
-                />
-              </div>
-              <div>
-                <label className="block font-semibold text-[#1D1D1F] mb-1.5">
-                  WhatsApp Digits (Country + Number)
-                </label>
-                <input
-                  value={draft.whatsappNumber || '916395694011'}
-                  onChange={(e) => updateKey('whatsappNumber', e.target.value)}
-                  className={`${inputCls} font-mono-num`}
-                />
+              <div className="sm:col-span-2 rounded-xl bg-[#F5F5F7] border border-[#E8E8ED] px-4 py-3 text-xs text-[#6E6E73]">
+                <span className="font-semibold text-[#1D1D1F]">Privacy Mode Active:</span> Public mobile numbers are hidden site-wide. Visitors reach AKYIN via{' '}
+                <span className="font-semibold text-[#1D1D1F]">WhatsApp Connect</span> and official email ({draft.contactEmail || 'connect@akyin.com'}).
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-3 pt-1">
@@ -394,8 +378,6 @@ export function AdminSettingsSection({
                   handleSave([
                     'notificationEmail',
                     'contactEmail',
-                    'contactPhone',
-                    'whatsappNumber',
                   ])
                 }
               >

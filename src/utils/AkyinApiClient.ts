@@ -35,6 +35,9 @@ export interface AdminSessionState {
   expiresAt: string;
 }
 
+// Security: Admin bearer tokens are held strictly in JS module memory, never localStorage/sessionStorage.
+let memoryAdminSession: AdminSessionState | null = null;
+
 export interface PublicBootstrapData {
   settings: WebsiteSettingsMap;
   ventures: VentureConfigRecord[];
@@ -128,50 +131,40 @@ export class AkyinApiClient {
   }
 
   public getStoredSession(): AdminSessionState | null {
-    if (typeof window === 'undefined') return null;
-    try {
-      // Purge any legacy token from localStorage
-      window.localStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
-      const raw = window.sessionStorage.getItem(ADMIN_SESSION_STORAGE_KEY);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw) as Partial<AdminSessionState>;
-      if (
-        typeof parsed.token !== 'string' ||
-        parsed.token.length < 12 ||
-        typeof parsed.expiresAt !== 'string'
-      ) {
-        this.clearSession();
-        return null;
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
+        window.sessionStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
+      } catch {
+        // ignore storage errors
       }
-      const expMs = Date.parse(parsed.expiresAt);
-      if (!Number.isFinite(expMs) || expMs <= Date.now()) {
-        this.clearSession();
-        return null;
-      }
-      return { token: parsed.token, expiresAt: parsed.expiresAt };
-    } catch {
-      this.clearSession();
+    }
+    if (!memoryAdminSession) return null;
+    const expMs = Date.parse(memoryAdminSession.expiresAt);
+    if (!Number.isFinite(expMs) || expMs <= Date.now()) {
+      memoryAdminSession = null;
       return null;
     }
+    return memoryAdminSession;
   }
 
   public saveSession(session: AdminSessionState): void {
-    if (typeof window === 'undefined') return;
     if (!session?.token || !session?.expiresAt) return;
-    window.localStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
-    window.sessionStorage.setItem(
-      ADMIN_SESSION_STORAGE_KEY,
-      JSON.stringify({
-        token: session.token,
-        expiresAt: session.expiresAt,
-      })
-    );
+    memoryAdminSession = {
+      token: session.token,
+      expiresAt: session.expiresAt,
+    };
   }
 
   public clearSession(): void {
+    memoryAdminSession = null;
     if (typeof window === 'undefined') return;
-    window.sessionStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
-    window.localStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
+    try {
+      window.sessionStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
+      window.localStorage.removeItem(ADMIN_SESSION_STORAGE_KEY);
+    } catch {
+      // ignore
+    }
   }
 
   private static readonly REQUEST_TIMEOUT_MS = 20000;
