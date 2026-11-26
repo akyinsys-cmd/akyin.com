@@ -190,6 +190,7 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
   const [blockedDates, setBlockedDates] = useState<BlockedDateRecord[]>([]);
   const [workspaceEnquiries, setWorkspaceEnquiries] = useState<EnquiryRecord[]>([]);
   const [loadingAppts, setLoadingAppts] = useState(false);
+  const [apptsError, setApptsError] = useState('');
 
   // Marketing Tools sub-navigation
   const [marketingSubTab, setMarketingSubTab] = useState<'routes' | 'jsonld'>('routes');
@@ -240,6 +241,7 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
   const loadAppointmentsData = useCallback(async () => {
     if (!currentUser || !hasClientPermission(currentUser.role, 'appointments')) return;
     setLoadingAppts(true);
+    setApptsError('');
     try {
       const [apptRes, leadsRes] = await Promise.all([
         suiteApi.getAppointments(),
@@ -273,6 +275,10 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
                   : 'In Progress',
           adminNotes: l.privateNotes,
         }))
+      );
+    } catch (err) {
+      setApptsError(
+        err instanceof Error ? err.message : 'Unable to load appointments and availability.'
       );
     } finally {
       setLoadingAppts(false);
@@ -327,10 +333,13 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
   }, [currentUser]);
 
   const handleLogout = async () => {
-    await suiteApi.logout();
-    setCurrentUser(null);
-    setOverviewData(null);
-    setActiveTab('Overview');
+    try {
+      await suiteApi.logout();
+    } finally {
+      setCurrentUser(null);
+      setOverviewData(null);
+      setActiveTab('Overview');
+    }
   };
 
   const handleSaveSettingsPatch = async (keys: string[], label: string) => {
@@ -557,6 +566,19 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
                   <span>Google Workspace Sync</span>
                 </button>
               </div>
+
+              {apptsError && (
+                <div className="rounded-2xl bg-[#FEF3F2] border border-[#FECDCA] px-4 py-3 flex items-center justify-between gap-4 text-xs font-semibold text-[#B42318]">
+                  <span>{apptsError}</span>
+                  <button
+                    type="button"
+                    onClick={() => void loadAppointmentsData()}
+                    className="px-3 py-1.5 rounded-lg bg-white border border-[#FECDCA] text-[#B42318] hover:bg-[#FFF5F5] cursor-pointer shrink-0"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
 
               {loadingAppts && appointments.length === 0 ? (
                 <div className="liquid-glass-card rounded-3xl p-12 text-center text-sm text-[#6E6E73]">

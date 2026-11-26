@@ -1,5 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import {
+  ComponentType,
+  Suspense,
+  lazy,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import {
   AppRoute,
   BUSINESS_VERTICAL_OPTIONS,
@@ -12,30 +22,51 @@ import { FloatingContactWidget } from './components/FloatingContactWidget';
 import { Footer } from './components/Footer';
 import { Navbar } from './components/Navbar';
 import { ReadingProgressBar } from './components/ReadingProgressBar';
-import { AboutPage } from './pages/AboutPage';
-import { AdminPage } from './pages/AdminPage';
-import { AdvisoryPage } from './pages/AdvisoryPage';
-import { AICalcPage } from './pages/AICalcPage';
-import { BizNXTPage } from './pages/BizNXTPage';
-import { BudgetBazaarPage } from './pages/BudgetBazaarPage';
-import { BusinessesPage } from './pages/BusinessesPage';
-import { ContactPage } from './pages/ContactPage';
+import { GlobalLoadingSkeleton } from './components/GlobalLoadingSkeleton';
+import { PageErrorBoundary } from './components/PageErrorBoundary';
 import { HomePage } from './pages/HomePage';
-import { InsightsPage } from './pages/InsightsPage';
-import { KartigoPage } from './pages/KartigoPage';
-import { MarketingPage } from './pages/MarketingPage';
-import { AutomotiveMarketingPage } from './pages/AutomotiveMarketingPage';
-import { PricingPage } from './pages/PricingPage';
-import { PublishingPage } from './pages/PublishingPage';
-import { QuotePortalPage } from './pages/QuotePortalPage';
-import { ServiceDetailPage } from './pages/ServiceDetailPage';
-import { SitemapPage } from './pages/SitemapPage';
-import { StorePage } from './pages/StorePage';
-import { TermsPage } from './pages/TermsPage';
-import { ToolsPage } from './pages/ToolsPage';
 import { RouteMetaProvider, useRouteMeta } from './context/RouteMetaContext';
 import { SiteConfigProvider } from './context/SiteConfigContext';
 import { registerAkyinWebMcpTools } from './utils/webmcp';
+
+function lazyPage<T extends ComponentType<any>>(
+  loader: () => Promise<T>
+) {
+  return lazy(async () => ({ default: await loader() }));
+}
+
+const AboutPage = lazyPage(() => import('./pages/AboutPage').then((m) => m.AboutPage));
+const AdminPage = lazyPage(() => import('./pages/AdminPage').then((m) => m.AdminPage));
+const AdvisoryPage = lazyPage(() => import('./pages/AdvisoryPage').then((m) => m.AdvisoryPage));
+const AICalcPage = lazyPage(() => import('./pages/AICalcPage').then((m) => m.AICalcPage));
+const BizNXTPage = lazyPage(() => import('./pages/BizNXTPage').then((m) => m.BizNXTPage));
+const BudgetBazaarPage = lazyPage(() =>
+  import('./pages/BudgetBazaarPage').then((m) => m.BudgetBazaarPage)
+);
+const BusinessesPage = lazyPage(() =>
+  import('./pages/BusinessesPage').then((m) => m.BusinessesPage)
+);
+const ContactPage = lazyPage(() => import('./pages/ContactPage').then((m) => m.ContactPage));
+const InsightsPage = lazyPage(() => import('./pages/InsightsPage').then((m) => m.InsightsPage));
+const KartigoPage = lazyPage(() => import('./pages/KartigoPage').then((m) => m.KartigoPage));
+const MarketingPage = lazyPage(() => import('./pages/MarketingPage').then((m) => m.MarketingPage));
+const AutomotiveMarketingPage = lazyPage(() =>
+  import('./pages/AutomotiveMarketingPage').then((m) => m.AutomotiveMarketingPage)
+);
+const PricingPage = lazyPage(() => import('./pages/PricingPage').then((m) => m.PricingPage));
+const PublishingPage = lazyPage(() =>
+  import('./pages/PublishingPage').then((m) => m.PublishingPage)
+);
+const QuotePortalPage = lazyPage(() =>
+  import('./pages/QuotePortalPage').then((m) => m.QuotePortalPage)
+);
+const ServiceDetailPage = lazyPage(() =>
+  import('./pages/ServiceDetailPage').then((m) => m.ServiceDetailPage)
+);
+const SitemapPage = lazyPage(() => import('./pages/SitemapPage').then((m) => m.SitemapPage));
+const StorePage = lazyPage(() => import('./pages/StorePage').then((m) => m.StorePage));
+const TermsPage = lazyPage(() => import('./pages/TermsPage').then((m) => m.TermsPage));
+const ToolsPage = lazyPage(() => import('./pages/ToolsPage').then((m) => m.ToolsPage));
 
 type StaticRoute = Exclude<AppRoute, `/services/${string}`>;
 
@@ -99,9 +130,6 @@ export const ROUTE_META: Record<StaticRoute, RouteMetadata> = {
             'https://www.amazon.com/stores/author/B0DT3L2T15/allbooks',
             'https://play.google.com/store/books/details/Akyin_s_THE_DISCIPLINE_CODE?id=seHuEQAAQBAJ',
             'https://aicalc.in',
-            'https://kartigo.online',
-            'https://biznxt.online',
-            'https://budgetbazaar.org',
           ],
           contactPoint: [
             {
@@ -561,6 +589,45 @@ export const ROUTE_META: Record<StaticRoute, RouteMetadata> = {
             },
           ],
         },
+        {
+          '@type': 'FAQPage',
+          '@id': 'https://akyin.com/marketing/automotive#lead-impact-tracker-faq',
+          name: 'Lead Impact Tracker FAQ — AKYIN Automotive Marketing',
+          mainEntity: [
+            {
+              '@type': 'Question',
+              name: 'What does the AKYIN Lead Impact Tracker measure for automotive dealerships?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'The Lead Impact Tracker lets dealerships simulate monthly ad budgets (₹30,000 to ₹5,00,000) across Hatchback/Compact Sedan, Midsize/Compact SUV, and Luxury/EV tiers to forecast Cost Per Test Drive (CPTD), showroom conversion rate, projected monthly test drives, and estimated car bookings.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'Can auto dealers download CSV reports from the Lead Impact Tracker?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Yes. Clicking Export CSV Report downloads a structured 30-day performance CSV containing daily Cost Per Test Drive (INR), estimated inbound leads, monthly ad budget, and selected vehicle tier for internal dealership records and management review.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'How do the Cost Per Test Drive trend chart and zoom controls work?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'The interactive Recharts trend chart visualizes 30-day Cost Per Test Drive performance with 7D, 14D, and 30D zoom-in toggles and a draggable range brush in the 30-day view so dealers can inspect daily acquisition efficiency closely.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'What does the 30-day moving average alert badge in the Lead Impact Tracker indicate?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'The benchmark alert badge automatically compares current Cost Per Test Drive against the 30-day moving average, notifying the dealership whenever CPTD exceeds the 30-day benchmark or confirming when efficiency is running below average.',
+              },
+            },
+          ],
+        },
       ],
     },
   },
@@ -596,27 +663,27 @@ export const ROUTE_META: Record<StaticRoute, RouteMetadata> = {
     },
   },
   '/ventures/kartigo': {
-    title: 'Kartigo.online — B2B Stock Supply & Wholesale Trade',
+    title: 'Kartigo — B2B Stock Supply & Wholesale Trade',
     description:
-      'Connect with wholesale commercial inventory, bulk stock lots, and reliable B2B trade distribution opportunities across categories on Kartigo.online.',
+      'Connect with wholesale commercial inventory, bulk stock lots, and reliable B2B trade distribution opportunities across categories with Kartigo.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'WholesaleStore',
-      name: 'Kartigo.online',
-      url: 'https://kartigo.online',
+      name: 'Kartigo',
+      url: 'https://akyin.com/ventures/kartigo',
       description:
         'B2B stock commerce and wholesale inventory supply platform connecting manufacturers, distributors, and retail buyers.',
     },
   },
   '/ventures/biznxt': {
-    title: 'BizNXT.online — Business Clarity & Consulting',
+    title: 'BizNXT — Business Clarity & Consulting',
     description:
-      'Practical business clarity, commercial feasibility analysis, and structured opportunity exploration for founders and SMEs at BizNXT.online.',
+      'Practical business clarity, commercial feasibility analysis, and structured opportunity exploration for founders and SMEs with BizNXT.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'ConsultingService',
-      name: 'BizNXT.online',
-      url: 'https://biznxt.online',
+      name: 'BizNXT',
+      url: 'https://akyin.com/ventures/biznxt',
       description:
         'Business guidance, feasibility analysis, and opportunity consulting for entrepreneurs and founders.',
     },
@@ -624,14 +691,14 @@ export const ROUTE_META: Record<StaticRoute, RouteMetadata> = {
   '/ventures/budget-bazaar': {
     title: 'Budget Bazaar — Everyday Value Retail | AKYIN Ventures',
     description:
-      'Discover affordable household goods, everyday essentials, and value-first consumer retail selections curated at budgetbazaar.org.',
+      'Discover affordable household goods, everyday essentials, and value-first consumer retail selections curated by Budget Bazaar.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'Store',
       name: 'Budget Bazaar',
-      url: 'https://budgetbazaar.org',
+      url: 'https://akyin.com/ventures/budget-bazaar',
       description:
-        'Value-oriented retail storefront bringing affordable household goods and everyday essentials directly to shoppers.',
+        'Value-oriented retail brand bringing affordable household goods and everyday essentials directly to shoppers.',
     },
   },
   '/pricing': {
@@ -817,8 +884,8 @@ export const ROUTE_META: Record<StaticRoute, RouteMetadata> = {
 };
 
 function parseRoute(pathname: string): AppRoute {
-  const pathWithoutHash = pathname.split('#')[0];
-  const cleaned = pathWithoutHash.replace(/\/+$/, '') || '/';
+  const pathWithoutQueryAndHash = (pathname || '/').split('?')[0].split('#')[0];
+  const cleaned = pathWithoutQueryAndHash.replace(/\/+$/, '') || '/';
   if (VALID_ROUTES.includes(cleaned as StaticRoute)) {
     return cleaned as AppRoute;
   }
@@ -834,7 +901,14 @@ function AppShell() {
   const [currentRoute, setCurrentRoute] = useState<AppRoute>(() =>
     typeof window !== 'undefined' ? parseRoute(window.location.pathname) : '/'
   );
-  const scrollTimerRef = useRef<number | null>(null);
+  const [isRoutePending, startRouteTransition] = useTransition();
+  const mainRef = useRef<HTMLElement | null>(null);
+  const pendingHashRef = useRef<string | null>(
+    typeof window !== 'undefined' && window.location.hash
+      ? window.location.hash.replace(/^#/, '')
+      : null
+  );
+  const scrollCleanupRef = useRef<(() => void) | null>(null);
   const copyToastTimerRef = useRef<number | null>(null);
   const [copyToastVisible, setCopyToastVisible] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState('');
@@ -845,45 +919,100 @@ function AppShell() {
     enquiryType: ENQUIRY_TYPE_OPTIONS[0] as string,
   });
 
-  const scrollToEcosystem = useCallback(() => {
-    if (scrollTimerRef.current !== null) {
-      window.clearTimeout(scrollTimerRef.current);
+  const cancelPendingScroll = useCallback(() => {
+    if (scrollCleanupRef.current) {
+      scrollCleanupRef.current();
+      scrollCleanupRef.current = null;
     }
-    scrollTimerRef.current = window.setTimeout(() => {
-      const el = document.getElementById('our-ecosystem');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      scrollTimerRef.current = null;
-    }, 80);
   }, []);
 
-  useEffect(() => {
-    if (
-      parseRoute(window.location.pathname) === '/' &&
-      window.location.hash === '#our-ecosystem'
-    ) {
-      scrollToEcosystem();
-    }
+  const scheduleHashScroll = useCallback(
+    (hashId: string | null) => {
+      cancelPendingScroll();
+      if (typeof window === 'undefined') return;
 
+      const behavior: ScrollBehavior = shouldReduceMotion ? 'auto' : 'smooth';
+      if (!hashId) {
+        pendingHashRef.current = null;
+        window.scrollTo({ top: 0, behavior });
+        return;
+      }
+
+      pendingHashRef.current = hashId;
+
+      const tryScroll = (): boolean => {
+        const target = document.getElementById(hashId);
+        if (target) {
+          target.scrollIntoView({ behavior, block: 'start' });
+          pendingHashRef.current = null;
+          return true;
+        }
+        return false;
+      };
+
+      let observer: MutationObserver | null = null;
+      let timeoutId: number | null = null;
+
+      const cleanup = () => {
+        if (observer) {
+          observer.disconnect();
+          observer = null;
+        }
+        if (timeoutId !== null) {
+          window.clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+      };
+
+      const rafId = window.requestAnimationFrame(() => {
+        if (tryScroll()) {
+          cleanup();
+          return;
+        }
+
+        const root = mainRef.current || document.body;
+        observer = new MutationObserver(() => {
+          if (tryScroll()) {
+            cleanup();
+          }
+        });
+        observer.observe(root, { childList: true, subtree: true });
+
+        timeoutId = window.setTimeout(() => {
+          cleanup();
+          pendingHashRef.current = null;
+        }, 5000);
+      });
+
+      scrollCleanupRef.current = () => {
+        window.cancelAnimationFrame(rafId);
+        cleanup();
+      };
+    },
+    [cancelPendingScroll, shouldReduceMotion]
+  );
+
+  useEffect(() => {
     const handlePopState = () => {
       const nextRoute = parseRoute(window.location.pathname);
-      setCurrentRoute(nextRoute);
-      if (nextRoute === '/' && window.location.hash === '#our-ecosystem') {
-        scrollToEcosystem();
+      const nextHash = window.location.hash ? window.location.hash.replace(/^#/, '') : null;
+      pendingHashRef.current = nextHash;
+      startRouteTransition(() => {
+        setCurrentRoute(nextRoute);
+      });
+      if (nextRoute === currentRoute) {
+        scheduleHashScroll(nextHash);
       }
     };
     window.addEventListener('popstate', handlePopState);
     return () => {
       window.removeEventListener('popstate', handlePopState);
-      if (scrollTimerRef.current !== null) {
-        window.clearTimeout(scrollTimerRef.current);
-      }
+      cancelPendingScroll();
       if (copyToastTimerRef.current !== null) {
         window.clearTimeout(copyToastTimerRef.current);
       }
     };
-  }, [scrollToEcosystem]);
+  }, [cancelPendingScroll, currentRoute, scheduleHashScroll]);
 
   const handleCopyLink = useCallback(async () => {
     const targetUrl =
@@ -1042,39 +1171,46 @@ function AppShell() {
     }
   }, [currentRoute, routeMetaMap]);
 
-  const navigate = useCallback((route: AppRoute) => {
-    const [rawPath, hashPart] = route.split('#');
-    const parsed = parseRoute(rawPath || '/');
-    setCurrentRoute(parsed);
-    const fullTarget = hashPart ? `${parsed}#${hashPart}` : parsed;
-    if (window.location.pathname !== parsed || (hashPart && window.location.hash !== `#${hashPart}`) || (!hashPart && window.location.hash)) {
-      window.history.pushState({}, '', fullTarget);
-    }
-    if (hashPart) {
-      window.setTimeout(() => {
-        const targetEl = document.getElementById(hashPart);
-        if (targetEl) {
-          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-      }, 120);
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, []);
+  const navigate = useCallback(
+    (route: AppRoute) => {
+      const [rawPath, hashPart] = route.split('#');
+      const parsed = parseRoute(rawPath || '/');
+      const cleanHash = hashPart ? hashPart.trim() : null;
+      const fullTarget = cleanHash ? `${parsed}#${cleanHash}` : parsed;
+
+      if (
+        typeof window !== 'undefined' &&
+        (window.location.pathname !== parsed ||
+          (cleanHash && window.location.hash !== `#${cleanHash}`) ||
+          (!cleanHash && window.location.hash))
+      ) {
+        window.history.pushState({}, '', fullTarget);
+      }
+
+      if (parsed === currentRoute) {
+        scheduleHashScroll(cleanHash);
+        return;
+      }
+
+      pendingHashRef.current = cleanHash;
+      startRouteTransition(() => {
+        setCurrentRoute(parsed);
+      });
+    },
+    [currentRoute, scheduleHashScroll]
+  );
+
+  useEffect(() => {
+    scheduleHashScroll(pendingHashRef.current);
+  }, [currentRoute, scheduleHashScroll]);
 
   useEffect(() => {
     registerAkyinWebMcpTools(navigate);
   }, [navigate]);
 
   const navigateEcosystem = useCallback(() => {
-    setCurrentRoute('/');
-    if (window.location.pathname !== '/' || window.location.hash !== '#our-ecosystem') {
-      window.history.pushState({}, '', '/#our-ecosystem');
-    }
-    scrollToEcosystem();
-  }, [scrollToEcosystem]);
+    navigate('/#our-ecosystem' as AppRoute);
+  }, [navigate]);
 
   const handleStartEnquiry = useCallback(
     (options: { category: string; vertical: string; enquiryType?: string }) => {
@@ -1088,11 +1224,11 @@ function AppShell() {
     [navigate]
   );
 
-  if (currentRoute === '/admin') {
-    return <AdminPage onNavigate={navigate} />;
-  }
+  const memoizedPageContent = useMemo(() => {
+    if (currentRoute === '/admin') {
+      return <AdminPage onNavigate={navigate} />;
+    }
 
-  const renderPage = () => {
     if (currentRoute.startsWith('/services/')) {
       const slug = currentRoute.slice('/services/'.length);
       return <ServiceDetailPage slug={slug} onNavigate={navigate} />;
@@ -1151,11 +1287,22 @@ function AppShell() {
       default:
         return <HomePage onNavigate={navigate} onStartEnquiry={handleStartEnquiry} />;
     }
-  };
+  }, [currentRoute, contactDefaults, navigate, handleStartEnquiry]);
+
+  const handleReturnHome = useCallback(() => navigate('/'), [navigate]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F5F5F7] text-[#1D1D1F]">
       <ReadingProgressBar />
+
+      {isRoutePending && (
+        <div
+          role="progressbar"
+          aria-label="Loading next page"
+          aria-busy="true"
+          className="fixed top-0 left-0 right-0 h-0.5 z-[80] bg-[#0071E3] animate-pulse"
+        />
+      )}
 
       <Navbar
         currentRoute={currentRoute}
@@ -1163,24 +1310,25 @@ function AppShell() {
         onNavigateEcosystem={navigateEcosystem}
       />
 
-      <main className="flex-1">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={currentRoute}
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={shouldReduceMotion ? undefined : { opacity: 0, y: -4 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <BreadcrumbBar
-              currentRoute={currentRoute}
-              onNavigate={navigate}
-              onCopyLink={handleCopyLink}
-              copied={copyToastVisible}
-            />
-            {renderPage()}
-          </motion.div>
-        </AnimatePresence>
+      <main ref={mainRef} className="flex-1">
+        <motion.div
+          key={currentRoute}
+          initial={shouldReduceMotion ? false : { opacity: 0.94 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <BreadcrumbBar
+            currentRoute={currentRoute}
+            onNavigate={navigate}
+            onCopyLink={handleCopyLink}
+            copied={copyToastVisible}
+          />
+          <PageErrorBoundary resetKey={currentRoute} onReturnHome={handleReturnHome}>
+            <Suspense fallback={<GlobalLoadingSkeleton />}>
+              {memoizedPageContent}
+            </Suspense>
+          </PageErrorBoundary>
+        </motion.div>
       </main>
 
       <Footer

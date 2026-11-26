@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AlertCircle,
   Clock,
@@ -47,15 +47,36 @@ export function AutomotiveIndustryNews() {
   const [fetchedAt, setFetchedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string>('');
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const requestSeqRef = useRef<number>(0);
 
   const loadHeadlines = useCallback(async (topic: NewsTopic) => {
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const seq = ++requestSeqRef.current;
+
+    let timedOut = false;
+    const timeoutId = window.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 15000);
+
     setLoading(true);
     setErrorMsg('');
     try {
-      const response = await fetch(`/api/automotive-news?topic=${encodeURIComponent(topic)}`);
+      const response = await fetch(`/api/automotive-news?topic=${encodeURIComponent(topic)}`, {
+        signal: controller.signal,
+      });
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        throw new Error(`Unexpected response from server (HTTP ${response.status}).`);
+      }
       const data = (await response.json().catch(() => null)) as
         | (Partial<NewsResponsePayload> & { error?: string })
         | null;
+
+      if (seq !== requestSeqRef.current) return;
 
       if (!response.ok) {
         throw new Error(data?.error || `Unable to load headlines (HTTP ${response.status}).`);
@@ -69,8 +90,13 @@ export function AutomotiveIndustryNews() {
       setSources(Array.isArray(data.sources) ? data.sources : []);
       setFetchedAt(data.fetchedAt || new Date().toISOString());
     } catch (err: unknown) {
-      const message =
-        err instanceof Error && err.message
+      if (seq !== requestSeqRef.current) return;
+      if (err instanceof DOMException && err.name === 'AbortError' && !timedOut) {
+        return;
+      }
+      const message = timedOut
+        ? 'Live headline search timed out. Please try refreshing.'
+        : err instanceof Error && err.message
           ? err.message
           : 'Unable to fetch live automotive headlines right now. Please try again shortly.';
       setArticles([]);
@@ -78,12 +104,18 @@ export function AutomotiveIndustryNews() {
       setFetchedAt(null);
       setErrorMsg(message);
     } finally {
-      setLoading(false);
+      window.clearTimeout(timeoutId);
+      if (seq === requestSeqRef.current) {
+        setLoading(false);
+      }
     }
   }, []);
 
   useEffect(() => {
     void loadHeadlines(activeTopic);
+    return () => {
+      abortControllerRef.current?.abort();
+    };
   }, [activeTopic, loadHeadlines]);
 
   const formattedSyncTime = fetchedAt

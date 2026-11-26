@@ -162,41 +162,17 @@ export function Footer({ onNavigate }: FooterProps) {
                     <ArrowUpRight className="w-3 h-3 text-[#A1A1A6]" />
                   </a>
                 </li>
-                <li>
-                  <a
-                    href="https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/kartigo"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 hover:text-[#0071E3] transition-colors"
-                  >
-                    <span>Kartigo</span>
-                    <span className="text-[10px] text-[#6E6E73]">(B2B Stock)</span>
-                    <ArrowUpRight className="w-3 h-3 text-[#A1A1A6]" />
-                  </a>
+                <li className="inline-flex items-center gap-1.5 w-full">
+                  <span>Kartigo</span>
+                  <span className="text-[10px] text-[#6E6E73]">(B2B Stock)</span>
                 </li>
-                <li>
-                  <a
-                    href="https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/biznxt"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 hover:text-[#0071E3] transition-colors"
-                  >
-                    <span>BizNXT</span>
-                    <span className="text-[10px] text-[#6E6E73]">(Consulting)</span>
-                    <ArrowUpRight className="w-3 h-3 text-[#A1A1A6]" />
-                  </a>
+                <li className="inline-flex items-center gap-1.5 w-full">
+                  <span>BizNXT</span>
+                  <span className="text-[10px] text-[#6E6E73]">(Consulting)</span>
                 </li>
-                <li>
-                  <a
-                    href="https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/budget-bazaar"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 hover:text-[#0071E3] transition-colors"
-                  >
-                    <span>Budget Bazaar</span>
-                    <span className="text-[10px] text-[#6E6E73]">(E-commerce)</span>
-                    <ArrowUpRight className="w-3 h-3 text-[#A1A1A6]" />
-                  </a>
+                <li className="inline-flex items-center gap-1.5 w-full">
+                  <span>Budget Bazaar</span>
+                  <span className="text-[10px] text-[#6E6E73]">(E-commerce)</span>
                 </li>
                 <li>
                   <span className="text-xs text-[#6E6E73]">

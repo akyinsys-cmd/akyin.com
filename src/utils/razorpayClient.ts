@@ -65,10 +65,28 @@ declare global {
 
 let scriptLoadPromise: Promise<boolean> | null = null;
 
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit = {},
+  timeoutMs = 15000
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
 export async function fetchRazorpayConfig(): Promise<RazorpayGatewayConfig> {
   try {
-    const res = await fetch('/api/razorpay/config');
+    const res = await fetchWithTimeout('/api/razorpay/config');
     if (!res.ok) {
+      return { configured: false, keyId: null, currency: 'INR', catalog: [] };
+    }
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
       return { configured: false, keyId: null, currency: 'INR', catalog: [] };
     }
     return (await res.json()) as RazorpayGatewayConfig;
@@ -83,23 +101,33 @@ export function loadRazorpayCheckoutScript(): Promise<boolean> {
   if (scriptLoadPromise) return scriptLoadPromise;
 
   scriptLoadPromise = new Promise<boolean>((resolve) => {
+    let settled = false;
+    const finish = (ok: boolean) => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timeoutId);
+      if (!ok) {
+        scriptLoadPromise = null;
+      }
+      resolve(ok);
+    };
+
+    const timeoutId = window.setTimeout(() => finish(false), 15000);
+
     const existing = document.querySelector<HTMLScriptElement>(
       'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
     );
     if (existing) {
-      existing.addEventListener('load', () => resolve(Boolean(window.Razorpay)), { once: true });
-      existing.addEventListener('error', () => resolve(false), { once: true });
+      existing.addEventListener('load', () => finish(Boolean(window.Razorpay)), { once: true });
+      existing.addEventListener('error', () => finish(false), { once: true });
       return;
     }
 
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
-    script.onload = () => resolve(Boolean(window.Razorpay));
-    script.onerror = () => {
-      scriptLoadPromise = null;
-      resolve(false);
-    };
+    script.onload = () => finish(Boolean(window.Razorpay));
+    script.onerror = () => finish(false);
     document.body.appendChild(script);
   });
 
@@ -113,7 +141,7 @@ export async function startRazorpayPayment(params: {
   referenceId?: string;
 }): Promise<RazorpayPaymentResult> {
   try {
-    const orderRes = await fetch('/api/razorpay/create-order', {
+    const orderRes = await fetchWithTimeout('/api/razorpay/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -199,7 +227,7 @@ export async function startRazorpayPayment(params: {
         },
         handler: async (response: RazorpayHandlerResponse) => {
           try {
-            const verifyRes = await fetch('/api/razorpay/verify-payment', {
+            const verifyRes = await fetchWithTimeout('/api/razorpay/verify-payment', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({

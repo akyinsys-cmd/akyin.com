@@ -23,12 +23,6 @@ export interface ClientItem {
 export const CLIENT_PREVIEW_URLS = {
   aicalc:
     'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/aicalc',
-  kartigo:
-    'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/kartigo',
-  biznxt:
-    'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/biznxt',
-  budgetBazaar:
-    'https://ais-dev-iwemnrdjpbl2zz7yzoxiyv-71845396109.asia-east1.run.app/ventures/budget-bazaar',
 } as const;
 
 export const CLIENT_STATS = {
@@ -49,9 +43,6 @@ export const AKYIN_CLIENTS: ClientItem[] = [
     id: 'biznxt',
     name: 'BizNXT.online',
     category: 'Business Guidance & Consulting',
-    websiteUrl: CLIENT_PREVIEW_URLS.biznxt,
-    websiteLabel: 'Visit Website',
-    isPreviewUrl: true,
     featured: true,
     summary:
       'Entrepreneurial consulting and strategic guidance platform assisting business founders in evaluating commercial opportunities.',
@@ -64,9 +55,6 @@ export const AKYIN_CLIENTS: ClientItem[] = [
     id: 'kartigo',
     name: 'Kartigo.online',
     category: 'B2B Stock Supply',
-    websiteUrl: CLIENT_PREVIEW_URLS.kartigo,
-    websiteLabel: 'Visit Website',
-    isPreviewUrl: true,
     featured: true,
     summary:
       'Wholesale commercial stock supply and B2B trade marketplace connecting volume buyers with verified inventory.',
@@ -91,9 +79,6 @@ export const AKYIN_CLIENTS: ClientItem[] = [
     id: 'budget-bazaar',
     name: 'Budget Bazaar',
     category: 'B2C E-commerce',
-    websiteUrl: CLIENT_PREVIEW_URLS.budgetBazaar,
-    websiteLabel: 'Visit Website',
-    isPreviewUrl: true,
     featured: true,
     summary:
       'Value-driven consumer retail storefront providing everyday essentials and household goods at accessible price points.',

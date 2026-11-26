@@ -26,7 +26,7 @@ export function EditorialReveal({
     <motion.div
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 'some', margin: '0px 0px -32px 0px' }}
+      viewport={{ once: true, amount: 'some' }}
       transition={{
         duration,
         delay,

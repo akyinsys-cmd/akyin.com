@@ -72,9 +72,6 @@ export const ROUTE_SEO_META: Record<string, ServerRouteSeoMeta> = {
             'https://www.amazon.com/stores/author/B0DT3L2T15/allbooks',
             'https://play.google.com/store/books/details/Akyin_s_THE_DISCIPLINE_CODE?id=seHuEQAAQBAJ',
             'https://aicalc.in',
-            'https://kartigo.online',
-            'https://biznxt.online',
-            'https://budgetbazaar.org',
           ],
           contactPoint: [
             {
@@ -376,6 +373,45 @@ export const ROUTE_SEO_META: Record<string, ServerRouteSeoMeta> = {
             },
           ],
         },
+        {
+          '@type': 'FAQPage',
+          '@id': 'https://akyin.com/marketing/automotive#lead-impact-tracker-faq',
+          name: 'Lead Impact Tracker FAQ — AKYIN Automotive Marketing',
+          mainEntity: [
+            {
+              '@type': 'Question',
+              name: 'What does the AKYIN Lead Impact Tracker measure for automotive dealerships?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'The Lead Impact Tracker lets dealerships simulate monthly ad budgets (₹30,000 to ₹5,00,000) across Hatchback/Compact Sedan, Midsize/Compact SUV, and Luxury/EV tiers to forecast Cost Per Test Drive (CPTD), showroom conversion rate, projected monthly test drives, and estimated car bookings.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'Can auto dealers download CSV reports from the Lead Impact Tracker?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Yes. Clicking Export CSV Report downloads a structured 30-day performance CSV containing daily Cost Per Test Drive (INR), estimated inbound leads, monthly ad budget, and selected vehicle tier for internal dealership records and management review.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'How do the Cost Per Test Drive trend chart and zoom controls work?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'The interactive Recharts trend chart visualizes 30-day Cost Per Test Drive performance with 7D, 14D, and 30D zoom-in toggles and a draggable range brush in the 30-day view so dealers can inspect daily acquisition efficiency closely.',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'What does the 30-day moving average alert badge in the Lead Impact Tracker indicate?',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'The benchmark alert badge automatically compares current Cost Per Test Drive against the 30-day moving average, notifying the dealership whenever CPTD exceeds the 30-day benchmark or confirming when efficiency is running below average.',
+              },
+            },
+          ],
+        },
       ],
     },
   },
@@ -412,37 +448,37 @@ export const ROUTE_SEO_META: Record<string, ServerRouteSeoMeta> = {
     },
   },
   '/ventures/kartigo': {
-    title: 'Kartigo.online — B2B Stock Supply & Wholesale Trade',
+    title: 'Kartigo — B2B Stock Supply & Wholesale Trade',
     description:
-      'Connect with wholesale commercial inventory, bulk stock lots, and reliable B2B trade distribution opportunities across categories on Kartigo.online.',
-    h1: 'Kartigo.online — B2B Wholesale Inventory & Commercial Stock Supply',
+      'Connect with wholesale commercial inventory, bulk stock lots, and reliable B2B trade distribution opportunities across categories with Kartigo.',
+    h1: 'Kartigo — B2B Wholesale Inventory & Commercial Stock Supply',
     summary:
       'Structured B2B wholesale supply desk connecting distributors, bulk traders, and retail merchants with curated commercial stock lots.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'WholesaleStore',
-      name: 'Kartigo.online',
-      url: 'https://kartigo.online',
+      name: 'Kartigo',
+      url: 'https://akyin.com/ventures/kartigo',
     },
   },
   '/ventures/biznxt': {
-    title: 'BizNXT.online — Business Clarity & Consulting',
+    title: 'BizNXT — Business Clarity & Consulting',
     description:
-      'Practical business clarity, commercial feasibility analysis, and structured opportunity exploration for founders and SMEs at BizNXT.online.',
-    h1: 'BizNXT.online — Founder Feasibility, Unit Economics & Business Clarity',
+      'Practical business clarity, commercial feasibility analysis, and structured opportunity exploration for founders and SMEs with BizNXT.',
+    h1: 'BizNXT — Founder Feasibility, Unit Economics & Business Clarity',
     summary:
       'Advisory and feasibility exploration helping emerging entrepreneurs evaluate commercial viability before deploying capital.',
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'ConsultingService',
-      name: 'BizNXT.online',
-      url: 'https://biznxt.online',
+      name: 'BizNXT',
+      url: 'https://akyin.com/ventures/biznxt',
     },
   },
   '/ventures/budget-bazaar': {
     title: 'Budget Bazaar — Everyday Value Retail | AKYIN Ventures',
     description:
-      'Discover affordable household goods, everyday essentials, and value-first consumer retail selections curated at budgetbazaar.org.',
+      'Discover affordable household goods, everyday essentials, and value-first consumer retail selections curated by Budget Bazaar.',
     h1: 'Budget Bazaar — Affordable Household Essentials & Consumer Retail',
     summary:
       'Value-focused retail selection offering practical everyday household items directly to cost-conscious shoppers.',
@@ -450,7 +486,7 @@ export const ROUTE_SEO_META: Record<string, ServerRouteSeoMeta> = {
       '@context': 'https://schema.org',
       '@type': 'Store',
       name: 'Budget Bazaar',
-      url: 'https://budgetbazaar.org',
+      url: 'https://akyin.com/ventures/budget-bazaar',
     },
   },
   '/pricing': {

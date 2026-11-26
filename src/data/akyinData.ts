@@ -327,9 +327,6 @@ export const GUMROAD_DIGITAL_PRODUCTS: DigitalProduct[] = [
 
 export const EXTERNAL_VERTICAL_URLS = {
   aicalc: 'https://aicalc.in',
-  kartigo: 'https://kartigo.online',
-  biznxt: 'https://biznxt.online',
-  budgetBazaar: 'https://budgetbazaar.org',
 } as const;
 
 export const IMAGES = {

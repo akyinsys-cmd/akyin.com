@@ -1,6 +1,6 @@
-import { ArrowUpRight, CheckCircle2, ShoppingBasket, Tag } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ShoppingBasket, Tag } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
-import { EXTERNAL_VERTICAL_URLS, IMAGES } from '../data/akyinData';
+import { IMAGES } from '../data/akyinData';
 import { ContactDispatcher } from '../components/ContactDispatcher';
 import { EditorialReveal } from '../components/EditorialReveal';
 import { GlassButton, GlassImageFrame, GlassPanel } from '../components/liquid-glass';
@@ -28,19 +28,17 @@ export function BudgetBazaarPage() {
               Everyday Essentials. Value-First Retail.
             </h1>
             <p className="text-base sm:text-lg text-[#6E6E73] leading-relaxed">
-              Budget Bazaar is an independent client business supported by AKYIN for retail performance marketing and demand generation. It brings practical household products, everyday essentials, and accessible consumer goods together under a straightforward, value-oriented retail storefront at budgetbazaar.org.
+              Budget Bazaar is an independent client business supported by AKYIN for retail performance marketing and demand generation. It brings practical household products, everyday essentials, and accessible consumer goods together under a straightforward, value-oriented retail brand.
             </p>
 
             <div className="flex flex-wrap items-center gap-3.5 pt-2">
               <GlassButton
-                href={EXTERNAL_VERTICAL_URLS.budgetBazaar}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#budget-bazaar-contact"
                 variant="primary"
                 size="lg"
               >
-                <span>Visit BudgetBazaar.org</span>
-                <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+                <span>Retail &amp; Sourcing Enquiries</span>
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </GlassButton>
               <GlassButton href="#budget-bazaar-focus" variant="glass" size="lg">
                 Retail Focus
@@ -60,7 +58,7 @@ export function BudgetBazaarPage() {
                   src={IMAGES.budgetBazaarRetail}
                   alt="Apple-style isolated modern household ceramic and anodized steel consumer goods stamped with the AKYIN emblem"
                   loading="eager"
-                  fallbackTitle="Budget Bazaar · budgetbazaar.org"
+                  fallbackTitle="Budget Bazaar · Value Retail"
                   className="w-full h-full bg-[#FFFFFF]"
                   imageClassName="object-contain p-3 group-hover:scale-[1.03]"
                 />
@@ -94,8 +92,8 @@ export function BudgetBazaarPage() {
                 desc: 'Practical household goods, daily essentials, and lifestyle merchandise chosen for regular use.',
               },
               {
-                title: 'Dedicated Digital Storefront',
-                desc: 'Accessible online through its independent retail domain at budgetbazaar.org.',
+                title: 'Focused Retail Categories',
+                desc: 'Structured around straightforward, budget-friendly household and everyday product categories.',
               },
               {
                 title: 'AKYIN Ventures Backing',
@@ -129,22 +127,20 @@ export function BudgetBazaarPage() {
               </div>
               <div>
                 <h2 className="font-display text-xl font-bold text-[#1D1D1F]">
-                  Shop or Explore Budget Bazaar Online
+                  Connect With Budget Bazaar
                 </h2>
                 <p className="text-sm text-[#6E6E73] mt-0.5">
-                  Visit the dedicated Budget Bazaar website at budgetbazaar.org.
+                  Submit an enquiry below for retail collaborations or product sourcing discussions.
                 </p>
               </div>
             </div>
             <GlassButton
-              href={EXTERNAL_VERTICAL_URLS.budgetBazaar}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#budget-bazaar-contact"
               variant="primary"
               size="lg"
             >
-              <span>Visit BudgetBazaar.org</span>
-              <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+              <span>Submit Retail Enquiry</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </GlassButton>
           </GlassPanel>
         </EditorialReveal>

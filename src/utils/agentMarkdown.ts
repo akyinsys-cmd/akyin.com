@@ -194,7 +194,7 @@ ${ventureList}
 - See full standalone service marketplace on [Services](/ventures/marketing) & [Pricing Page](/pricing)
 
 ## External Platforms & Publishing
-- [AICalc.in](${EXTERNAL_VERTICAL_URLS.aicalc}) | [Kartigo.online](${EXTERNAL_VERTICAL_URLS.kartigo}) | [BizNXT.online](${EXTERNAL_VERTICAL_URLS.biznxt}) | [BudgetBazaar.org](${EXTERNAL_VERTICAL_URLS.budgetBazaar})
+- [AICalc.in](${EXTERNAL_VERTICAL_URLS.aicalc})
 - [Google Play Books — THE DISCIPLINE CODE](${PUBLISHING_LINKS.googlePlayDisciplineCode}) | [Amazon Author Store](${PUBLISHING_LINKS.amazonAuthorStore})
 ${commonFooter}`;
 }

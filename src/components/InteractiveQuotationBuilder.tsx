@@ -304,53 +304,70 @@ export function InteractiveQuotationBuilder({
         return `- ${srv.name} (${label}) x ${entry.qty}: ${fmtExact(price * entry.qty, currency)}`;
       });
 
-      const res = await fetch('/api/public/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName,
-          businessName,
-          email,
-          mobileNumber,
-          city,
-          country,
-          businessCategory: selectedEntries[0]?.service.category || 'Marketing Services',
-          requiredService:
-            selectedEntries.length === 1
-              ? selectedEntries[0].service.name
-              : `Custom Quote (${selectedEntries.length} Standalone Services)`,
-          monthlyMarketingBudget: fmtExact(activeTotals.payableNow, currency),
-          preferredContactMethod: 'Email & WhatsApp',
-          message: [
-            `Interactive Quotation Builder Request (${currency}) — View Mode: ${planView === 'monthly' ? 'Monthly Subscription' : 'One-Time Project'}`,
-            ...summaryLines,
-            `One-Time Subtotal: ${fmtExact(activeTotals.oneTimeSubtotal, currency)}`,
-            `Monthly Recurring Subtotal: ${fmtExact(activeTotals.monthlySubtotal, currency)}/mo`,
-            `Usage Metered Charges: ${fmtExact(activeTotals.usageSubtotal, currency)}`,
-            `Total Payable Now (${includeGst ? 'incl. 18% GST' : 'excl. GST'}): ${fmtExact(activeTotals.payableNow, currency)}`,
-            notes ? `Client Notes: ${notes}` : '',
-          ]
-            .filter(Boolean)
-            .join('\n'),
-          consentAccepted: true,
-          source: 'Interactive Quotation Builder (/quote)',
-          campaignSource: 'Website',
-          honeypot: '',
-        }),
-      });
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 15000);
+      let res: Response;
+      try {
+        res = await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            fullName,
+            businessName,
+            email,
+            mobileNumber,
+            city,
+            country,
+            businessCategory: selectedEntries[0]?.service.category || 'Marketing Services',
+            requiredService:
+              selectedEntries.length === 1
+                ? selectedEntries[0].service.name
+                : `Custom Quote (${selectedEntries.length} Standalone Services)`,
+            monthlyMarketingBudget: fmtExact(activeTotals.payableNow, currency),
+            preferredContactMethod: 'Email & WhatsApp',
+            message: [
+              `Interactive Quotation Builder Request (${currency}) — View Mode: ${planView === 'monthly' ? 'Monthly Subscription' : 'One-Time Project'}`,
+              ...summaryLines,
+              `One-Time Subtotal: ${fmtExact(activeTotals.oneTimeSubtotal, currency)}`,
+              `Monthly Recurring Subtotal: ${fmtExact(activeTotals.monthlySubtotal, currency)}/mo`,
+              `Usage Metered Charges: ${fmtExact(activeTotals.usageSubtotal, currency)}`,
+              `Total Payable Now (${includeGst ? 'incl. 18% GST' : 'excl. GST'}): ${fmtExact(activeTotals.payableNow, currency)}`,
+              notes ? `Client Notes: ${notes}` : '',
+            ]
+              .filter(Boolean)
+              .join('\n'),
+            consentAccepted: true,
+            source: 'Interactive Quotation Builder (/quote)',
+            campaignSource: 'Website',
+            honeypot: '',
+          }),
+        });
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        throw new Error(`Unexpected server response (HTTP ${res.status}). Please retry.`);
+      }
       const data = (await res.json().catch(() => ({}))) as {
         ok?: boolean;
         leadId?: string;
         error?: string;
+        issues?: string[];
       };
       if (!res.ok || !data.ok) {
-        throw new Error(data.error || 'Unable to submit quotation request.');
+        throw new Error(data.issues?.[0] || data.error || 'Unable to submit quotation request.');
       }
       setSubmittedLeadId(data.leadId || 'CONFIRMED');
       setRequestOpen(false);
       onSuccessLeadId?.(data.leadId || '');
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Unable to submit quotation request.');
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setSubmitError('Request timed out after 15 seconds. Please check your connection and try again.');
+      } else {
+        setSubmitError(err instanceof Error ? err.message : 'Unable to submit quotation request.');
+      }
     } finally {
       setSubmitting(false);
     }

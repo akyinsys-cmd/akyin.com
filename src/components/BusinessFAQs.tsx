@@ -29,9 +29,9 @@ const FAQ_ITEMS: FaqItem[] = [
     id: 'dedicated-platforms',
     category: 'Platform Strategy',
     question:
-      'Why do client businesses like AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar have separate websites?',
+      'How do independent client businesses work alongside AKYIN Ventures?',
     answer:
-      'AICalc, Kartigo, BizNXT, and Budget Bazaar are independent client businesses with their own distinct operations, customer bases, and digital infrastructures. Operating dedicated domains (such as aicalc.in, kartigo.online, biznxt.online, and budgetbazaar.org) ensures each business serves its specific audience directly, while AKYIN provides external digital solutions, marketing execution, and growth strategy.',
+      'AICalc (aicalc.in), Kartigo, BizNXT, and Budget Bazaar are independent client businesses with their own distinct operations and customer bases, while AKYIN provides external digital solutions, marketing execution, and growth strategy.',
   },
   {
     id: 'advisory-marketing',

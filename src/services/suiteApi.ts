@@ -501,7 +501,39 @@ async function apiJson<T>(
   if (withAuth && memoryBearerToken) {
     headers['Authorization'] = `Bearer ${memoryBearerToken}`;
   }
-  const resp = await fetch(url, { ...options, headers });
+
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 15000);
+  const externalSignal = options.signal;
+  const onExternalAbort = () => controller.abort();
+  if (externalSignal) {
+    if (externalSignal.aborted) {
+      controller.abort();
+    } else {
+      externalSignal.addEventListener('abort', onExternalAbort, { once: true });
+    }
+  }
+
+  let resp: Response;
+  try {
+    resp = await fetch(url, { ...options, headers, signal: controller.signal });
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError' && !externalSignal?.aborted) {
+      throw new Error('Request timed out after 15 seconds. Please retry.');
+    }
+    throw err;
+  } finally {
+    window.clearTimeout(timeoutId);
+    if (externalSignal) {
+      externalSignal.removeEventListener('abort', onExternalAbort);
+    }
+  }
+
+  const contentType = resp.headers.get('content-type') || '';
+  if (contentType.includes('text/html')) {
+    throw new Error(`Unexpected HTML response from API (HTTP ${resp.status}).`);
+  }
+
   const data = (await resp.json().catch(() => ({}))) as T & { error?: string };
   if (!resp.ok) {
     if (resp.status === 401 && withAuth) {

@@ -399,11 +399,21 @@ async function startServer() {
     res.status(404).json({ error: 'MCP server card not found.' });
   });
 
+  const DOWNLOAD_PDF_ALIASES: Record<string, string> = {
+    'AKYIN_All_Businesses_Presentation_Updated.pdf': 'assets/aistudio/All_Businesses_Presentation_72c79302.pdf',
+    'AKYIN_Marketing_All_Businesses_Presentation.pdf': 'assets/aistudio/All_Businesses_Presentation_72c79302.pdf',
+    'AKYIN_Automotive_Marketing_Presentation_Updated.pdf': 'assets/aistudio/Automotive_Presentation_4a4e967e.pdf',
+  };
+
   // Explicit route for downloadable business presentations & pricing documents (PDFs)
-  app.get('/downloads/:filename', (req: Request, res: Response, next: NextFunction) => {
+  app.get('/downloads/:filename', (req: Request, res: Response) => {
     const rawFilename = req.params.filename;
     const sanitizedFilename = path.basename(rawFilename);
-    const resolvedPath = resolvePublicOrDistFile(path.join('downloads', sanitizedFilename));
+    const aliasRelPath = DOWNLOAD_PDF_ALIASES[sanitizedFilename];
+    const resolvedPath =
+      resolvePublicOrDistFile(path.join('downloads', sanitizedFilename)) ||
+      (aliasRelPath ? resolvePublicOrDistFile(aliasRelPath) : null);
+
     if (resolvedPath && fs.existsSync(resolvedPath)) {
       if (sanitizedFilename.toLowerCase().endsWith('.pdf')) {
         res.setHeader('Content-Type', 'application/pdf');
@@ -412,7 +422,7 @@ async function startServer() {
       res.setHeader('Cache-Control', 'public, max-age=86400');
       return res.sendFile(resolvedPath);
     }
-    next();
+    res.status(404).json({ error: 'Download file not found.', code: 'DOWNLOAD_NOT_FOUND' });
   });
 
   // Markdown content negotiation for AI agents requesting Accept: text/markdown
@@ -665,6 +675,15 @@ async function startServer() {
     });
   });
 
+  // Health check endpoint for monitoring and readiness probes
+  app.get('/api/health', (_req: Request, res: Response) => {
+    res.json({
+      ok: true,
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+    });
+  });
+
   // Mount AKYIN Business Management Suite routes (CRM, Clients, Services, Quotations, Invoices, Razorpay, Reports, Appointments, Auth & Audit)
   registerSuiteRoutes(app);
   // Start background cron-like scheduler for upcoming monthly subscription renewal SMTP reminders
@@ -808,6 +827,11 @@ Return ONLY a valid JSON array (no extra commentary) where each object contains:
     }
   });
 
+  // Return structured JSON 404 for unknown /api/* routes instead of falling through to HTML SPA fallback
+  app.use('/api', (_req: Request, res: Response) => {
+    res.status(404).json({ error: 'API route not found.', code: 'NOT_FOUND' });
+  });
+
   if (process.env.NODE_ENV === 'production') {
     const distDir = path.resolve(__dirname, 'dist');
     const indexFile = path.join(distDir, 'index.html');
@@ -815,6 +839,16 @@ Return ONLY a valid JSON array (no extra commentary) where each object contains:
 
     app.use(express.static(distDir, { dotfiles: 'ignore' }));
     app.get('*', (req: Request, res: Response) => {
+      const reqPath = req.path || '/';
+      if (
+        reqPath.startsWith('/api/') ||
+        reqPath.startsWith('/assets/') ||
+        reqPath.startsWith('/downloads/') ||
+        /\.[a-z0-9]{1,8}$/i.test(reqPath)
+      ) {
+        res.status(404).end('Resource not found.');
+        return;
+      }
       if (!cachedIndexHtml) {
         res.status(404).send('Build output not found.');
         return;
@@ -842,8 +876,16 @@ Return ONLY a valid JSON array (no extra commentary) where each object contains:
 
     app.use(async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const vite = await vitePromise;
         const reqPath = req.path || '/';
+        if (reqPath.startsWith('/assets/')) {
+          const publicAssetPath = path.resolve(__dirname, 'public', reqPath.slice(1));
+          if (!fs.existsSync(publicAssetPath)) {
+            res.status(404).end('Asset not found.');
+            return;
+          }
+        }
+
+        const vite = await vitePromise;
         const isPageNavigation =
           (req.method === 'GET' || req.method === 'HEAD') &&
           !reqPath.startsWith('/api/') &&

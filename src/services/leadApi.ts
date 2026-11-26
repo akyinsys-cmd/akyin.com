@@ -53,13 +53,31 @@ export async function submitValidatedLead(
     campaignSource: sanitizeTextInput(payload.campaignSource || 'Website', 40, false),
   };
 
-  const response = await fetch('/api/leads', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(cleanPayload),
-  });
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 15000);
+  let response: Response;
+  try {
+    response = await fetch('/api/leads', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: controller.signal,
+      body: JSON.stringify(cleanPayload),
+    });
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw new Error('Submission timed out after 15 seconds. Please check your connection and retry.');
+    }
+    throw err;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    throw new Error(`Unexpected server response (HTTP ${response.status}). Please retry.`);
+  }
 
   const body = (await response.json().catch(() => ({}))) as {
     ok?: boolean;

@@ -125,7 +125,7 @@ export function buildInitialClients(nowIso: string): ClientRecord[] {
       phone: '',
       city: '',
       country: 'India',
-      websiteUrl: '/ventures/biznxt',
+      websiteUrl: '',
       supportScope: 'Advisory Funnels, Commercial Structure & Digital Positioning',
       summary:
         'Entrepreneurial consulting and strategic guidance platform assisting business founders in evaluating commercial opportunities.',
@@ -142,7 +142,7 @@ export function buildInitialClients(nowIso: string): ClientRecord[] {
       phone: '',
       city: '',
       country: 'India',
-      websiteUrl: '/ventures/kartigo',
+      websiteUrl: '',
       supportScope: 'B2B Growth, Buyer Qualification & Platform Strategy',
       summary:
         'Wholesale commercial stock supply and B2B trade marketplace connecting volume buyers with verified inventory.',
@@ -176,7 +176,7 @@ export function buildInitialClients(nowIso: string): ClientRecord[] {
       phone: '',
       city: '',
       country: 'India',
-      websiteUrl: '/ventures/budget-bazaar',
+      websiteUrl: '',
       supportScope: 'E-commerce Marketing & Customer Demand Campaigns',
       summary:
         'Value-driven consumer retail storefront providing everyday essentials and household goods.',

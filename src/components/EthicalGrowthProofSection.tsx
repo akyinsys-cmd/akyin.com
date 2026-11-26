@@ -43,34 +43,42 @@ export function EthicalGrowthProofSection({
 
     async function inspectNextAvailableSlot() {
       const todayIst = getTodayIstDate();
+      const candidateDates: string[] = [];
       for (let offset = 0; offset <= 7; offset += 1) {
         const candidateDate = addDaysIst(todayIst, offset);
-        if (blockedDates.includes(candidateDate)) {
-          continue;
-        }
-        try {
-          const res = await akyinApiClient.fetchAvailability(candidateDate);
-          if (!res.blocked) {
-            const openSlots = res.slots.filter((s) => s.available);
-            if (openSlots.length > 0) {
-              if (!active) return;
-              const friendly = formatFriendlyDateIst(candidateDate);
-              setSlotSummary({
-                loading: false,
-                dateLabel: friendly,
-                openSlotsCount: openSlots.length,
-                firstSlotLabel: openSlots[0]?.label || '',
-                statusText: `${openSlots.length} configured IST slot${openSlots.length === 1 ? '' : 's'} available on ${friendly}`,
-              });
-              return;
-            }
-          }
-        } catch {
-          // Continue scanning next upcoming day
+        if (!blockedDates.includes(candidateDate)) {
+          candidateDates.push(candidateDate);
         }
       }
 
+      const settledResults = await Promise.allSettled(
+        candidateDates.map(async (candidateDate) => ({
+          candidateDate,
+          res: await akyinApiClient.fetchAvailability(candidateDate),
+        }))
+      );
+
       if (!active) return;
+
+      for (const result of settledResults) {
+        if (result.status !== 'fulfilled') continue;
+        const { candidateDate, res } = result.value;
+        if (!res.blocked) {
+          const openSlots = res.slots.filter((s) => s.available);
+          if (openSlots.length > 0) {
+            const friendly = formatFriendlyDateIst(candidateDate);
+            setSlotSummary({
+              loading: false,
+              dateLabel: friendly,
+              openSlotsCount: openSlots.length,
+              firstSlotLabel: openSlots[0]?.label || '',
+              statusText: `${openSlots.length} configured IST slot${openSlots.length === 1 ? '' : 's'} available on ${friendly}`,
+            });
+            return;
+          }
+        }
+      }
+
       setSlotSummary({
         loading: false,
         dateLabel: '',
@@ -80,7 +88,7 @@ export function EthicalGrowthProofSection({
       });
     }
 
-    inspectNextAvailableSlot();
+    void inspectNextAvailableSlot();
     return () => {
       active = false;
     };

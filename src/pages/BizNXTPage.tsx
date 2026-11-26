@@ -1,6 +1,6 @@
-import { ArrowRight, ArrowUpRight, Compass, Lightbulb, TrendingUp } from 'lucide-react';
+import { ArrowRight, Compass, Lightbulb, TrendingUp } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
-import { AppRoute, EXTERNAL_VERTICAL_URLS, IMAGES } from '../data/akyinData';
+import { AppRoute, IMAGES } from '../data/akyinData';
 import { ContactDispatcher } from '../components/ContactDispatcher';
 import { EditorialReveal } from '../components/EditorialReveal';
 import {
@@ -37,34 +37,28 @@ export function BizNXTPage({ onNavigate }: BizNXTPageProps) {
               Business Clarity. Smarter Decisions. Better Direction.
             </h1>
             <p className="text-base sm:text-lg text-[#6E6E73] leading-relaxed">
-              BizNXT is an independent client business supported by AKYIN for advisory funnel strategy and digital positioning. It focuses on entrepreneurial guidance, consulting, and helping founders explore business opportunities and make informed commercial decisions at biznxt.online.
+              BizNXT is an independent client business supported by AKYIN for advisory funnel strategy and digital positioning. It focuses on entrepreneurial guidance, consulting, and helping founders explore business opportunities and make informed commercial decisions.
             </p>
 
             <div className="flex flex-wrap items-center gap-3.5 pt-2">
-              <GlassButton
-                href={EXTERNAL_VERTICAL_URLS.biznxt}
-                target="_blank"
-                rel="noopener noreferrer"
-                variant="primary"
-                size="lg"
-              >
-                <span>Visit BizNXT.online</span>
-                <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
-              </GlassButton>
               {onNavigate ? (
                 <GlassButton
-                  variant="glass"
+                  variant="primary"
                   size="lg"
                   onClick={() => onNavigate('/advisory')}
                 >
                   <span>Book Advisory Consultation</span>
-                  <ArrowRight className="w-4 h-4 text-[#1D1D1F]" aria-hidden="true" />
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </GlassButton>
               ) : (
-                <GlassButton href="#biznxt-guidance" variant="glass" size="lg">
-                  Explore Consulting Scope
+                <GlassButton href="#biznxt-contact" variant="primary" size="lg">
+                  <span>Request Consulting</span>
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </GlassButton>
               )}
+              <GlassButton href="#biznxt-guidance" variant="glass" size="lg">
+                Explore Consulting Scope
+              </GlassButton>
             </div>
           </motion.div>
 
@@ -104,8 +98,7 @@ export function BizNXTPage({ onNavigate }: BizNXTPageProps) {
               Starting or refining a business involves navigating numerous choices—evaluating commercial demand, structuring operations, selecting sales channels, and pacing capital responsibly.
             </p>
             <p className="text-base text-[#6E6E73] leading-relaxed">
-              Operating under AKYIN Ventures at{' '}
-              <span className="font-semibold text-[#1D1D1F]">biznxt.online</span>, BizNXT provides structured business guidance and consulting centered on realistic planning rather than theoretical jargon.
+              Supported within the AKYIN Ventures client showcase, BizNXT provides structured business guidance and consulting centered on realistic planning rather than theoretical jargon.
             </p>
           </div>
 
@@ -201,8 +194,7 @@ export function BizNXTPage({ onNavigate }: BizNXTPageProps) {
                 BizNXT does not offer unrealistic promises or pre-packaged formulas. Consulting engagements focus on asking the right commercial questions, examining real constraints, and helping entrepreneurs organize clear next steps.
               </p>
               <p className="text-[#6E6E73]">
-                Visit the dedicated platform at{' '}
-                <span className="font-semibold text-[#1D1D1F]">biznxt.online</span> or submit an enquiry below to discuss a guidance or consulting conversation.
+                Submit an enquiry below or schedule an advisory session to discuss a structured business guidance or consulting conversation.
               </p>
             </div>
           </div>
@@ -210,21 +202,19 @@ export function BizNXTPage({ onNavigate }: BizNXTPageProps) {
           <GlassPanel className="p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="space-y-1.5">
               <h3 className="font-display text-2xl font-bold text-[#1D1D1F]">
-                Explore BizNXT Online
+                Discuss BizNXT Consulting
               </h3>
               <p className="text-sm text-[#6E6E73]">
-                Access the dedicated BizNXT consulting website directly at biznxt.online.
+                Connect with the BizNXT consulting desk directly through the enquiry form below.
               </p>
             </div>
             <GlassButton
-              href={EXTERNAL_VERTICAL_URLS.biznxt}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#biznxt-contact"
               variant="primary"
               size="lg"
             >
-              <span>Visit BizNXT.online</span>
-              <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+              <span>Submit Consulting Enquiry</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </GlassButton>
           </GlassPanel>
         </EditorialReveal>

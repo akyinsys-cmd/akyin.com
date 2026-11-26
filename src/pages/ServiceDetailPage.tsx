@@ -128,10 +128,13 @@ export function ServiceDetailPage({ slug, onNavigate }: ServiceDetailPageProps) 
     }
 
     setSubmitting(true);
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 15000);
     try {
       const resp = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           fullName: fullName.trim(),
           businessName: businessName.trim(),
@@ -150,14 +153,27 @@ export function ServiceDetailPage({ slug, onNavigate }: ServiceDetailPageProps) 
           campaignSource: 'Service Detail Page',
         }),
       });
-      const data = (await resp.json().catch(() => ({}))) as { leadId?: string; error?: string };
+      const contentType = resp.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        throw new Error(`Unexpected server response (HTTP ${resp.status}). Please retry.`);
+      }
+      const data = (await resp.json().catch(() => ({}))) as {
+        leadId?: string;
+        error?: string;
+        issues?: string[];
+      };
       if (!resp.ok) {
-        throw new Error(data.error || 'Unable to submit enquiry right now.');
+        throw new Error(data.issues?.[0] || data.error || 'Unable to submit enquiry right now.');
       }
       setSubmittedLeadId(data.leadId || 'RECEIVED');
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Submission failed.');
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setFormError('Request timed out after 15 seconds. Please check your connection and retry.');
+      } else {
+        setFormError(err instanceof Error ? err.message : 'Submission failed.');
+      }
     } finally {
+      window.clearTimeout(timeoutId);
       setSubmitting(false);
     }
   };

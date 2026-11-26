@@ -1,6 +1,6 @@
-import { ArrowUpRight, Boxes, Building2, CheckCircle2, Truck } from 'lucide-react';
+import { ArrowRight, Boxes, Building2, CheckCircle2, Truck } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
-import { EXTERNAL_VERTICAL_URLS, IMAGES } from '../data/akyinData';
+import { IMAGES } from '../data/akyinData';
 import { ContactDispatcher } from '../components/ContactDispatcher';
 import { EditorialReveal } from '../components/EditorialReveal';
 import {
@@ -33,19 +33,17 @@ export function KartigoPage() {
               Connecting Businesses With Stock Opportunities.
             </h1>
             <p className="text-base sm:text-lg text-[#6E6E73] leading-relaxed">
-              Kartigo is an independent client business supported by AKYIN for B2B commercial growth and buyer acquisition. It is a B2B stock supply platform designed to support commercial buyers and volume sellers through a dedicated commerce environment at kartigo.online.
+              Kartigo is an independent client business supported by AKYIN for B2B commercial growth and buyer acquisition. It is a B2B stock supply platform designed to support commercial buyers and volume sellers through a dedicated wholesale commerce environment.
             </p>
 
             <div className="flex flex-wrap items-center gap-3.5 pt-2">
               <GlassButton
-                href={EXTERNAL_VERTICAL_URLS.kartigo}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#kartigo-contact"
                 variant="primary"
                 size="lg"
               >
-                <span>Explore Kartigo.online</span>
-                <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+                <span>Connect for B2B Supply</span>
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </GlassButton>
               <GlassButton href="#kartigo-concept" variant="glass" size="lg">
                 Learn How It Works
@@ -65,7 +63,7 @@ export function KartigoPage() {
                   src={IMAGES.kartigoWarehouse}
                   alt="Apple-style stacked white and metallic anodized wholesale B2B packaging crates embossed with the AKYIN emblem"
                   loading="eager"
-                  fallbackTitle="KARTIGO · kartigo.online"
+                  fallbackTitle="KARTIGO · B2B Stock Supply"
                   className="w-full h-full bg-[#FFFFFF]"
                   imageClassName="object-contain p-3"
                 />
@@ -91,7 +89,7 @@ export function KartigoPage() {
               Businesses sourcing inventory and suppliers holding available commercial stock often rely on fragmented phone calls and informal messaging threads. Kartigo gives B2B buyers and sellers a dedicated web destination built around commercial stock discovery.
             </p>
             <p>
-              As an independent operating platform under AKYIN Ventures at <span className="font-semibold text-[#1D1D1F]">kartigo.online</span>, Kartigo focuses cleanly on B2B stock supply interactions without unrelated consumer retail clutter.
+              As an independent B2B commerce platform supported by AKYIN Ventures, Kartigo focuses cleanly on B2B stock supply interactions without unrelated consumer retail clutter.
             </p>
           </div>
         </EditorialReveal>
@@ -170,8 +168,8 @@ export function KartigoPage() {
             {[
               {
                 step: '01',
-                title: 'Visit Kartigo.online',
-                desc: 'Access the dedicated B2B stock commerce platform directly on its independent domain.',
+                title: 'Submit Trade Requirements',
+                desc: 'Share your wholesale sourcing requirements or available commercial stock inventory with the desk.',
               },
               {
                 step: '02',
@@ -205,19 +203,17 @@ export function KartigoPage() {
                   Ready to Explore Wholesale &amp; B2B Stock Supply?
                 </h3>
                 <p className="text-sm text-[#6E6E73] mt-0.5">
-                  Visit the dedicated Kartigo platform directly at kartigo.online.
+                  Connect directly with the Kartigo B2B commerce desk below.
                 </p>
               </div>
             </div>
             <GlassButton
-              href={EXTERNAL_VERTICAL_URLS.kartigo}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#kartigo-contact"
               variant="primary"
               size="lg"
             >
-              <span>Explore Kartigo.online</span>
-              <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+              <span>Submit B2B Enquiry</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </GlassButton>
           </GlassPanel>
         </EditorialReveal>

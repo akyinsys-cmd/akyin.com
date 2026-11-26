@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ArrowRight,
   BarChart3,
@@ -252,34 +252,40 @@ export function AutomotiveMarketingTrends({ onNavigate }: AutomotiveMarketingTre
   const shouldReduceMotion = useReducedMotion();
   const [trends, setTrends] = useState<AutomotiveTrendItem[]>(BASE_AUTOMOTIVE_TRENDS);
   const [groundedHeadlines, setGroundedHeadlines] = useState<GroundedHeadline[]>(GROUNDED_MARKET_HEADLINES);
-  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedTrend, setSelectedTrend] = useState<AutomotiveTrendItem | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>(() =>
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   );
+  const refreshTimerRef = useRef<number | null>(null);
 
-  const fetchGroundedTrends = async (isManualRefresh = false) => {
-    if (isManualRefresh) setRefreshing(true);
-    else setLoading(true);
-
-    try {
-      // Simulated live Google Search grounding sync with latency
-      await new Promise((resolve) => setTimeout(resolve, isManualRefresh ? 600 : 400));
+  const fetchGroundedTrends = (isManualRefresh = false) => {
+    if (!isManualRefresh) {
       setTrends(BASE_AUTOMOTIVE_TRENDS);
       setGroundedHeadlines(GROUNDED_MARKET_HEADLINES);
       setLastUpdated(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-    } catch {
-      setTrends(BASE_AUTOMOTIVE_TRENDS);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+      return;
     }
+    if (refreshTimerRef.current !== null) {
+      window.clearTimeout(refreshTimerRef.current);
+    }
+    setRefreshing(true);
+    refreshTimerRef.current = window.setTimeout(() => {
+      refreshTimerRef.current = null;
+      setTrends(BASE_AUTOMOTIVE_TRENDS);
+      setGroundedHeadlines(GROUNDED_MARKET_HEADLINES);
+      setLastUpdated(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      setRefreshing(false);
+    }, 300);
   };
 
   useEffect(() => {
-    void fetchGroundedTrends();
+    return () => {
+      if (refreshTimerRef.current !== null) {
+        window.clearTimeout(refreshTimerRef.current);
+      }
+    };
   }, []);
 
   const categories = [
@@ -335,7 +341,7 @@ export function AutomotiveMarketingTrends({ onNavigate }: AutomotiveMarketingTre
               variant="subtle"
               size="sm"
               onClick={() => void fetchGroundedTrends(true)}
-              disabled={refreshing || loading}
+              disabled={refreshing}
               ariaLabel="Refresh grounded automotive trends"
             >
               <RefreshCw
@@ -348,23 +354,7 @@ export function AutomotiveMarketingTrends({ onNavigate }: AutomotiveMarketingTre
         </div>
 
         {/* Recharts Dynamic Chart Visualization */}
-        {loading ? (
-          <div className="frosted-glass-card rounded-[30px] p-6 sm:p-8 space-y-6 animate-pulse">
-            <div className="flex items-center justify-between border-b border-[#1D1D1F]/8 pb-4">
-              <div className="space-y-2">
-                <div className="h-3 w-40 bg-[#ECECF0] rounded-full" />
-                <div className="h-6 w-72 bg-[#ECECF0] rounded-xl" />
-              </div>
-              <div className="h-7 w-36 bg-[#ECECF0] rounded-full" />
-            </div>
-            <div className="w-full h-[320px] bg-[#ECECF0]/70 rounded-2xl flex items-center justify-center">
-              <p className="text-xs font-semibold text-[#6E6E73] animate-pulse">
-                Syncing Google Search Grounded Analytics...
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="frosted-glass-card rounded-[30px] p-6 sm:p-8 space-y-6">
+        <div className="frosted-glass-card rounded-[30px] p-6 sm:p-8 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1D1D1F]/8 pb-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.06em] text-[#6E6E73]">
@@ -421,7 +411,6 @@ export function AutomotiveMarketingTrends({ onNavigate }: AutomotiveMarketingTre
               </ResponsiveContainer>
             </div>
           </div>
-        )}
 
         {/* Dynamic Category Filter Bar */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
@@ -448,22 +437,8 @@ export function AutomotiveMarketingTrends({ onNavigate }: AutomotiveMarketingTre
           })}
         </div>
 
-        {/* Loading Skeletons */}
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((n) => (
-              <div
-                key={n}
-                className="liquid-glass-card rounded-3xl p-7 space-y-4 animate-pulse bg-white/60"
-              >
-                <div className="h-4 w-28 bg-[#ECECF0] rounded-full" />
-                <div className="h-7 w-4/5 bg-[#ECECF0] rounded-xl" />
-                <div className="h-16 bg-[#ECECF0] rounded-xl" />
-                <div className="h-10 bg-[#ECECF0] rounded-xl pt-4" />
-              </div>
-            ))}
-          </div>
-        ) : filteredTrends.length === 0 ? (
+        {/* Trend Cards */}
+        {filteredTrends.length === 0 ? (
           <GlassPanel className="p-10 text-center space-y-3">
             <p className="text-sm font-semibold text-[#1D1D1F]">
               No trends found for this category.

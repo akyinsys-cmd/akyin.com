@@ -4,18 +4,27 @@ import express from "express";
 import fs2 from "fs";
 import path2 from "path";
 import { fileURLToPath } from "url";
-import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 
 // src/data/akyinData.ts
+var SERVICE_MARKETPLACE_CATEGORIES = [
+  "Automotive Marketing",
+  "Digital Marketing",
+  "Social Media Management",
+  "Creative and Graphic Design",
+  "Video and Content Services",
+  "Business Documents and Presentations",
+  "Excel and Reporting Services",
+  "Messaging and Communication",
+  "Lead Management and CRM",
+  "Business Consulting and Training"
+];
 var OFFICIAL_CONTACT = {
   parentBrand: "AKYIN VENTURES",
   contactName: "Shaikh Nazir",
   domain: "https://akyin.com",
   websiteLabel: "akyin.com",
   email: "connect@akyin.com",
-  phoneDisplay: "+91 63956 94011",
-  phoneHref: "tel:+916395694011",
-  whatsappNumber: "916395694011",
+  whatsappLabel: "WhatsApp Connect",
   whatsappChannelUrl: "https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U",
   whatsappUrl: "https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U",
   internationalPositioning: "Building Businesses. Creating Opportunities.",
@@ -192,10 +201,7 @@ var GUMROAD_DIGITAL_PRODUCTS = [
   }
 ];
 var EXTERNAL_VERTICAL_URLS = {
-  aicalc: "https://aicalc.in",
-  kartigo: "https://kartigo.online",
-  biznxt: "https://biznxt.online",
-  budgetBazaar: "https://budgetbazaar.org"
+  aicalc: "https://aicalc.in"
 };
 var IMAGES = {
   liquidGlassHero: "/src/assets/images/apple_hero_glass_monolith_1795345424385.jpg",
@@ -440,60 +446,12 @@ var FULL_ECOSYSTEM_TICKER = [
   ...ECOSYSTEM_CLIENTS_TICKER,
   ...ECOSYSTEM_PLATFORMS_TICKER
 ];
-var PRICING_PACKAGES = [
-  {
-    id: "package-a",
-    code: "PACKAGE A",
-    name: "Full-Service Growth Marketing & Lead Management",
-    subtitle: "Complete end-to-end digital customer acquisition paired with managed AI-assisted calling and enquiry qualification.",
-    setupFee: "\u20B939,999",
-    monthlyFee: "\u20B949,999",
-    featured: true,
-    includes: [
-      "Meta ads management & campaign optimization",
-      "Lead generation forms & conversion creatives",
-      "AI-assisted calling up to 1,000 mins/month (subject to vendor plan)",
-      "Structured lead filtering & buyer intent capture",
-      "Hot / Warm / Future Follow-up / Unreachable / Not Interested classification",
-      "Daily Excel enquiry reports & monthly performance review"
-    ],
-    excludes: [
-      "Meta ad spend (paid directly to Meta by client)",
-      "Extra AI calling minutes beyond 1,000 mins/month",
-      "Influencer / creator fees",
-      "Special on-location video shoots & third-party production"
-    ],
-    enquiryServiceValue: "Package A \u2014 Full-Service Growth Marketing & Lead Management"
-  },
-  {
-    id: "package-b",
-    code: "PACKAGE B",
-    name: "Lead Filtering & Qualification Only",
-    subtitle: "Dedicated managed calling and classification for businesses that already receive incoming enquiries and need disciplined qualification.",
-    setupFee: "\u20B914,999",
-    monthlyFee: "\u20B919,999",
-    featured: false,
-    includes: [
-      "AI-assisted calling of existing inbound enquiries (up to 1,000 mins/month)",
-      "Requirement, budget, timeline & appointment intent capture",
-      "Hot / Warm / Future Follow-up / Unreachable / Not Interested classification",
-      "Daily Excel qualification sheets & call summaries",
-      "Monthly qualification & conversion insight report"
-    ],
-    excludes: [
-      "Meta advertising & paid campaign management",
-      "New lead generation (qualifies existing enquiries only)",
-      "Extra AI calling minutes beyond 1,000 mins/month"
-    ],
-    enquiryServiceValue: "Package B \u2014 Lead Filtering & Qualification Only"
-  }
-];
 var RATE_CARD_ITEMS = [
   {
     id: "rc-1",
     service: "Meta lead generation management",
     category: "Lead Generation",
-    fee: "\u20B920,000",
+    fee: "\u20B940,000",
     unit: "/month",
     notes: "Campaign strategy, ad setup & optimization (ad spend extra)"
   },
@@ -501,7 +459,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-2",
     service: "Lead filtering and qualification",
     category: "Qualification",
-    fee: "\u20B912,000",
+    fee: "\u20B924,000",
     unit: "/month",
     notes: "Existing enquiry calling & Hot/Warm/Future classification"
   },
@@ -509,7 +467,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-3",
     service: "AI calling workflow management",
     category: "Qualification",
-    fee: "\u20B95,000",
+    fee: "\u20B910,000",
     unit: "/month",
     notes: "Managed internally by AKYIN (not standalone software)"
   },
@@ -517,7 +475,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-4",
     service: "CRM and lead pipeline management",
     category: "Operations",
-    fee: "\u20B95,000",
+    fee: "\u20B910,000",
     unit: "/month",
     notes: "Pipeline hygiene, status tracking & Excel/summary reporting"
   },
@@ -525,7 +483,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-5",
     service: "Social media management",
     category: "Creative & Social",
-    fee: "\u20B98,000",
+    fee: "\u20B916,000",
     unit: "/month",
     notes: "Scheduled brand content & page hygiene"
   },
@@ -533,7 +491,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-6",
     service: "8 promotional reels",
     category: "Creative & Social",
-    fee: "\u20B910,000",
+    fee: "\u20B920,000",
     unit: "/month",
     notes: "Edited vertical reels from client or curated footage"
   },
@@ -541,7 +499,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-7",
     service: "10 graphic creatives",
     category: "Creative & Social",
-    fee: "\u20B94,000",
+    fee: "\u20B98,000",
     unit: "/month",
     notes: "Static offer, product highlight & festive templates"
   },
@@ -549,7 +507,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-8",
     service: "Influencer campaign coordination",
     category: "Influencer",
-    fee: "\u20B92,500",
+    fee: "\u20B95,000",
     unit: "/campaign",
     notes: "Creator shortlisting, brief & shoot scheduling"
   },
@@ -557,7 +515,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-9",
     service: "Influencer video and upload",
     category: "Influencer",
-    fee: "\u20B96,000",
+    fee: "\u20B912,000",
     unit: "/creator",
     notes: "Coordination & content publishing workflow (creator fees separate)"
   },
@@ -565,7 +523,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-10",
     service: "Product / model launch campaign",
     category: "Campaigns",
-    fee: "\u20B910,000",
+    fee: "\u20B920,000",
     unit: "/campaign",
     notes: "Dedicated new product/model unveiling & booking promotion"
   },
@@ -573,7 +531,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-11",
     service: "Demo / visit booking campaign",
     category: "Campaigns",
-    fee: "\u20B97,500",
+    fee: "\u20B915,000",
     unit: "/campaign",
     notes: "Targeted local appointment, demo or test-drive booking drive"
   },
@@ -581,7 +539,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-12",
     service: "Upgrade / exchange event campaign",
     category: "Campaigns",
-    fee: "\u20B910,000",
+    fee: "\u20B920,000",
     unit: "/campaign",
     notes: "Promotional weekend event & upgrade valuation push"
   },
@@ -589,7 +547,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-13",
     service: "Festive campaign",
     category: "Campaigns",
-    fee: "\u20B910,000",
+    fee: "\u20B920,000",
     unit: "/campaign",
     notes: "Seasonal offer rollout & customer footfall drive"
   },
@@ -597,7 +555,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-14",
     service: "Catalog & stock rotation marketing",
     category: "Campaigns",
-    fee: "\u20B98,000",
+    fee: "\u20B916,000",
     unit: "/month",
     notes: "Specialty inventory & pre-owned stock promotion"
   },
@@ -605,7 +563,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-15",
     service: "Google Business Profile management",
     category: "Local Search",
-    fee: "\u20B93,000",
+    fee: "\u20B96,000",
     unit: "/month",
     notes: "Listing hygiene, updates & local Maps discovery"
   },
@@ -613,7 +571,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-16",
     service: "Local SEO management",
     category: "Local Search",
-    fee: "\u20B96,000",
+    fee: "\u20B912,000",
     unit: "/month",
     notes: "Catchment keyword & regional search visibility"
   },
@@ -621,7 +579,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-17",
     service: "Customer retention campaign",
     category: "Retention",
-    fee: "\u20B98,000",
+    fee: "\u20B916,000",
     unit: "/month",
     notes: "Repeat customer & service centre booking outreach"
   },
@@ -629,7 +587,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-18",
     service: "Corporate / B2B campaign",
     category: "B2B / Institutional",
-    fee: "\u20B910,000",
+    fee: "\u20B920,000",
     unit: "/campaign",
     notes: "Institutional, corporate & commercial buyer acquisition"
   },
@@ -637,7 +595,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-19",
     service: "Product & pitch presentation PPT",
     category: "Sales Enablement",
-    fee: "\u20B93,000",
+    fee: "\u20B96,000",
     unit: "/presentation",
     notes: "Structured offering, product & pricing sales deck"
   },
@@ -645,7 +603,7 @@ var RATE_CARD_ITEMS = [
     id: "rc-20",
     service: "Sales training",
     category: "Training",
-    fee: "\u20B925,000",
+    fee: "\u20B950,000",
     unit: "/session",
     notes: "Product presentation, objection handling & deal closing"
   },
@@ -653,15 +611,150 @@ var RATE_CARD_ITEMS = [
     id: "rc-21",
     service: "Personality development training",
     category: "Training",
-    fee: "\u20B925,000",
+    fee: "\u20B950,000",
     unit: "/session",
     notes: "Grooming, communication & executive frontline etiquette"
+  },
+  {
+    id: "rc-22",
+    service: "Bulk SMS Marketing (10,000 SMS Package)",
+    category: "Direct Messaging",
+    fee: "\u20B93,000",
+    unit: "/10,000 SMS (\u20B90.30/SMS)",
+    notes: "Promotional/provider-supported transactional SMS; additional credits billed at admin-configured rate"
+  },
+  {
+    id: "rc-23",
+    service: "Additional Bulk SMS Credits",
+    category: "Direct Messaging",
+    fee: "\u20B90.30",
+    unit: "/SMS (admin configurable)",
+    notes: "Calculated using admin-configured per-SMS rate; subject to provider & DLT conditions"
+  },
+  {
+    id: "rc-24",
+    service: "WhatsApp Business Messaging Setup (One-Time Fee)",
+    category: "WhatsApp Messaging",
+    fee: "\u20B94,999",
+    unit: "/one-time setup",
+    notes: "Setup & workflow configuration ONLY \u2014 strictly separate from per-message usage charges"
+  },
+  {
+    id: "rc-25",
+    service: "WhatsApp Business Message Usage",
+    category: "WhatsApp Messaging",
+    fee: "\u20B91.50",
+    unit: "/message (billed separately)",
+    notes: "Metered per message according to configured billing unit; provider API activated per client credentials"
+  },
+  {
+    id: "rc-26",
+    service: "Logo and Branding Design (Standalone Project)",
+    category: "Creative & Documentation",
+    fee: "\u20B96,000",
+    unit: "/project",
+    notes: "Vector logo, mark variations, palette & high-res production files"
+  },
+  {
+    id: "rc-27",
+    service: "Logo and Branding Design (Monthly Retainer)",
+    category: "Creative & Documentation",
+    fee: "\u20B910,000",
+    unit: "/month",
+    notes: "Continuous brand collateral, graphic asset updates & guidelines"
+  },
+  {
+    id: "rc-28",
+    service: "Social Media Thumbnail Design (5-Pack)",
+    category: "Creative & Documentation",
+    fee: "\u20B93,000",
+    unit: "/pack (5 creatives)",
+    notes: "High-CTR YouTube, Instagram & Facebook promotional creatives"
+  },
+  {
+    id: "rc-29",
+    service: "Social Media Thumbnail Retainer",
+    category: "Creative & Documentation",
+    fee: "\u20B98,000",
+    unit: "/month (15 creatives)",
+    notes: "Monthly continuous video thumbnail and social asset production"
+  },
+  {
+    id: "rc-30",
+    service: "Script Writing (3-Pack)",
+    category: "Creative & Documentation",
+    fee: "\u20B94,000",
+    unit: "/pack (3 scripts)",
+    notes: "Commercial video, reels, explainer & presentation scripts"
+  },
+  {
+    id: "rc-31",
+    service: "Script Writing Retainer",
+    category: "Creative & Documentation",
+    fee: "\u20B912,000",
+    unit: "/month (12 scripts)",
+    notes: "Ongoing monthly video scripts, ad copy & commercial scripting"
+  },
+  {
+    id: "rc-32",
+    service: "PowerPoint Presentation (12 Slides)",
+    category: "Creative & Documentation",
+    fee: "\u20B96,000",
+    unit: "/presentation",
+    notes: "Company profiles, pitch decks, sales presentations & proposals"
+  },
+  {
+    id: "rc-33",
+    service: "PowerPoint Deck Maintenance Retainer",
+    category: "Creative & Documentation",
+    fee: "\u20B914,000",
+    unit: "/month",
+    notes: "Monthly presentation updates, client pitch decks & revision support"
+  },
+  {
+    id: "rc-34",
+    service: "Excel Reports (Custom Automated Sheet)",
+    category: "Creative & Documentation",
+    fee: "\u20B95,000",
+    unit: "/report sheet",
+    notes: "Custom sales tracking, lead pipeline & inventory formula sheets"
+  },
+  {
+    id: "rc-35",
+    service: "Excel Reporting Retainer",
+    category: "Creative & Documentation",
+    fee: "\u20B910,000",
+    unit: "/month",
+    notes: "Weekly data refresh, automated models & custom business calculations"
+  },
+  {
+    id: "rc-36",
+    service: "Additional Business Support (Task Sprint)",
+    category: "Creative & Documentation",
+    fee: "\u20B94,000",
+    unit: "/10-hour sprint",
+    notes: "Data entry, document formatting, CRM hygiene & customer enquiry sorting"
+  },
+  {
+    id: "rc-37",
+    service: "Additional Business Support Retainer",
+    category: "Creative & Documentation",
+    fee: "\u20B98,000",
+    unit: "/month (25 hours)",
+    notes: "Dedicated monthly operational and administrative business assistance"
   }
 ];
 var ENQUIRY_TYPE_OPTIONS = [
   "General Consultation / Proposal",
-  "Package A \u2014 Full-Service Growth Marketing & Lead Management",
-  "Package B \u2014 Lead Filtering & Qualification Only",
+  "Automotive Dealership Marketing & Sales Strategy",
+  "Meta Ads Management",
+  "Online Lead Generation Campaigns",
+  "Lead Filtering & Qualification",
+  "Bulk SMS Marketing",
+  "WhatsApp Business Messaging Setup",
+  "Logo Design",
+  "PowerPoint Presentation Design",
+  "Excel Reports & Automation",
   ...RATE_CARD_ITEMS.map((item) => item.service),
   "Book Distribution / Publishing Rights",
   "AKYIN THRIFT Wholesale / Shopping Enquiry",
@@ -681,35 +774,29 @@ function buildMarkdownForRoute(pathname) {
 - **Website**: ${OFFICIAL_CONTACT.domain}
 - **Contact Lead**: ${OFFICIAL_CONTACT.contactName}
 - **Email**: [${OFFICIAL_CONTACT.email}](mailto:${OFFICIAL_CONTACT.email})
-- **Phone**: [${OFFICIAL_CONTACT.phoneDisplay}](${OFFICIAL_CONTACT.phoneHref})
+- **WhatsApp Connect**: [Join Official AKYIN Channel](${OFFICIAL_CONTACT.whatsappUrl})
 - **Service Availability**: ${OFFICIAL_CONTACT.regionIndicator} \u2014 ${OFFICIAL_CONTACT.internationalSupportLine}
 - **Follow AKYIN**: [Facebook \u2013 Follow AKYIN](${OFFICIAL_CONTACT.marketingSocials[0].url}) | [YouTube \u2013 Subscribe to AKYIN Marketing](${OFFICIAL_CONTACT.marketingSocials[1].url}) | [Instagram \u2013 Follow AKYIN Ventures](${OFFICIAL_CONTACT.marketingSocials[2].url}) | [WhatsApp \u2013 Join AKYIN Updates](${OFFICIAL_CONTACT.marketingSocials[3].url})
-- **Key Pages**: [About](/about) | [Ventures](/ventures) | [Pricing](/pricing) | [Advisory](/advisory) | [Contact](/contact) | [Terms](/terms) | [Privacy](/privacy) | [Sitemap](/sitemap)
+- **Key Pages**: [About](/about) | [Ventures](/ventures) | [Services](/ventures/marketing) | [Pricing](/pricing) | [Advisory](/advisory) | [Contact](/contact) | [Terms](/terms) | [Privacy](/privacy) | [Sitemap](/sitemap)
 - **Agent Endpoints**: [/llms.txt](/llms.txt) | [/.well-known/mcp/server-card.json](/.well-known/mcp/server-card.json) | [/robots.txt](/robots.txt)
 `;
   if (cleaned === "/pricing") {
-    const pkgLines = PRICING_PACKAGES.map(
-      (p) => `### ${p.code}: ${p.name}
-- **One-Time Setup**: ${p.setupFee} INR
-- **Monthly Retainer**: ${p.monthlyFee} INR
-- **Includes**: ${p.includes.join("; ")}
-- **Excludes**: ${p.excludes.join("; ")}`
-    ).join("\n\n");
     const rateLines = RATE_CARD_ITEMS.map(
       (r) => `| ${r.service} | ${r.category} | ${r.fee}${r.unit} INR | ${r.notes} |`
     ).join("\n");
-    return `# AKYIN Ventures \u2014 Transparent Pricing & Rate Card
+    return `# AKYIN Ventures \u2014 Transparent Standalone Service Pricing (INR)
 
-> All commercial retainers, training workshops, and individual services are priced transparently in INR. Ad spend is paid directly to Meta or Google by clients.
+> Every AKYIN MARKETINGS service is 100% standalone\u2014select only what you need with zero compulsory bundles. Advertising budgets are paid directly to Meta or Google by clients.
 
-${pkgLines}
+## Key Standalone Service Highlights
+- **Meta Ads Management**: \u20B940,000 / month ([/services/meta-ads-management](/services/meta-ads-management))
+- **Lead Filtering & Qualification**: \u20B924,000 / month ([/services/lead-filtering](/services/lead-filtering))
+- **Bulk SMS Marketing**: \u20B93,000 for 10,000 SMS credits \xB7 \u20B90.30/SMS ([/services/bulk-sms](/services/bulk-sms))
+- **WhatsApp Business Messaging Setup**: \u20B94,999 one-time setup \xB7 Usage billed separately at \u20B91.50/msg ([/services/whatsapp-business-setup](/services/whatsapp-business-setup))
+- **Commercial & Dealership Sales Training**: \u20B950,000 / session ([/services/commercial-dealership-sales-training](/services/commercial-dealership-sales-training))
+- **1-on-1 Business Advisory Consultation**: \u20B93,998 / 30-min IST session ([Book Advisory](/advisory))
 
-## Business Advisory & Training
-- **Sales Team & Showroom Training**: \u20B925,000 / session
-- **Personality Development Workshop**: \u20B925,000 / session
-- **1-on-1 Business Advisory Consultation**: \u20B91,999 / 30-min IST session ([Book Advisory](/advisory))
-
-## 21-Item Individual Service Rate Card
+## Standalone Service Rate Schedule
 | Service | Category | Fee (INR) | Scope Notes |
 |---|---|---|---|
 ${rateLines}
@@ -718,12 +805,12 @@ ${commonFooter}`;
   if (cleaned === "/marketing/automotive") {
     return `# AKYIN Marketing \u2014 Automotive Dealership Growth Division
 
-> Specialized 16-service marketing, lead filtering, and floor sales coaching division engineered for automotive dealerships.
+> Standalone showroom marketing, test-drive acquisition, two-tier lead qualification, and floor sales coaching engineered for automotive dealerships.
 
-## Core Capabilities
-- **Lead Generation (01)** & **Lead Filtering & Qualification (02)** managed independently for clean showroom accountability.
-- Interactive Tools: **Agency Value Calculator (12/24 Month ROI)**, **Lead Quality Index**, **Lead Density Heatmap**, **Performance Radar Benchmark**, and **Executive A4 Dealership Dossier (PDF & PNG)**.
-- **Transparent Retainers**: Package A (\u20B939,999 setup + \u20B949,999/mo), Package B (\u20B914,999 setup + \u20B919,999/mo), Sales Training (\u20B925,000/session). [Full Pricing](/pricing).
+## Core Standalone Automotive Capabilities
+- **Online Lead Generation** ([/services/lead-generation](/services/lead-generation)) & **Lead Filtering & Qualification** ([/services/lead-filtering](/services/lead-filtering)) delivered independently for clean showroom accountability.
+- **Test-Drive Lead Generation** ([/services/test-drive-lead-generation](/services/test-drive-lead-generation)) & **Showroom Launch / Exchange Event Campaigns** ([/services/dealer-launch-exchange-campaigns](/services/dealer-launch-exchange-campaigns)).
+- **Commercial & Dealership Sales Training**: \u20B950,000 / session ([View Full Pricing](/pricing)).
 ${commonFooter}`;
   }
   if (cleaned === "/ventures/publishing") {
@@ -750,13 +837,16 @@ ${digitalLines}
 ${commonFooter}`;
   }
   if (cleaned === "/ventures/marketing") {
-    return `# AKYIN MARKETINGS \u2014 Full-Service Marketing Agency
-    
-> Drive qualified demand and strengthen commercial sales execution across retail, B2B, services, and automotive dealerships.
+    const catLines = SERVICE_MARKETPLACE_CATEGORIES.map((c, idx) => `${idx + 1}. **${c}**`).join("\n");
+    return `# AKYIN MARKETINGS \u2014 10-Category Standalone Service Marketplace
 
-- **18 Specialized Agency Services** across Lead Gen & Filtering, AI-Assisted Calling, Creative & Video Production, Local Growth, and Commercial Sales Training.
+> Choose individual marketing, design, documentation, reporting, messaging, CRM, and training services\u2014zero forced bundles.
+
+## 10 Standalone Service Categories
+${catLines}
+
 - **Automotive Division**: [AKYIN Automotive Marketing](/marketing/automotive)
-- **Pricing**: Package A (\u20B939,999 setup + \u20B949,999/mo) \xB7 Package B (\u20B914,999 setup + \u20B919,999/mo) \xB7 Sales Training (\u20B925,000/session). [View Full Rate Card](/pricing).
+- **Pricing & Quotation Builder**: [View Transparent Standalone Pricing](/pricing)
 ${commonFooter}`;
   }
   if (cleaned === "/terms" || cleaned === "/privacy") {
@@ -765,22 +855,21 @@ ${commonFooter}`;
 ## Terms of Service
 1. **Parent Group Attribution**: akyin.com represents AKYIN Ventures and its seven operating verticals. Third-party marketplaces (Amazon, Google Play Books, Shopify) and clients (AutoClub) are explicitly distinguished.
 2. **Direct Platform Ad Billing**: Clients pay Meta and Google advertising spend directly to those platforms. Agency fees cover strategy, setup, management, and qualification only.
-3. **Service Separation**: Lead Generation and Lead Filtering are strictly separated. AI-assisted calling and CRM pipeline tracking are internal managed services, not standalone SaaS licenses.
+3. **Standalone Service Separation**: Every service is strictly standalone. Lead Generation and Lead Filtering are independently selectable. Bulk SMS and WhatsApp setup vs. per-message charges remain transparently itemized.
 
 ## Privacy Policy
 - Visitor enquiries are validated client-side and transmitted directly to AKYIN Ventures' authorized workspace desk or user-selected WhatsApp/Email apps.
 - AKYIN Ventures never sells or brokers contact data to third parties.
-- Contact [connect@akyin.com](mailto:connect@akyin.com) or [+91 63956 94011](tel:+916395694011) for data requests.
+- Contact [connect@akyin.com](mailto:connect@akyin.com) or [WhatsApp Connect](${OFFICIAL_CONTACT.whatsappUrl}) for data requests.
 ${commonFooter}`;
   }
   if (cleaned === "/about") {
     return `# About AKYIN Ventures \u2014 One Vision. Multiple Business Ventures.
 
-AKYIN Ventures operates seven specialized operating businesses alongside a full-service marketing agency grounded in 16 years of commercial & automotive industry experience (mass-market to luxury retail).
+AKYIN Ventures operates specialized operating businesses alongside a 10-category standalone marketing marketplace grounded in 16 years of commercial & automotive industry experience (mass-market to luxury retail).
 
 - **Owned Verticals**: AKYIN Publishing, AKYIN MARKETINGS, AKYIN Store (AKYIN Thrift), AICalc.in, Kartigo.online, BizNXT.online, Budget Bazaar.
 - **Security & Integrity**: Strict CSP rules, URI allowlisting, schema-validated forms, and zero-broker enquiry routing.
-- **FAQs**: Clear boundaries between owned ventures, external clients (AutoClub), and distribution platforms.
 ${commonFooter}`;
   }
   if (cleaned === "/advisory") {
@@ -789,18 +878,37 @@ ${commonFooter}`;
 > Your Business. Your Vision. A Clearer Direction.
 
 - **Format**: 1-on-1 Strategic Consultation (30-minute slots, Asia/Kolkata IST).
-- **Indicative Consultation Fee**: \u20B91,999 INR per session (confirmed before slot lock; no automated online gateway charge).
+- **Consultation Fee**: \u20B93,998 INR per session (confirmed before slot lock).
 - **Focus Areas**: Business feasibility, sales team conversion, agency growth roadmap, and venture planning.
 ${commonFooter}`;
   }
   if (cleaned === "/contact") {
     return `# Contact AKYIN Ventures \u2014 Central Enquiry Desk
 
-Reach our corporate desk or any of the seven operating verticals directly:
+Reach our corporate desk or any operating vertical directly:
 
 - **Corporate Email**: [connect@akyin.com](mailto:connect@akyin.com)
-- **Phone**: [+91 63956 94011](tel:+916395694011)
+- **WhatsApp Connect**: [Join Official AKYIN Channel](${OFFICIAL_CONTACT.whatsappUrl})
 - **Booking Desk**: [Schedule Business Advisory](/advisory)
+${commonFooter}`;
+  }
+  if (cleaned === "/tools") {
+    return `# AKYIN Business, Marketing & Sales Calculators Suite (20 Free Tools)
+
+> Interactive marketing ROI, ROAS, CAC, CPL, break-even, GST, pricing, margin, commission, and consultation workflow tools by AKYIN Ventures.
+
+- **Marketing Calculators**: ROAS, CPL, CAC, Conversion Rate, Agency Value ROI, Ad Budget Planner
+- **Sales & Finance Calculators**: Profit Margin, Break-Even Units, Discount Impact, Sales Commission, GST Calculator (India 5%/12%/18%/28%)
+- **Growth & Lead Ops Tools**: Follow-up SLA Estimator, Quotation Estimator, Service Finder, Appointment Slot Finder (/advisory), and Direct Enquiry Dispatcher (/contact)
+${commonFooter}`;
+  }
+  if (cleaned === "/insights") {
+    return `# AKYIN Ventures \u2014 Insights & Business Philosophy
+
+> Operational perspectives across performance marketing, automotive dealership test-drive conversion, publishing, retail positioning, and B2B digital commerce.
+
+- Explore structured growth essays and real-time automotive dealership industry trends at [Insights](/insights).
+- For 1-on-1 execution advice, schedule an [IST Business Advisory session](/advisory).
 ${commonFooter}`;
   }
   const ventureList = VENTURES_PORTFOLIO.map(
@@ -808,20 +916,22 @@ ${commonFooter}`;
   ).join("\n");
   return `# AKYIN Ventures \u2014 Building Ideas Into Businesses
 
-> Multi-business corporate group and full-service marketing agency operating seven independent verticals across digital marketing, publishing, fashion retail, AI tools, B2B supply, value retail, and consulting.
+> Multi-business corporate group and standalone marketing service marketplace operating across digital marketing, publishing, fashion retail, AI tools, B2B supply, value retail, and consulting.
 
-## Seven Operating Verticals
+## Operating Verticals
 ${ventureList}
 
-## Transparent Agency & Consultation Pricing (INR)
-- **Package A (Full-Service Growth Marketing & Lead Management)**: \u20B939,999 setup + \u20B949,999/month
-- **Package B (Lead Filtering & Qualification Only)**: \u20B914,999 setup + \u20B919,999/month
-- **Commercial & Dealership Sales Training**: \u20B925,000 / session
-- **Business Advisory Session (30 min IST)**: \u20B91,999 / session
-- See complete 21-item schedule on [Pricing Page](/pricing)
+## Standalone Agency & Consultation Highlights (INR)
+- **Meta Ads Management**: \u20B940,000 / month
+- **Lead Filtering & Qualification**: \u20B924,000 / month
+- **Bulk SMS Marketing**: \u20B93,000 (10,000 SMS credits \xB7 \u20B90.30/SMS)
+- **WhatsApp Business Setup**: \u20B94,999 one-time setup (separate from \u20B91.50/msg usage)
+- **Commercial & Dealership Sales Training**: \u20B950,000 / session
+- **Business Advisory Session (30 min IST)**: \u20B93,998 / session
+- See full standalone service marketplace on [Services](/ventures/marketing) & [Pricing Page](/pricing)
 
 ## External Platforms & Publishing
-- [AICalc.in](${EXTERNAL_VERTICAL_URLS.aicalc}) | [Kartigo.online](${EXTERNAL_VERTICAL_URLS.kartigo}) | [BizNXT.online](${EXTERNAL_VERTICAL_URLS.biznxt}) | [BudgetBazaar.org](${EXTERNAL_VERTICAL_URLS.budgetBazaar})
+- [AICalc.in](${EXTERNAL_VERTICAL_URLS.aicalc})
 - [Google Play Books \u2014 THE DISCIPLINE CODE](${PUBLISHING_LINKS.googlePlayDisciplineCode}) | [Amazon Author Store](${PUBLISHING_LINKS.amazonAuthorStore})
 ${commonFooter}`;
 }
@@ -836,48 +946,70 @@ var PAYMENT_CATALOG_LIST = [
     sku: "advisory-session",
     title: "1-on-1 Business Advisory Consultation (30 min IST)",
     shortLabel: "Advisory Session",
-    category: "Executive Consultation",
-    amountPaise: 199900,
-    amountInr: 1999,
-    displayPrice: "\u20B91,999",
+    category: "Business Consulting and Training",
+    amountPaise: 399800,
+    amountInr: 3998,
+    displayPrice: "\u20B93,998",
     description: "30-minute private strategy consultation on India Standard Time (Asia/Kolkata)."
   },
   {
-    sku: "package-a-setup",
-    title: "Package A \u2014 Full-Service Growth Marketing Setup Fee",
-    shortLabel: "Package A Setup",
-    category: "Agency Retainer Setup",
-    amountPaise: 3999900,
-    amountInr: 39999,
-    displayPrice: "\u20B939,999",
-    description: "One-time onboarding, ad architecture & AI qualification script setup for Package A."
+    sku: "growth-marketing-setup",
+    title: "Full-Service Growth Marketing & Lead Management Setup Fee",
+    shortLabel: "Growth Marketing Setup",
+    category: "Digital Marketing",
+    amountPaise: 7999800,
+    amountInr: 79998,
+    displayPrice: "\u20B979,998",
+    description: "One-time onboarding, Meta & Google campaign architecture, and qualification workflow setup."
   },
   {
-    sku: "package-b-setup",
-    title: "Package B \u2014 Lead Filtering & Qualification Setup Fee",
-    shortLabel: "Package B Setup",
-    category: "Agency Retainer Setup",
-    amountPaise: 1499900,
-    amountInr: 14999,
-    displayPrice: "\u20B914,999",
-    description: "One-time onboarding, calling workflow & pipeline sheet setup for Package B."
+    sku: "lead-filtering-setup",
+    title: "Lead Filtering & Qualification Onboarding Setup Fee",
+    shortLabel: "Lead Filtering Setup",
+    category: "Lead Management and CRM",
+    amountPaise: 2999800,
+    amountInr: 29998,
+    displayPrice: "\u20B929,998",
+    description: "One-time onboarding, AI-assisted calling workflow & daily Excel pipeline sheet setup."
   },
   {
     sku: "sales-training",
     title: "Commercial & Dealership Sales Training Workshop",
     shortLabel: "Sales Training",
-    category: "Showroom & Team Coaching",
-    amountPaise: 25e5,
-    amountInr: 25e3,
-    displayPrice: "\u20B925,000",
+    category: "Business Consulting and Training",
+    amountPaise: 5e6,
+    amountInr: 5e4,
+    displayPrice: "\u20B950,000",
     description: "Per-session commercial sales, walkthrough & closing workshop for teams."
+  },
+  {
+    sku: "bulk-sms-starter",
+    title: "Bulk SMS Marketing (10,000 SMS Credits Package)",
+    shortLabel: "Bulk SMS (10k)",
+    category: "Messaging and Communication",
+    amountPaise: 3e5,
+    amountInr: 3e3,
+    displayPrice: "\u20B93,000",
+    description: "10,000 SMS credits package (\u20B90.30/SMS effective rate). Additional SMS credits billed per quotation. Subject to provider & DLT conditions."
+  },
+  {
+    sku: "whatsapp-business-setup",
+    title: "WhatsApp Business Messaging Setup (One-Time Setup Fee)",
+    shortLabel: "WhatsApp Setup",
+    category: "Messaging and Communication",
+    amountPaise: 499900,
+    amountInr: 4999,
+    displayPrice: "\u20B94,999",
+    description: "One-time WhatsApp Business setup, profile & workflow configuration fee only. Message usage (\u20B91.50/msg) is billed separately."
   }
 ];
 var PAYMENT_CATALOG_BY_SKU = {
   "advisory-session": PAYMENT_CATALOG_LIST[0],
-  "package-a-setup": PAYMENT_CATALOG_LIST[1],
-  "package-b-setup": PAYMENT_CATALOG_LIST[2],
-  "sales-training": PAYMENT_CATALOG_LIST[3]
+  "growth-marketing-setup": PAYMENT_CATALOG_LIST[1],
+  "lead-filtering-setup": PAYMENT_CATALOG_LIST[2],
+  "sales-training": PAYMENT_CATALOG_LIST[3],
+  "bulk-sms-starter": PAYMENT_CATALOG_LIST[4],
+  "whatsapp-business-setup": PAYMENT_CATALOG_LIST[5]
 };
 
 // server/auth.ts
@@ -1048,11 +1180,22 @@ function clampNumber(value, min, max) {
   if (!Number.isFinite(value)) return min;
   return Math.min(Math.max(value, min), max);
 }
+function inferBillingType(item) {
+  const text = `${item.title} ${item.description || ""}`.toLowerCase();
+  if (text.includes("monthly") || text.includes("/month") || text.includes("recurring") || text.includes("retainer")) {
+    return "monthly";
+  }
+  if (text.includes("usage") || text.includes("per message") || text.includes("additional credit") || text.includes("/sms")) {
+    return "usage";
+  }
+  return "one-time";
+}
 function calculateQuotationTotals(rawItems, configuredDiscount, gstEnabled, gstRate) {
   const items = rawItems.map((item) => {
     const qty = Math.max(0, Number.isFinite(item.qty) ? item.qty : 0);
     const unitPrice = Math.max(0, Number.isFinite(item.unitPrice) ? item.unitPrice : 0);
     const lineTotal = round2(qty * unitPrice);
+    const billingType = item.billingType || inferBillingType(item);
     return {
       id: item.id,
       serviceId: item.serviceId,
@@ -1060,22 +1203,41 @@ function calculateQuotationTotals(rawItems, configuredDiscount, gstEnabled, gstR
       description: item.description || "",
       qty,
       unitPrice: round2(unitPrice),
-      lineTotal
+      lineTotal,
+      billingType
     };
   });
   const subtotal = round2(items.reduce((acc, item) => acc + item.lineTotal, 0));
+  const oneTimeSubtotal = round2(
+    items.filter((it) => it.billingType === "one-time").reduce((acc, it) => acc + it.lineTotal, 0)
+  );
+  const monthlySubtotal = round2(
+    items.filter((it) => it.billingType === "monthly").reduce((acc, it) => acc + it.lineTotal, 0)
+  );
+  const usageSubtotal = round2(
+    items.filter((it) => it.billingType === "usage").reduce((acc, it) => acc + it.lineTotal, 0)
+  );
   const discountAmount = round2(clampNumber(configuredDiscount, 0, subtotal));
   const taxableAmount = round2(Math.max(0, subtotal - discountAmount));
   const effectiveGstRate = gstEnabled ? clampNumber(gstRate, 0, 100) : 0;
   const gstAmount = gstEnabled ? round2(taxableAmount * (effectiveGstRate / 100)) : 0;
   const grandTotal = round2(taxableAmount + gstAmount);
+  const futureRecurringAmount = round2(
+    monthlySubtotal + (gstEnabled ? monthlySubtotal * (effectiveGstRate / 100) : 0)
+  );
+  const payableNow = grandTotal;
   return {
     items,
     subtotal,
+    oneTimeSubtotal,
+    monthlySubtotal,
+    usageSubtotal,
     discountAmount,
     taxableAmount,
     gstAmount,
-    grandTotal
+    grandTotal,
+    payableNow,
+    futureRecurringAmount
   };
 }
 function getIstDateParts(date = /* @__PURE__ */ new Date()) {
@@ -1384,6 +1546,151 @@ function computeRevenueReport(db, filter = {}, now = /* @__PURE__ */ new Date())
     matchingPayments: allPeriodPayments
   };
 }
+var CREATIVE_SERVICE_CATEGORY = "Business Creative & Documentation Services";
+function computeRecurringRevenueInsights(db, monthsWindow = 12, now = /* @__PURE__ */ new Date()) {
+  const safeWindow = Math.min(24, Math.max(3, Math.floor(monthsWindow || 12)));
+  const { year: curYear, month: curMonth } = getIstDateParts(now);
+  const subscriptions = db.subscriptions || [];
+  const creativeSubs = subscriptions.filter(
+    (s) => s.serviceCategory === CREATIVE_SERVICE_CATEGORY
+  );
+  const activeCreativeInr = creativeSubs.filter(
+    (s) => s.status === "ACTIVE" && s.currency === "INR"
+  );
+  const activeAllInr = subscriptions.filter(
+    (s) => s.status === "ACTIVE" && s.currency === "INR"
+  );
+  const activeCreativeMrr = round2(
+    activeCreativeInr.reduce((acc, s) => acc + (Number(s.monthlyAmount) || 0), 0)
+  );
+  const activeCreativeMrrWithGst = round2(
+    activeCreativeInr.reduce((acc, s) => {
+      const mult = s.gstEnabled ? 1 + (s.gstRate || 0) / 100 : 1;
+      return acc + (Number(s.monthlyAmount) || 0) * mult;
+    }, 0)
+  );
+  const totalActiveMrr = round2(
+    activeAllInr.reduce((acc, s) => acc + (Number(s.monthlyAmount) || 0), 0)
+  );
+  const activeCreativeSubscribers = creativeSubs.filter((s) => s.status === "ACTIVE").length;
+  const pausedCreativeSubscribers = creativeSubs.filter((s) => s.status === "PAUSED").length;
+  const cancelledCreativeSubscribers = creativeSubs.filter((s) => s.status === "CANCELLED").length;
+  const creativeSharePercent = totalActiveMrr > 0 ? round2(activeCreativeMrr / totalActiveMrr * 100) : 0;
+  const averageRevenuePerCreativeSubscriber = activeCreativeInr.length > 0 ? round2(activeCreativeMrr / activeCreativeInr.length) : 0;
+  const nonInrMap = /* @__PURE__ */ new Map();
+  for (const s of creativeSubs.filter((sub) => sub.status === "ACTIVE" && sub.currency !== "INR")) {
+    const cur = s.currency;
+    const existing = nonInrMap.get(cur) || { count: 0, monthlyTotal: 0 };
+    existing.count += 1;
+    existing.monthlyTotal = round2(existing.monthlyTotal + (Number(s.monthlyAmount) || 0));
+    nonInrMap.set(cur, existing);
+  }
+  const nonInrCreativeSubscriptions = Array.from(nonInrMap.entries()).map(([currency, v]) => ({
+    currency,
+    ...v
+  }));
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const currentMonthKey = `${curYear}-${String(curMonth).padStart(2, "0")}`;
+  const realizedByMonth = /* @__PURE__ */ new Map();
+  for (const p of db.payments || []) {
+    if (!isVerifiedLivePayment(p)) continue;
+    if (p.currency !== "INR") continue;
+    if (p.serviceCategory !== CREATIVE_SERVICE_CATEGORY) continue;
+    const mKey = (p.capturedAt || p.createdAt || "").slice(0, 7);
+    if (!mKey) continue;
+    realizedByMonth.set(
+      mKey,
+      round2((realizedByMonth.get(mKey) || 0) + Math.max(0, p.amount - p.refundedAmount))
+    );
+  }
+  const monthlyTrend = [];
+  for (let offset = safeWindow - 1; offset >= 0; offset -= 1) {
+    const d = new Date(Date.UTC(curYear, curMonth - 1 - offset, 1));
+    const y = d.getUTCFullYear();
+    const m = d.getUTCMonth() + 1;
+    const mKey = `${y}-${String(m).padStart(2, "0")}`;
+    const label = `${monthNames[m - 1]} ${String(y).slice(-2)}`;
+    let monthCreativeMrr = 0;
+    let monthCreativeMrrWithGst = 0;
+    let monthAllActiveMrr = 0;
+    let monthCreativeCount = 0;
+    for (const s of subscriptions) {
+      if (s.currency !== "INR") continue;
+      const startMonth = (s.startDate || s.createdAt || "").slice(0, 7);
+      if (!startMonth || startMonth > mKey) continue;
+      const updatedMonth = (s.updatedAt || "").slice(0, 7);
+      const activeInMonth = s.status === "ACTIVE" || mKey < currentMonthKey && updatedMonth > mKey && (s.status === "PAUSED" || s.status === "CANCELLED");
+      if (!activeInMonth) continue;
+      const amt = Number(s.monthlyAmount) || 0;
+      monthAllActiveMrr += amt;
+      if (s.serviceCategory === CREATIVE_SERVICE_CATEGORY) {
+        monthCreativeMrr += amt;
+        monthCreativeMrrWithGst += amt * (s.gstEnabled ? 1 + (s.gstRate || 0) / 100 : 1);
+        monthCreativeCount += 1;
+      }
+    }
+    monthlyTrend.push({
+      month: mKey,
+      label,
+      creativeMrr: round2(monthCreativeMrr),
+      creativeMrrWithGst: round2(monthCreativeMrrWithGst),
+      allActiveMrr: round2(monthAllActiveMrr),
+      activeCreativeCount: monthCreativeCount,
+      realizedCreativeCollections: round2(realizedByMonth.get(mKey) || 0)
+    });
+  }
+  const creativeCatalog = (db.services || []).filter((s) => s.category === CREATIVE_SERVICE_CATEGORY).sort((a, b) => a.sortOrder - b.sortOrder);
+  const byServiceMap = /* @__PURE__ */ new Map();
+  for (const srv of creativeCatalog) {
+    byServiceMap.set(srv.id, {
+      serviceId: srv.id,
+      serviceName: srv.name,
+      listMonthlyPrice: Number(srv.monthlyPrice ?? srv.recurringFee ?? 0) || 0,
+      activeCount: 0,
+      pausedCount: 0,
+      mrrInr: 0
+    });
+  }
+  for (const sub of creativeSubs) {
+    const existing = byServiceMap.get(sub.serviceId) || {
+      serviceId: sub.serviceId,
+      serviceName: sub.serviceName,
+      listMonthlyPrice: Number(sub.monthlyAmount) || 0,
+      activeCount: 0,
+      pausedCount: 0,
+      mrrInr: 0
+    };
+    if (sub.status === "ACTIVE") {
+      existing.activeCount += 1;
+      if (sub.currency === "INR") {
+        existing.mrrInr = round2(existing.mrrInr + (Number(sub.monthlyAmount) || 0));
+      }
+    } else if (sub.status === "PAUSED") {
+      existing.pausedCount += 1;
+    }
+    byServiceMap.set(sub.serviceId, existing);
+  }
+  const byCreativeService = Array.from(byServiceMap.values()).sort(
+    (a, b) => b.mrrInr - a.mrrInr || b.activeCount - a.activeCount || a.serviceName.localeCompare(b.serviceName)
+  );
+  return {
+    monthsWindow: safeWindow,
+    generatedAt: now.toISOString(),
+    summary: {
+      activeCreativeMrr,
+      activeCreativeMrrWithGst,
+      totalActiveMrr,
+      activeCreativeSubscribers,
+      pausedCreativeSubscribers,
+      cancelledCreativeSubscribers,
+      creativeSharePercent,
+      averageRevenuePerCreativeSubscriber,
+      nonInrCreativeSubscriptions
+    },
+    monthlyTrend,
+    byCreativeService
+  };
+}
 
 // server/notifications.ts
 import crypto2 from "crypto";
@@ -1418,10 +1725,17 @@ async function sendViaSmtp(cfg, to, subject, textBody) {
       servername: cfg.host,
       timeout: 1e4
     });
-    const socket = cfg.port === 465 ? connectTls() : net.connect({ host: cfg.host, port: cfg.port, timeout: 1e4 });
-    let step = 0;
+    let socket = cfg.port === 465 ? tls.connect({
+      host: cfg.host,
+      port: cfg.port,
+      servername: cfg.host,
+      timeout: 1e4
+    }) : net.connect({ host: cfg.host, port: cfg.port, timeout: 1e4 });
+    let step = "greeting";
     let buffer = "";
     let settled = false;
+    let tlsUpgraded = cfg.port === 465;
+    let ehloSupportsStarttls = false;
     const finish = (err) => {
       if (settled) return;
       settled = true;
@@ -1433,40 +1747,90 @@ async function sendViaSmtp(cfg, to, subject, textBody) {
       if (err) reject(err);
       else resolve();
     };
-    socket.on("timeout", () => finish(new Error("SMTP connection timed out")));
-    socket.on("error", (err) => finish(err));
     const sendCmd = (cmd) => {
       socket.write(`${cmd}\r
 `);
+    };
+    const attachSocketListeners = (sock) => {
+      sock.on("timeout", () => finish(new Error("SMTP connection timed out")));
+      sock.on("error", (err) => finish(err));
+      sock.on("data", (chunk) => {
+        buffer += chunk.toString("utf8");
+        const lines = buffer.split(/\r?\n/);
+        buffer = lines.pop() || "";
+        for (const line of lines) {
+          if (!line) continue;
+          if (step === "ehlo_plain" && /STARTTLS/i.test(line)) {
+            ehloSupportsStarttls = true;
+          }
+          if (line.length >= 4 && line[3] === "-") continue;
+          const code = Number(line.slice(0, 3));
+          if (Number.isFinite(code)) {
+            handleLine(code, line);
+          }
+        }
+      });
     };
     const handleLine = (code, line) => {
       if (code >= 400) {
         finish(new Error(`SMTP ${code}: ${line}`));
         return;
       }
-      if (step === 0 && code === 220) {
-        step = 1;
+      if (step === "greeting" && code === 220) {
+        if (tlsUpgraded) {
+          step = "ehlo_tls";
+        } else {
+          step = "ehlo_plain";
+        }
         sendCmd("EHLO akyin.com");
-      } else if (step === 1 && code === 250) {
-        step = 2;
+      } else if (step === "ehlo_plain" && code === 250) {
+        if (!tlsUpgraded && (ehloSupportsStarttls || cfg.port === 587)) {
+          step = "starttls";
+          sendCmd("STARTTLS");
+        } else {
+          step = "auth_user";
+          sendCmd("AUTH LOGIN");
+        }
+      } else if (step === "starttls" && code === 220) {
+        const plainSock = socket;
+        plainSock.removeAllListeners("data");
+        plainSock.removeAllListeners("error");
+        plainSock.removeAllListeners("timeout");
+        buffer = "";
+        const tlsSock = tls.connect(
+          {
+            socket: plainSock,
+            servername: cfg.host,
+            timeout: 1e4
+          },
+          () => {
+            tlsUpgraded = true;
+            step = "ehlo_tls";
+            sendCmd("EHLO akyin.com");
+          }
+        );
+        socket = tlsSock;
+        attachSocketListeners(tlsSock);
+      } else if (step === "ehlo_tls" && code === 250) {
+        step = "auth_user";
         sendCmd("AUTH LOGIN");
-      } else if (step === 2 && code === 334) {
-        step = 3;
+      } else if (step === "auth_user" && code === 334) {
+        step = "auth_pass";
         sendCmd(Buffer.from(cfg.user, "utf8").toString("base64"));
-      } else if (step === 3 && code === 334) {
-        step = 4;
+      } else if (step === "auth_pass" && code === 334) {
+        step = "auth_done";
         sendCmd(Buffer.from(cfg.pass, "utf8").toString("base64"));
-      } else if (step === 4 && code === 235) {
-        step = 5;
+      } else if (step === "auth_done" && code === 235) {
+        step = "mail_from";
         sendCmd(`MAIL FROM:<${cleanFrom}>`);
-      } else if (step === 5 && code === 250) {
-        step = 6;
+      } else if (step === "mail_from" && code === 250) {
+        step = "rcpt_to";
         sendCmd(`RCPT TO:<${cleanTo}>`);
-      } else if (step === 6 && (code === 250 || code === 251)) {
-        step = 7;
+      } else if (step === "rcpt_to" && (code === 250 || code === 251)) {
+        step = "data_cmd";
         sendCmd("DATA");
-      } else if (step === 7 && code === 354) {
-        step = 8;
+      } else if (step === "data_cmd" && code === 354) {
+        step = "data_body";
         const safeText = textBody.replace(/^\./gm, "..");
         const message = [
           `From: AKYIN Ventures <${cleanFrom}>`,
@@ -1481,26 +1845,14 @@ async function sendViaSmtp(cfg, to, subject, textBody) {
         ].join("\r\n");
         socket.write(`${message}\r
 `);
-      } else if (step === 8 && code === 250) {
-        step = 9;
+      } else if (step === "data_body" && code === 250) {
+        step = "quit";
         sendCmd("QUIT");
-      } else if (step === 9) {
+      } else if (step === "quit") {
         finish();
       }
     };
-    socket.on("data", (chunk) => {
-      buffer += chunk.toString("utf8");
-      const lines = buffer.split(/\r?\n/);
-      buffer = lines.pop() || "";
-      for (const line of lines) {
-        if (!line) continue;
-        if (line.length >= 4 && line[3] === "-") continue;
-        const code = Number(line.slice(0, 3));
-        if (Number.isFinite(code)) {
-          handleLine(code, line);
-        }
-      }
-    });
+    attachSocketListeners(socket);
   });
 }
 async function dispatchNotification(db, options) {
@@ -1543,7 +1895,64 @@ async function dispatchNotification(db, options) {
 import crypto3 from "crypto";
 import fs from "fs";
 import path from "path";
-var CURRENT_SCHEMA_VERSION = 1;
+
+// server/types.ts
+import { z } from "zod";
+var USER_ROLES = [
+  "Super Admin",
+  "Sales Manager",
+  "Finance Manager",
+  "Staff"
+];
+var CRM_STAGES = [
+  "NEW",
+  "CONTACTED",
+  "QUALIFIED",
+  "PROPOSAL SENT",
+  "NEGOTIATION",
+  "WON",
+  "LOST"
+];
+var LEAD_SOURCES = [
+  "Website",
+  "Google Ads",
+  "Facebook",
+  "Instagram",
+  "YouTube",
+  "WhatsApp",
+  "Referral",
+  "Direct contact",
+  "Other"
+];
+var DEFAULT_SERVICE_CATEGORIES = [
+  "Automotive Marketing",
+  "Digital Marketing",
+  "Social Media Management",
+  "Creative and Graphic Design",
+  "Video and Content Services",
+  "Business Documents and Presentations",
+  "Excel and Reporting Services",
+  "Messaging and Communication",
+  "Lead Management and CRM",
+  "Business Consulting and Training"
+];
+var SERVICE_CATEGORIES = DEFAULT_SERVICE_CATEGORIES;
+var quotationLineItemSchema = z.object({
+  id: z.string().trim().min(1).max(60),
+  serviceId: z.string().trim().max(60).optional(),
+  title: z.string().trim().min(1).max(160),
+  description: z.string().trim().max(500).default(""),
+  qty: z.number().finite().positive().max(1e7),
+  unitPrice: z.number().finite().min(0).max(1e8),
+  billingType: z.enum(["one-time", "monthly", "usage"]).optional()
+});
+
+// server/storage.ts
+var CURRENT_SCHEMA_VERSION = 4;
+var MESSAGING_DISCLAIMER = "Messaging rates are subject to provider charges, applicable taxes, message category, destination and delivery conditions. Final charges are confirmed in the quotation.";
+function slugifyServiceName(value) {
+  return String(value || "").toLowerCase().trim().replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "service";
+}
 function getDataDir() {
   return process.env.AKYIN_DATA_DIR ? path.resolve(process.env.AKYIN_DATA_DIR) : path.resolve(process.cwd(), ".akyin-data");
 }
@@ -1576,20 +1985,23 @@ var DEFAULT_NOTIFICATION_SETTINGS = {
     payment_failed: true,
     appointment_booked: true,
     appointment_cancelled: true,
-    refund_processed: true
+    refund_processed: true,
+    service_price_updated: true,
+    service_added: true,
+    subscription_renewal_reminder: true
   }
 };
 var DEFAULT_WEBSITE_SETTINGS = {
   reportedClientsCount: 58,
   advisoryHeadline: "Your Business. Your Vision. A Clearer Direction.",
   advisorySubheadline: "Focused 1-on-1 commercial advisory and business direction sessions with AKYIN Ventures\u2014structured around clarity, unit economics, and practical execution.",
-  consultationFee: "\u20B91,999 (30-min IST Session)",
+  consultationFee: "\u20B93,998 (30-min IST Session)",
   advisorySlotDuration: "30",
   advisoryMaxBookings: "2",
   notificationEmail: process.env.OWNER_NOTIFICATION_EMAIL || "connect@akyin.com",
   contactEmail: "connect@akyin.com",
-  contactPhone: "+91 63956 94011",
-  whatsappNumber: "916395694011",
+  contactPhone: "",
+  whatsappNumber: "",
   heroHeadline: "Building Ideas Into Businesses.",
   heroSubheadline: "AKYIN Ventures brings together diverse business initiatives across publishing, marketing, retail, digital technology, B2B commerce and business consulting.",
   footerTagline: "A diversified business group working across marketing, publishing, technology, commerce and business solutions.",
@@ -1616,7 +2028,7 @@ function buildInitialClients(nowIso) {
       phone: "",
       city: "",
       country: "India",
-      websiteUrl: "/ventures/biznxt",
+      websiteUrl: "",
       supportScope: "Advisory Funnels, Commercial Structure & Digital Positioning",
       summary: "Entrepreneurial consulting and strategic guidance platform assisting business founders in evaluating commercial opportunities.",
       wordmarkStyle: "sans",
@@ -1632,7 +2044,7 @@ function buildInitialClients(nowIso) {
       phone: "",
       city: "",
       country: "India",
-      websiteUrl: "/ventures/kartigo",
+      websiteUrl: "",
       supportScope: "B2B Growth, Buyer Qualification & Platform Strategy",
       summary: "Wholesale commercial stock supply and B2B trade marketplace connecting volume buyers with verified inventory.",
       wordmarkStyle: "sans",
@@ -1664,7 +2076,7 @@ function buildInitialClients(nowIso) {
       phone: "",
       city: "",
       country: "India",
-      websiteUrl: "/ventures/budget-bazaar",
+      websiteUrl: "",
       supportScope: "E-commerce Marketing & Customer Demand Campaigns",
       summary: "Value-driven consumer retail storefront providing everyday essentials and household goods.",
       wordmarkStyle: "sans",
@@ -1786,267 +2198,1600 @@ function buildInitialClients(nowIso) {
     updatedAt: nowIso
   }));
 }
+function buildInitialServiceCategories(nowIso) {
+  const descriptions = {
+    "Automotive Marketing": "Showroom lead acquisition, test-drive bookings, dealership campaigns, and commercial automotive sales consulting.",
+    "Digital Marketing": "Performance advertising across Google Ads & Meta Ads, SEO, landing page conversion optimisation, and digital lead growth.",
+    "Social Media Management": "Ongoing Instagram, Facebook, and YouTube management, editorial calendars, and social account optimisation.",
+    "Creative and Graphic Design": "Standalone logo design, brand identity stationery, brochures, catalogues, carousels, and high-CTR thumbnails.",
+    "Video and Content Services": "Promotional reels production, commercial script writing, copywriting, and creator campaign coordination.",
+    "Business Documents and Presentations": "Executive PowerPoint decks, investor pitch decks, business reports, Word/PDF formatting, templates, and ATS resumes.",
+    "Excel and Reporting Services": "Automated Excel workbooks, KPI dashboards, spreadsheet cleaning, and structured monthly reporting.",
+    "Messaging and Communication": "Transparent Bulk SMS credit packages and WhatsApp Business setup with clear separation from usage charges.",
+    "Lead Management and CRM": "Standalone enquiry filtering, AI-assisted outbound calling workflows, pipeline management, and callback discipline.",
+    "Business Consulting and Training": "1-on-1 business advisory sessions, commercial & dealership sales training, personality development, and custom solutions."
+  };
+  return DEFAULT_SERVICE_CATEGORIES.map((name, idx) => ({
+    id: `cat-${slugifyServiceName(name)}`,
+    name,
+    slug: slugifyServiceName(name),
+    description: descriptions[name] || `${name} standalone commercial services.`,
+    sortOrder: idx + 1,
+    menuOrder: idx + 1,
+    active: true,
+    updatedAt: nowIso
+  }));
+}
 function buildInitialServices(nowIso) {
   const list = [
+    // =========================================================================
+    // 1. AUTOMOTIVE MARKETING
+    // =========================================================================
     {
-      id: "srv-digital-marketing",
-      name: "Package A \u2014 Full-Service Growth Marketing & Lead Management",
-      category: "Digital marketing",
-      description: "End-to-end paid acquisition, creative suite, AI-assisted enquiry qualification, and daily CRM tracking.",
+      id: "srv-automotive",
+      slug: "automotive-marketing",
+      name: "Automotive Dealership Marketing & Sales Strategy",
+      category: "Automotive Marketing",
+      description: "Specialized showroom marketing, dealer campaign management, automotive sales consulting, and dealership growth strategy backed by 16 years of automotive industry experience.",
+      benefits: [
+        "Unifies showroom enquiry capture with floor conversion discipline",
+        "Separates media acquisition from buyer qualification so sales desks focus on test-drive ready prospects",
+        "Grounded in direct showroom experience across mass-market to luxury badges"
+      ],
       deliverables: [
-        "Meta & Google campaign architecture",
-        "8 promotional reels + 10 graphic creatives/month",
-        "Two-tier lead vetting & Hot/Warm/Future handover",
-        "Daily pipeline sheet & monthly executive summary"
+        "Showroom marketing & catchment audit",
+        "Dealer campaign management roadmap",
+        "Automotive sales consulting & follow-up playbook",
+        "Dealership growth strategy workshop"
+      ],
+      workProcess: [
+        "Audit current dealership enquiries, ad spend & showroom walk-in ratios",
+        "Structure catchment-level vehicle offer & campaign architecture",
+        "Align floor executives on test-drive conversion & follow-up SLAs"
       ],
       pricingModel: "fixed",
-      setupFee: 39999,
-      recurringFee: 3e4,
-      billingCycle: "monthly",
-      addons: [{ name: "Ad creative boost pack (6 additional creatives)", price: 4e3 }],
-      gstEnabled: true,
-      gstRate: 18,
-      deliveryPeriod: "7\u201310 business days onboarding"
-    },
-    {
-      id: "srv-lead-gen",
-      name: "Package B \u2014 Lead Filtering & Qualification Retainer",
-      category: "Lead generation",
-      description: "Structured telephonic and AI-assisted vetting of existing inbound leads before sales floor handover.",
-      deliverables: [
-        "AI-assisted outbound calling (up to 1,000 mins/month)",
-        "Budget, timeline & intent verification",
-        "Hot / Warm / Future Lead status tagging"
-      ],
-      pricingModel: "fixed",
-      setupFee: 14999,
-      recurringFee: 12e3,
-      billingCycle: "monthly",
-      addons: [{ name: "CRM pipeline reporting management", price: 5e3 }],
-      gstEnabled: true,
-      gstRate: 18,
-      deliveryPeriod: "5 business days setup"
-    },
-    {
-      id: "srv-social-media",
-      name: "Social Media Management & Reels Suite",
-      category: "Social media management",
-      description: "Monthly brand editorial calendar, scheduled publishing, and community hygiene across Instagram & Facebook.",
-      deliverables: [
-        "Scheduled monthly content calendar",
-        "Page hygiene & response playbooks",
-        "Performance summary report"
-      ],
-      pricingModel: "fixed",
-      setupFee: 0,
-      recurringFee: 8e3,
-      billingCycle: "monthly",
+      setupFee: 5e4,
+      recurringFee: 0,
+      oneTimePrice: 5e4,
+      monthlyPrice: 0,
+      billingCycle: "one-time",
       addons: [
-        { name: "8 promotional reels/month", price: 1e4 },
-        { name: "10 graphic creatives/month", price: 4e3 }
+        { name: "Festive / Exchange event campaign", price: 2e4 },
+        { name: "Catalog & pre-owned stock rotation", price: 16e3 }
       ],
       gstEnabled: true,
       gstRate: 18,
-      deliveryPeriod: "Monthly cycle"
+      deliveryPeriod: "On-site / virtual workshop + campaign sprint",
+      revisionLimit: "2 post-training coaching review calls",
+      additionalDeliverableCharge: 1e4,
+      subscriptionDuration: "One-time dealership growth engagement",
+      renewalTerms: "Optional monthly dealer retainer scoped separately",
+      cancellationPolicy: "7 days written notice prior to scheduled workshop",
+      menuOrder: 1,
+      showInMenu: true
     },
     {
-      id: "srv-google-ads",
-      name: "Google Ads & Search Acquisition Management",
-      category: "Google Ads management",
-      description: "High-intent Search, Performance Max, and local Google Maps lead campaigns with direct client ad billing.",
-      deliverables: [
-        "Keyword intent research & negative keyword hygiene",
-        "Conversion tracking & landing page alignment",
-        "Weekly bid & CPL optimization"
+      id: "srv-test-drive-leads",
+      slug: "test-drive-lead-generation",
+      name: "Test-Drive Lead Generation",
+      category: "Automotive Marketing",
+      description: "Geo-fenced dealership campaigns structured specifically to capture confirmed showroom and doorstep test-drive enquiries within your city catchment.",
+      benefits: [
+        "Captures preferred model, variant & booking date upfront",
+        "Targets local vehicle buyers inside showroom driving radius",
+        "Direct ad spend stays inside your dealership billing account"
       ],
-      pricingModel: "custom",
-      setupFee: 0,
-      recurringFee: 0,
-      billingCycle: "monthly",
-      addons: [{ name: "Google Business Profile management", price: 3e3 }],
-      gstEnabled: true,
-      gstRate: 18,
-      deliveryPeriod: "5\u20137 business days launch"
-    },
-    {
-      id: "srv-meta-ads",
-      name: "Meta Ads Lead Generation Management",
-      category: "Meta Ads management",
-      description: "Targeted Facebook & Instagram lead forms and WhatsApp click-to-chat acquisition (ad spend billed directly to client).",
       deliverables: [
-        "Campaign strategy & audience segmentation",
-        "Instant lead forms & retargeting flows",
-        "Creative A/B testing & CPL optimization"
+        "Catchment-targeted test-drive ad creative suite",
+        "Dedicated model & booking slot lead form",
+        "Weekly cost-per-booking attribution log"
+      ],
+      workProcess: [
+        "Select priority models, catchment radius & offer hooks",
+        "Launch geo-fenced test-drive creatives & booking capture",
+        "Deliver live enquiry notifications to showroom sales desk"
       ],
       pricingModel: "fixed",
-      setupFee: 0,
-      recurringFee: 2e4,
-      billingCycle: "monthly",
-      addons: [{ name: "Demo / visit booking micro-campaign", price: 7500 }],
-      gstEnabled: true,
-      gstRate: 18,
-      deliveryPeriod: "5 business days launch"
-    },
-    {
-      id: "srv-website-dev",
-      name: "Website Development & Conversion Landing Pages",
-      category: "Website development",
-      description: "Fast, mobile-first business websites and conversion landing pages tailored for lead capture.",
-      deliverables: [
-        "Responsive UI & clean information architecture",
-        "Integrated enquiry & WhatsApp/booking capture",
-        "Technical SEO metadata & analytics setup"
-      ],
-      pricingModel: "custom",
-      setupFee: 0,
+      setupFee: 15e3,
       recurringFee: 0,
+      oneTimePrice: 15e3,
+      monthlyPrice: 0,
       billingCycle: "one-time",
       addons: [],
       gstEnabled: true,
       gstRate: 18,
-      deliveryPeriod: "2\u20134 weeks (scope dependent)"
+      deliveryPeriod: "4\u20135 business days",
+      revisionLimit: "Up to 2 revision rounds",
+      additionalDeliverableCharge: 3e3,
+      subscriptionDuration: "Standalone campaign setup",
+      renewalTerms: "Optional monthly management",
+      cancellationPolicy: "Prior to campaign publishing",
+      menuOrder: 2,
+      showInMenu: true
     },
     {
-      id: "srv-seo",
-      name: "Local SEO & Google Business Profile Management",
-      category: "SEO",
-      description: "Regional search visibility, catchment keyword positioning, and Google Maps listing optimization.",
+      id: "srv-auto-launch-exchange",
+      slug: "dealer-launch-exchange-campaigns",
+      name: "Showroom Launch & Exchange Event Campaigns",
+      category: "Automotive Marketing",
+      description: "Focused dealership promotion for new model unveilings, weekend exchange melas, and limited-window upgrade bonus drives.",
+      benefits: [
+        "Builds concentrated footfall ahead of model launches or weekend camps",
+        "Captures existing vehicle details for exchange valuation readiness"
+      ],
       deliverables: [
-        "Local catchment keyword optimization",
-        "Google Business Profile weekly updates",
-        "Monthly organic ranking & call click report"
+        "Pre-launch teaser & exchange bonus creatives",
+        "Event-week local awareness & RSVP lead capture",
+        "Post-event enquiry summary sheet"
+      ],
+      workProcess: [
+        "Finalize event dates, exchange incentives & OEM creative guidelines",
+        "Deploy countdown awareness and RSVP lead forms 10 days prior",
+        "Hand over daily confirmed RSVP lists for showroom calling"
+      ],
+      pricingModel: "fixed",
+      setupFee: 2e4,
+      recurringFee: 0,
+      oneTimePrice: 2e4,
+      monthlyPrice: 0,
+      billingCycle: "one-time",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "5 business days",
+      revisionLimit: "Up to 2 revision rounds",
+      additionalDeliverableCharge: 4e3,
+      subscriptionDuration: "Standalone event campaign",
+      renewalTerms: "Per event schedule",
+      cancellationPolicy: "72 hours prior to campaign kickoff",
+      menuOrder: 3,
+      showInMenu: true
+    },
+    {
+      id: "srv-automotive-retention",
+      slug: "customer-follow-up-management",
+      name: "Customer Follow-Up & Retention Campaigns",
+      category: "Automotive Marketing",
+      description: "Structured outreach for dealerships and service centers covering periodic service due reminders, catalog stock rotation, and post-enquiry customer follow-up.",
+      benefits: [
+        "Re-engages dormant buyers and service center databases systematically",
+        "Reduces showroom lead leakage through scheduled follow-up cadences"
+      ],
+      deliverables: [
+        "Follow-up messaging templates & campaign cadence",
+        "Pre-owned / priority stock highlight ads",
+        "Monthly retention & reactivation tracking sheet"
+      ],
+      workProcess: [
+        "Segment existing dealership or service database cleanly",
+        "Configure scheduled reminder and offer outreach waves",
+        "Track repeat bookings and re-opened enquiries monthly"
       ],
       pricingModel: "fixed",
       setupFee: 0,
-      recurringFee: 6e3,
+      recurringFee: 16e3,
+      oneTimePrice: 0,
+      monthlyPrice: 16e3,
       billingCycle: "monthly",
-      addons: [{ name: "Google Business Profile add-on", price: 3e3 }],
+      addons: [],
       gstEnabled: true,
       gstRate: 18,
-      deliveryPeriod: "Ongoing monthly"
+      deliveryPeriod: "5\u20137 business days rollout",
+      revisionLimit: "Monthly cadence refinement",
+      additionalDeliverableCharge: 3e3,
+      subscriptionDuration: "Monthly standalone service",
+      renewalTerms: "Auto-renews monthly",
+      cancellationPolicy: "7 business days notice",
+      menuOrder: 4,
+      showInMenu: true
+    },
+    // =========================================================================
+    // 2. DIGITAL MARKETING
+    // =========================================================================
+    {
+      id: "srv-lead-generation",
+      slug: "lead-generation",
+      name: "Online Lead Generation Campaigns",
+      category: "Digital Marketing",
+      description: "Dedicated digital customer acquisition focused strictly on generating fresh, high-intent inbound buyer enquiries across search and social channels.",
+      benefits: [
+        "Built strictly around measurable cost-per-enquiry and buyer quality",
+        "Zero forced retainer bundling\u2014select Meta, Google, or both independently",
+        "Full transparency: ad spend stays directly in your own ad account"
+      ],
+      deliverables: [
+        "Audience & keyword intent targeting plan",
+        "Conversion ad creative & instant lead form setup",
+        "Retargeting funnel & lead source attribution report"
+      ],
+      workProcess: [
+        "Define ideal buyer profile, unit economics & daily enquiry target",
+        "Launch segmented ad sets, instant forms & tracking pixels",
+        "Optimize weekly bids, creatives & cost per qualified enquiry"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "monthly",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "5\u20137 business days launch",
+      revisionLimit: "Weekly campaign optimization",
+      additionalDeliverableCharge: 0,
+      subscriptionDuration: "Quoted per channel & geography",
+      renewalTerms: "Monthly or campaign sprint",
+      cancellationPolicy: "7 days notice",
+      menuOrder: 5,
+      showInMenu: true
     },
     {
-      id: "srv-branding",
-      name: "Branding, Collateral & Sales Pitch Presentation",
-      category: "Branding",
-      description: "Cohesive corporate brand positioning, visual templates, and structured commercial pitch PPTs.",
+      id: "srv-meta-ads",
+      slug: "meta-ads-management",
+      name: "Meta Ads Management",
+      category: "Digital Marketing",
+      description: "Targeted Facebook & Instagram lead generation, instant lead forms, and WhatsApp click-to-chat campaigns with direct client ad billing.",
+      benefits: [
+        "Continuous A/B testing of hooks, formats & buyer segments",
+        "Direct WhatsApp & instant lead form capture without middlemen"
+      ],
       deliverables: [
-        "Structured product & pricing pitch PPT deck",
-        "Brand visual typography & palette alignment",
-        "Print-ready brochure & digital share kit"
+        "Meta Business Manager & pixel audit",
+        "Instant lead forms & retargeting audiences",
+        "Creative rotation & weekly CPL optimization report"
+      ],
+      workProcess: [
+        "Configure Meta conversion events & custom audiences",
+        "Launch cold acquisition and warm retargeting ad sets",
+        "Review cost-per-lead and refresh fatigued creatives weekly"
+      ],
+      pricingModel: "fixed",
+      setupFee: 0,
+      recurringFee: 4e4,
+      oneTimePrice: 0,
+      monthlyPrice: 4e4,
+      billingCycle: "monthly",
+      addons: [{ name: "Demo / visit booking micro-campaign", price: 15e3 }],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "5 business days launch",
+      revisionLimit: "Continuous weekly ad set rotation",
+      additionalDeliverableCharge: 5e3,
+      subscriptionDuration: "Monthly management service",
+      renewalTerms: "Auto-renews monthly",
+      cancellationPolicy: "7 days notice before cycle end",
+      menuOrder: 6,
+      showInMenu: true
+    },
+    {
+      id: "srv-google-ads",
+      slug: "google-ads-management",
+      name: "Google Ads Management",
+      category: "Digital Marketing",
+      description: "High-intent Google Search, Performance Max, and local discovery campaigns capturing prospects actively searching for your products or services.",
+      benefits: [
+        "Captures ready-to-buy search intent with negative keyword hygiene",
+        "Direct Google Ads billing ensures complete spend control"
+      ],
+      deliverables: [
+        "Keyword intent research & negative keyword exclusion list",
+        "Search & Performance Max campaign architecture",
+        "Conversion tracking & weekly search term optimization"
+      ],
+      workProcess: [
+        "Map commercial buyer keywords & city catchment filters",
+        "Configure call, form & WhatsApp conversion tags",
+        "Prune wasted clicks weekly and scale top-converting ad groups"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "monthly",
+      addons: [{ name: "Google Business Profile management", price: 6e3 }],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "5\u20137 business days launch",
+      revisionLimit: "Weekly keyword & ad copy adjustments",
+      additionalDeliverableCharge: 3e3,
+      subscriptionDuration: "Monthly management",
+      renewalTerms: "Monthly renewal",
+      cancellationPolicy: "7 days notice",
+      menuOrder: 7,
+      showInMenu: true
+    },
+    {
+      id: "srv-seo",
+      slug: "search-engine-optimisation",
+      name: "Search Engine Optimisation & Local SEO",
+      category: "Digital Marketing",
+      description: "On-page search optimisation, catchment keyword positioning, and Google Business Profile management for sustained organic discovery.",
+      benefits: [
+        "Improves local Maps visibility and high-intent organic traffic",
+        "Aligns page metadata, headings & schema with search intent"
+      ],
+      deliverables: [
+        "Technical & local catchment SEO optimization",
+        "Google Business Profile hygiene & weekly updates",
+        "Monthly ranking & organic call intent report"
+      ],
+      workProcess: [
+        "Audit crawlability, local citations & page metadata",
+        "Optimize priority service URLs & Google Maps profile",
+        "Publish updates and monitor search impressions monthly"
+      ],
+      pricingModel: "fixed",
+      setupFee: 0,
+      recurringFee: 12e3,
+      oneTimePrice: 0,
+      monthlyPrice: 12e3,
+      billingCycle: "monthly",
+      addons: [{ name: "Google Business Profile add-on", price: 6e3 }],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "Ongoing monthly",
+      revisionLimit: "Monthly keyword set expansion",
+      additionalDeliverableCharge: 2e3,
+      subscriptionDuration: "Monthly service",
+      renewalTerms: "Monthly renewal",
+      cancellationPolicy: "7 days notice before cycle renewal",
+      menuOrder: 8,
+      showInMenu: true
+    },
+    {
+      id: "srv-website-dev",
+      slug: "landing-page-optimisation",
+      name: "Landing Page Optimisation & Conversion Websites",
+      category: "Digital Marketing",
+      description: "Fast, mobile-first conversion landing pages and website architecture engineered to convert paid and organic visitors into structured enquiries.",
+      benefits: [
+        "Eliminates slow page drop-offs across mobile ad clicks",
+        "Connects enquiry forms cleanly with WhatsApp & CRM tracking"
+      ],
+      deliverables: [
+        "Responsive conversion-focused layout & copy hierarchy",
+        "Lead capture form, WhatsApp & analytics event setup",
+        "Core Web Vitals & clean metadata verification"
+      ],
+      workProcess: [
+        "Review offer, audience objection points & traffic source",
+        "Build clean high-contrast landing flow & mobile CTAs",
+        "Verify form telemetry & launch speed before campaign kickoff"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "one-time",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "2\u20134 weeks (scope dependent)",
+      revisionLimit: "3 full rounds of UI revision",
+      additionalDeliverableCharge: 5e3,
+      subscriptionDuration: "Project milestone basis",
+      renewalTerms: "Optional monthly maintenance contract",
+      cancellationPolicy: "Milestone pro-rata settlement",
+      menuOrder: 9,
+      showInMenu: true
+    },
+    {
+      id: "srv-digital-marketing",
+      slug: "full-service-growth-marketing",
+      name: "Full-Service Growth Marketing & Lead Management",
+      category: "Digital Marketing",
+      description: "Standalone full-funnel digital acquisition and ongoing campaign optimisation paired with structured enquiry tracking (ad spend paid directly to Meta/Google).",
+      benefits: [
+        "Combines acquisition campaigns, creative refreshes & structured pipeline reporting",
+        "Selectable independently without compulsory add-ons"
+      ],
+      deliverables: [
+        "Meta & Google campaign architecture",
+        "Monthly creative refresh & ad optimisation",
+        "Structured enquiry pipeline sheet & executive summary"
+      ],
+      workProcess: [
+        "Onboard brand, ad accounts & target CPA goals in 7\u201310 business days",
+        "Deploy acquisition campaigns and refresh creatives monthly",
+        "Deliver executive performance review every month"
+      ],
+      pricingModel: "fixed",
+      setupFee: 79998,
+      recurringFee: 6e4,
+      oneTimePrice: 79998,
+      monthlyPrice: 6e4,
+      billingCycle: "monthly",
+      addons: [{ name: "Ad creative boost pack (6 additional creatives)", price: 8e3 }],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "7\u201310 business days onboarding",
+      revisionLimit: "Unlimited campaign optimizations",
+      additionalDeliverableCharge: 8e3,
+      subscriptionDuration: "Monthly service",
+      renewalTerms: "Auto-renews monthly; 15 days notice",
+      cancellationPolicy: "15 business days prior to cycle renewal",
+      menuOrder: 10,
+      showInMenu: true
+    },
+    {
+      id: "srv-customer-acquisition",
+      slug: "digital-advertising-campaigns",
+      name: "Digital Advertising & B2B Acquisition Campaigns",
+      category: "Digital Marketing",
+      description: "Targeted buyer acquisition sprints for commercial services, institutional B2B offers, and regional product launches.",
+      benefits: [
+        "Focused sprint execution for time-bound offers or new city rollouts",
+        "Separates campaign management fees from media budget"
+      ],
+      deliverables: [
+        "Offer positioning & campaign targeting build",
+        "Lead capture form & weekly performance tracker"
+      ],
+      workProcess: [
+        "Scope campaign objective, target cities & offer creatives",
+        "Publish ads & track initial 7-day lead quality metrics",
+        "Refine targeting and close campaign sprint with full report"
+      ],
+      pricingModel: "fixed",
+      setupFee: 0,
+      recurringFee: 16e3,
+      oneTimePrice: 0,
+      monthlyPrice: 16e3,
+      billingCycle: "monthly",
+      addons: [{ name: "Corporate / B2B campaign sprint", price: 2e4 }],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "7 business days rollout",
+      revisionLimit: "Weekly messaging adjustments",
+      additionalDeliverableCharge: 3e3,
+      subscriptionDuration: "Monthly campaign management",
+      renewalTerms: "Auto-renews monthly",
+      cancellationPolicy: "7 business days notice",
+      menuOrder: 11,
+      showInMenu: false
+    },
+    // =========================================================================
+    // 3. SOCIAL MEDIA MANAGEMENT
+    // =========================================================================
+    {
+      id: "srv-social-media",
+      slug: "social-media-management",
+      name: "Instagram & Facebook Management",
+      category: "Social Media Management",
+      description: "Consistent Instagram and Facebook brand presence covering content calendar planning, post publishing, and account optimisation.",
+      benefits: [
+        "Maintains active social credibility for inbound buyers checking your brand",
+        "Structured monthly calendar approved ahead of scheduling"
+      ],
+      deliverables: [
+        "Monthly content calendar & caption copy",
+        "Scheduled Instagram & Facebook posting",
+        "Monthly reach & engagement summary"
+      ],
+      workProcess: [
+        "Align visual tone, product priorities & monthly calendar pillars",
+        "Prepare posts and obtain streamlined approval",
+        "Schedule publishing and deliver monthly performance summary"
+      ],
+      pricingModel: "fixed",
+      setupFee: 0,
+      recurringFee: 16e3,
+      oneTimePrice: 0,
+      monthlyPrice: 16e3,
+      billingCycle: "monthly",
+      addons: [
+        { name: "8 promotional reels/month", price: 2e4 },
+        { name: "10 graphic creatives/month", price: 8e3 }
+      ],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "Monthly cycle",
+      revisionLimit: "2 feedback rounds per calendar",
+      additionalDeliverableCharge: 2e3,
+      subscriptionDuration: "Monthly service",
+      renewalTerms: "Auto-renews monthly",
+      cancellationPolicy: "7 days prior to next month billing",
+      menuOrder: 12,
+      showInMenu: true
+    },
+    {
+      id: "srv-youtube-management",
+      slug: "youtube-channel-management",
+      name: "YouTube Channel Management",
+      category: "Social Media Management",
+      description: "End-to-end YouTube channel optimisation, video SEO titles/descriptions, playlist architecture, and consistent upload cadence.",
+      benefits: [
+        "Turns product walkthroughs and founder insights into searchable evergreen video assets",
+        "Pairs seamlessly with YouTube Thumbnail Design and Script Writing"
+      ],
+      deliverables: [
+        "Channel metadata, keywords & playlist structuring",
+        "Video upload formatting, tags & end-screen setup",
+        "Monthly watch-time & CTR review"
+      ],
+      workProcess: [
+        "Audit channel structure, search keywords & audience retention gaps",
+        "Standardize upload checklists, descriptions & CTA links",
+        "Publish consistently and track CTR and subscriber trends monthly"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "monthly",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "Ongoing monthly or setup sprint",
+      revisionLimit: "Per publishing schedule",
+      additionalDeliverableCharge: 0,
+      subscriptionDuration: "Scoped per upload frequency",
+      renewalTerms: "Monthly",
+      cancellationPolicy: "7 days notice",
+      menuOrder: 13,
+      showInMenu: true
+    },
+    {
+      id: "srv-social-content-planning",
+      slug: "social-media-content-planning",
+      name: "Content Calendar & Social Post Planning",
+      category: "Social Media Management",
+      description: "Strategic monthly content calendar management, topic ideation, post creation briefs, and bio/account optimisation.",
+      benefits: [
+        "Gives internal teams a crisp roadmap of what to shoot and publish every week",
+        "Eliminates inconsistent ad-hoc posting across social handles"
+      ],
+      deliverables: [
+        "30-day multi-platform content calendar",
+        "Post topic hooks, format specs & caption angles",
+        "Profile bio & highlight optimization checklist"
+      ],
+      workProcess: [
+        "Audit business priorities, offers & seasonal dates",
+        "Build a 30-day structured posting calendar with creative briefs",
+        "Refine next month plan based on top-performing formats"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "monthly",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "3\u20135 business days",
+      revisionLimit: "2 calendar adjustment rounds",
+      additionalDeliverableCharge: 0,
+      subscriptionDuration: "One-time or monthly",
+      renewalTerms: "Monthly",
+      cancellationPolicy: "7 days notice",
+      menuOrder: 14,
+      showInMenu: true
+    },
+    // =========================================================================
+    // 4. CREATIVE AND GRAPHIC DESIGN
+    // =========================================================================
+    {
+      id: "srv-creative-logo",
+      slug: "logo-design",
+      name: "Logo and Branding Design",
+      category: "Creative and Graphic Design",
+      description: "Business logo design, clean vector variations, basic brand identity guidelines, brand colour & typography suggestions, and export-ready files.",
+      benefits: [
+        "Clean, scalable vector branding tailored for digital storefronts and print stationery",
+        "Order as a single one-time project or ongoing brand creative support"
+      ],
+      deliverables: [
+        "Business logo design",
+        "Logo variations",
+        "Basic brand identity",
+        "Brand colour and typography suggestions",
+        "Export-ready files (SVG, PNG, PDF)"
+      ],
+      workProcess: [
+        "Collect brand brief, target market positioning & style references",
+        "Present initial logo directions and colour/font pairings",
+        "Refine selected mark across revisions and deliver export-ready files"
+      ],
+      pricingModel: "fixed",
+      setupFee: 6e3,
+      recurringFee: 1e4,
+      oneTimePrice: 6e3,
+      monthlyPrice: 1e4,
+      billingCycle: "one-time",
+      addons: [{ name: "Additional concept direction & vector master pack", price: 2e3 }],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "3\u20135 business days",
+      revisionLimit: "3 rounds of design revisions included",
+      additionalDeliverableCharge: 1e3,
+      subscriptionDuration: "Standalone project or monthly brand creative retainer",
+      renewalTerms: "Monthly subscription auto-renews; cancel anytime 7 days prior",
+      cancellationPolicy: "Cancel subscription anytime with 7 days notice",
+      menuOrder: 15,
+      showInMenu: true
+    },
+    {
+      id: "srv-creative-thumbnails",
+      slug: "youtube-thumbnail-design",
+      name: "YouTube Thumbnail & Social Creative Design",
+      category: "Creative and Graphic Design",
+      description: "High-CTR YouTube thumbnails, Instagram promotional thumbnails, Facebook creatives, and sharp advertising graphics built for click performance.",
+      benefits: [
+        "Designed for instant mobile legibility and strong visual contrast",
+        "Flexible 5-pack standalone order or 15-creative monthly plan"
+      ],
+      deliverables: [
+        "YouTube thumbnails",
+        "Instagram promotional thumbnails",
+        "Facebook creatives",
+        "Advertising creatives",
+        "Custom promotional graphics"
+      ],
+      workProcess: [
+        "Receive video title, hook text, brand assets & photos",
+        "Design high-contrast compositions optimized for small viewports",
+        "Deliver final PNG/JPG creatives with requested revision tweaks"
       ],
       pricingModel: "fixed",
       setupFee: 3e3,
-      recurringFee: 0,
+      recurringFee: 8e3,
+      oneTimePrice: 3e3,
+      monthlyPrice: 8e3,
       billingCycle: "one-time",
-      addons: [{ name: "10 branded graphic templates", price: 4e3 }],
+      addons: [{ name: "Express 12-hour turnaround add-on", price: 1500 }],
       gstEnabled: true,
       gstRate: 18,
-      deliveryPeriod: "5\u20137 business days"
+      deliveryPeriod: "24\u201348 hours per batch",
+      revisionLimit: "2 revisions per creative",
+      additionalDeliverableCharge: 500,
+      subscriptionDuration: "Standalone 5-pack or monthly 15-creative plan",
+      renewalTerms: "Auto-renews monthly on renewal date",
+      cancellationPolicy: "Cancel anytime before monthly renewal",
+      menuOrder: 16,
+      showInMenu: true
     },
     {
+      id: "srv-branding",
+      slug: "brand-identity-stationery-design",
+      name: "Business Card, Letterhead & Brand Stationery Design",
+      category: "Creative and Graphic Design",
+      description: "Print-ready business card design, official corporate letterhead design, and cohesive visual brand identity templates.",
+      benefits: [
+        "Print-ready CMYK & digital PDF deliverables ready for local offset or digital printing",
+        "Consistent typography and layout across sales cards and correspondence"
+      ],
+      deliverables: [
+        "Business card design (print & digital)",
+        "Official letterhead design (Word & PDF)",
+        "Brand visual typography & palette kit"
+      ],
+      workProcess: [
+        "Align existing logo, contact details & brand colours",
+        "Draft clean minimalist front/back business card & letterhead layouts",
+        "Finalize revisions and export press-ready files"
+      ],
+      pricingModel: "fixed",
+      setupFee: 6e3,
+      recurringFee: 0,
+      oneTimePrice: 6e3,
+      monthlyPrice: 0,
+      billingCycle: "one-time",
+      addons: [{ name: "10 branded graphic templates", price: 8e3 }],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "5\u20137 business days",
+      revisionLimit: "3 revision rounds included",
+      additionalDeliverableCharge: 1500,
+      subscriptionDuration: "One-time project delivery",
+      renewalTerms: "N/A (One-time)",
+      cancellationPolicy: "Cancellation prior to second proofing round",
+      menuOrder: 17,
+      showInMenu: true
+    },
+    {
+      id: "srv-company-profile-brochure",
+      slug: "brochure-company-profile-design",
+      name: "Company Profile, Brochure, Flyer & Product Catalogue Design",
+      category: "Creative and Graphic Design",
+      description: "Structured graphic layout for corporate company profiles, multi-fold brochures, promotional flyers, posters, and multi-SKU product catalogues.",
+      benefits: [
+        "Turns complex SKU specs or company credentials into effortless visual reading",
+        "Supplied in both print-ready high-DPI PDF and lightweight WhatsApp share PDF"
+      ],
+      deliverables: [
+        "Company profile or multi-page brochure design",
+        "Flyer, poster or product catalogue layout",
+        "Print & WhatsApp-optimized PDF exports"
+      ],
+      workProcess: [
+        "Organize company copy, product specs & high-res imagery",
+        "Design clean grid typography and product hierarchy",
+        "Proof pages across revision cycles and deliver print & web PDFs"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "one-time",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "5\u201310 business days (page count dependent)",
+      revisionLimit: "2\u20133 proofing cycles",
+      additionalDeliverableCharge: 0,
+      subscriptionDuration: "Scoped by page count",
+      renewalTerms: "N/A (One-time)",
+      cancellationPolicy: "Milestone basis",
+      menuOrder: 18,
+      showInMenu: true
+    },
+    {
+      id: "srv-social-post-carousel",
+      slug: "social-media-post-carousel-design",
+      name: "Social Media Post, Carousel & YouTube Channel Branding",
+      category: "Creative and Graphic Design",
+      description: "Custom social media post design, multi-slide educational carousel posts, ad creative design, and unified YouTube channel banner branding.",
+      benefits: [
+        "Boosts saves and shares with structured swipeable carousel storytelling",
+        "Consistent channel art across social profiles and ad placements"
+      ],
+      deliverables: [
+        "Custom social media static & carousel post designs",
+        "Ad creative banners sized for feed & story placements",
+        "YouTube channel banner, avatar & watermark branding"
+      ],
+      workProcess: [
+        "Review offer message, copy points & target placement dimensions",
+        "Design cohesive post, carousel or channel branding pack",
+        "Deliver layered exports sized for Instagram, Facebook & YouTube"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "one-time",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "3\u20135 business days",
+      revisionLimit: "2 revision rounds per creative batch",
+      additionalDeliverableCharge: 0,
+      subscriptionDuration: "One-time batch or monthly",
+      renewalTerms: "Optional monthly",
+      cancellationPolicy: "Prior to final batch sign-off",
+      menuOrder: 19,
+      showInMenu: true
+    },
+    // =========================================================================
+    // 5. VIDEO AND CONTENT SERVICES
+    // =========================================================================
+    {
+      id: "srv-creative-scriptwriting",
+      slug: "script-writing",
+      name: "Script Writing",
+      category: "Video and Content Services",
+      description: "Strategic conversion scripts for promotional videos, vertical reels, YouTube explainers, paid advertisements, and business presentations.",
+      benefits: [
+        "Hooks viewers inside the first 3 seconds with clear commercial storytelling",
+        "Structured voiceover cues and scene beats ready for effortless shooting"
+      ],
+      deliverables: [
+        "Promotional video scripts",
+        "Reels and short-video scripts",
+        "YouTube scripts",
+        "Advertisement scripts",
+        "Business presentation scripts"
+      ],
+      workProcess: [
+        "Define product benefits, target audience & video runtime",
+        "Draft structured hook, proof points & closing CTA script",
+        "Refine pacing and phrasing across included revision passes"
+      ],
+      pricingModel: "fixed",
+      setupFee: 4e3,
+      recurringFee: 12e3,
+      oneTimePrice: 4e3,
+      monthlyPrice: 12e3,
+      billingCycle: "one-time",
+      addons: [{ name: "Teleprompter cues & voiceover pacing guide", price: 1e3 }],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "2\u20133 business days",
+      revisionLimit: "2 revisions per script",
+      additionalDeliverableCharge: 800,
+      subscriptionDuration: "Standalone 3-script pack or monthly 12-script retainer",
+      renewalTerms: "Renews monthly; roll-over unused scripts within 30 days",
+      cancellationPolicy: "Cancel anytime with 7 days advance notice",
+      menuOrder: 20,
+      showInMenu: true
+    },
+    {
+      id: "srv-reels-video-production",
+      slug: "promotional-video-reels",
+      name: "Promotional Video & Reels Production",
+      category: "Video and Content Services",
+      description: "High-retention vertical promotional reels, dynamic captions, product cutdowns, and multi-ratio social video edits.",
+      benefits: [
+        "Turns raw showroom or studio clips into polished vertical brand stories",
+        "Formatted natively for Instagram Reels, YouTube Shorts & Meta video ads"
+      ],
+      deliverables: [
+        "Promotional reels edit suite (up to 8 reels/pack)",
+        "Motion typography captions & clean sound pacing",
+        "Multi-aspect ratio exports (9:16 & 1:1)"
+      ],
+      workProcess: [
+        "Receive raw product footage or shoot brief & hook script",
+        "Edit tight vertical cutdowns with visual callouts and captions",
+        "Review timing/text revisions and deliver export-ready MP4 files"
+      ],
+      pricingModel: "fixed",
+      setupFee: 2e4,
+      recurringFee: 0,
+      oneTimePrice: 2e4,
+      monthlyPrice: 0,
+      billingCycle: "one-time",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "5\u20137 business days per batch",
+      revisionLimit: "2 edit cut revisions per video",
+      additionalDeliverableCharge: 2500,
+      subscriptionDuration: "Standalone video edit batch",
+      renewalTerms: "Optional monthly batch",
+      cancellationPolicy: "Prior to assembly cut delivery",
+      menuOrder: 21,
+      showInMenu: true
+    },
+    {
+      id: "srv-content-copywriting",
+      slug: "content-copywriting",
+      name: "Content Copywriting & Video Creative Coordination",
+      category: "Video and Content Services",
+      description: "Persuasive commercial copywriting for web pages, brochures, email campaigns, plus end-to-end creator and video shoot coordination.",
+      benefits: [
+        "Sharp, jargon-free B2B and consumer copywriting tailored to Indian & UAE buyers",
+        "Coordinates creators, talking points & shoot deliverables cleanly"
+      ],
+      deliverables: [
+        "Website, landing page & ad copywriting",
+        "Creator brief & video shoot coordination plan",
+        "Proofed publication-ready copy deck"
+      ],
+      workProcess: [
+        "Gather product USP, objections & buyer tone requirements",
+        "Draft structured headlines, body copy & creator briefs",
+        "Coordinate feedback edits and approve final messaging"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "one-time",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "3\u20135 business days",
+      revisionLimit: "2 copy revision passes",
+      additionalDeliverableCharge: 0,
+      subscriptionDuration: "Quoted by scope & shoot volume",
+      renewalTerms: "Per project or monthly",
+      cancellationPolicy: "Milestone basis",
+      menuOrder: 22,
+      showInMenu: true
+    },
+    // =========================================================================
+    // 6. BUSINESS DOCUMENTS AND PRESENTATIONS
+    // =========================================================================
+    {
+      id: "srv-creative-ppt",
+      slug: "presentation-design",
+      name: "PowerPoint Presentation & Pitch Deck Design",
+      category: "Business Documents and Presentations",
+      description: "Basic PPT, Professional PPT, Investor pitch decks, Company profile PPTs, and Sales presentations structured with crisp executive hierarchy.",
+      benefits: [
+        "Transforms dense raw notes into boardroom-ready slide storytelling",
+        "Editable PowerPoint (.pptx) + clean shareable PDF included"
+      ],
+      deliverables: [
+        "Basic or Professional PowerPoint presentation",
+        "Investor pitch deck & Company profile PPT",
+        "Sales & marketing presentation slides",
+        "Editable PPTX + print/email PDF formats"
+      ],
+      workProcess: [
+        "Review raw outline, financial points & brand identity",
+        "Structure slide narrative flow and key visual layouts",
+        "Refine data callouts across 3 review cycles and export master files"
+      ],
+      pricingModel: "fixed",
+      setupFee: 6e3,
+      recurringFee: 14e3,
+      oneTimePrice: 6e3,
+      monthlyPrice: 14e3,
+      billingCycle: "one-time",
+      addons: [{ name: "Animated slide transitions & interactive PDF deck", price: 2500 }],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "3\u20135 business days",
+      revisionLimit: "3 slide deck review cycles",
+      additionalDeliverableCharge: 600,
+      subscriptionDuration: "Standalone 12-slide deck or monthly slide update retainer",
+      renewalTerms: "Renews monthly for active sales & investor updates",
+      cancellationPolicy: "Cancel anytime before next billing date",
+      menuOrder: 23,
+      showInMenu: true
+    },
+    {
+      id: "srv-business-reports-docs",
+      slug: "business-reports-formatting",
+      name: "Business Reports, Word & PDF Formatting",
+      category: "Business Documents and Presentations",
+      description: "Clean formatting and layout engineering for corporate business reports, Word documents (.docx), executive dossiers, and interactive PDFs.",
+      benefits: [
+        "Standardizes headings, tables, page numbers & visual alignment effortlessly",
+        "Eliminates broken layouts across Word and PDF viewers"
+      ],
+      deliverables: [
+        "Structured business report layout",
+        "Word document (.docx) style & template cleanup",
+        "Clean bookmarked PDF formatting"
+      ],
+      workProcess: [
+        "Inspect raw draft documents, tables & brand style preferences",
+        "Apply consistent typographic hierarchy, tables & headers",
+        "Deliver both editable DOCX and clean finalized PDF"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "one-time",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "2\u20134 business days",
+      revisionLimit: "2 layout proofing rounds",
+      additionalDeliverableCharge: 0,
+      subscriptionDuration: "Scoped by page count",
+      renewalTerms: "N/A (One-time)",
+      cancellationPolicy: "Prior to final export",
+      menuOrder: 24,
+      showInMenu: true
+    },
+    {
+      id: "srv-quotation-invoice-templates",
+      slug: "quotation-invoice-templates",
+      name: "Quotation & Invoice Templates",
+      category: "Business Documents and Presentations",
+      description: "Custom-branded commercial quotation and GST/UAE tax invoice templates built cleanly in Excel, Word, or fillable PDF.",
+      benefits: [
+        "Automatic subtotal, discount & tax formulas reduce manual billing errors",
+        "Projects immediate commercial credibility with corporate buyers"
+      ],
+      deliverables: [
+        "Custom branded Quotation template (with GST/VAT toggles)",
+        "Automated commercial Invoice layout (Excel / Word / PDF)"
+      ],
+      workProcess: [
+        "Collect company logo, bank details, tax rules & payment terms",
+        "Build clean layout with automatic calculation fields",
+        "Test printout margins & PDF export formatting before handover"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "one-time",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "2\u20133 business days",
+      revisionLimit: "2 template adjustments",
+      additionalDeliverableCharge: 0,
+      subscriptionDuration: "One-time deliverable",
+      renewalTerms: "N/A (One-time)",
+      cancellationPolicy: "Prior to final template delivery",
+      menuOrder: 25,
+      showInMenu: true
+    },
+    {
+      id: "srv-resume-ats-formatting",
+      slug: "ats-resume-formatting",
+      name: "Resume & ATS Resume Formatting",
+      category: "Business Documents and Presentations",
+      description: "Clean, recruiter-readable executive resumes and Applicant Tracking System (ATS) compliant CV formatting tailored for clarity and impact.",
+      benefits: [
+        "ATS-safe clean structure without broken multi-column parser traps",
+        "Highlights measurable business outcomes & crisp role progression"
+      ],
+      deliverables: [
+        "ATS-friendly formatted Resume (.docx + .pdf)",
+        "Executive headline & achievement bullet structuring"
+      ],
+      workProcess: [
+        "Review current CV, career target roles & key achievements",
+        "Reformat typography, section keywords & impact phrasing",
+        "Deliver ATS-tested Word and PDF editions"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "one-time",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "2\u20133 business days",
+      revisionLimit: "2 content & layout revisions",
+      additionalDeliverableCharge: 0,
+      subscriptionDuration: "One-time career service",
+      renewalTerms: "N/A (One-time)",
+      cancellationPolicy: "Prior to finalized draft delivery",
+      menuOrder: 26,
+      showInMenu: true
+    },
+    {
+      id: "srv-creative-support",
+      slug: "business-documentation-support",
+      name: "Additional Business Documentation Support",
+      category: "Business Documents and Presentations",
+      description: "Flexible operational assistance for commercial data entry, business document formatting, basic customer enquiry handling, and custom documentation.",
+      benefits: [
+        "Offloads repetitive commercial documentation onto structured specialists",
+        "Bookable as a 10-hour sprint or 25-hour monthly support allocation"
+      ],
+      deliverables: [
+        "Structured data entry & cleanup",
+        "Commercial document formatting",
+        "Basic customer enquiry sorting & CRM entry",
+        "Custom business documentation"
+      ],
+      workProcess: [
+        "Define task checklist, turnaround expectations & file formats",
+        "Execute tasks with QA checks in 10-hr sprints or monthly blocks",
+        "Deliver verified spreadsheets & formatted documentation"
+      ],
+      pricingModel: "fixed",
+      setupFee: 4e3,
+      recurringFee: 8e3,
+      oneTimePrice: 4e3,
+      monthlyPrice: 8e3,
+      billingCycle: "one-time",
+      addons: [{ name: "Priority weekend operational coverage block", price: 3e3 }],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "Ongoing according to agreed schedule",
+      revisionLimit: "Quality-checked output with 2 correction rounds",
+      additionalDeliverableCharge: 500,
+      subscriptionDuration: "Standalone 10-hr sprint or 25-hr monthly retainer",
+      renewalTerms: "Renews monthly; unused hours do not roll over",
+      cancellationPolicy: "Cancel anytime before monthly renewal",
+      menuOrder: 27,
+      showInMenu: false
+    },
+    // =========================================================================
+    // 7. EXCEL AND REPORTING SERVICES
+    // =========================================================================
+    {
+      id: "srv-creative-excel",
+      slug: "excel-reporting",
+      name: "Excel Workbooks, Dashboards & Automation",
+      category: "Excel and Reporting Services",
+      description: "Basic & Professional Excel workbooks, executive Excel dashboards, automated calculation formulas, sales trackers, and inventory sheets.",
+      benefits: [
+        "Replaces error-prone manual totals with dynamic XLOOKUP/Pivot/formula models",
+        "Built cleanly for non-technical managers to filter daily numbers immediately"
+      ],
+      deliverables: [
+        "Basic or Professional Excel workbook",
+        "Interactive Excel KPI dashboard",
+        "Sales, lead & inventory tracking templates",
+        "Custom automated calculation formulas"
+      ],
+      workProcess: [
+        "Review source data layout, KPI definitions & team workflow",
+        "Engineer clean formulas, data validation dropdowns & visual charts",
+        "Walk through usage and complete 2 formula/layout adjustments"
+      ],
+      pricingModel: "fixed",
+      setupFee: 5e3,
+      recurringFee: 1e4,
+      oneTimePrice: 5e3,
+      monthlyPrice: 1e4,
+      billingCycle: "one-time",
+      addons: [{ name: "Google Sheets & CSV automated sync integration", price: 3e3 }],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "3\u20134 business days",
+      revisionLimit: "2 post-delivery formula / layout adjustments",
+      additionalDeliverableCharge: 1e3,
+      subscriptionDuration: "Standalone custom workbook or monthly maintenance retainer",
+      renewalTerms: "Renews monthly for weekly report refreshes",
+      cancellationPolicy: "Cancel anytime with 7 days notice",
+      menuOrder: 28,
+      showInMenu: true
+    },
+    {
+      id: "srv-data-cleaning",
+      slug: "data-cleaning-structuring",
+      name: "Data Cleaning & Spreadsheet Structuring",
+      category: "Excel and Reporting Services",
+      description: "Thorough deduplication, phone/email standardization, scattered tab consolidation, and structured spreadsheet hygiene.",
+      benefits: [
+        "Prepares messy historical lead or customer exports for accurate campaigns and reporting",
+        "Eliminates duplicate rows, inconsistent date formats & broken formulas"
+      ],
+      deliverables: [
+        "Deduplicated & standardized XLSX / CSV master file",
+        "Data validation rules & clean column taxonomy"
+      ],
+      workProcess: [
+        "Inspect raw exports for duplicates, formatting drift & missing keys",
+        "Clean, normalize and verify record accuracy",
+        "Deliver structured master file ready for CRM or reporting"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "one-time",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "2\u20135 business days (volume dependent)",
+      revisionLimit: "1 verification & correction pass",
+      additionalDeliverableCharge: 0,
+      subscriptionDuration: "Scoped per record volume",
+      renewalTerms: "N/A (One-time)",
+      cancellationPolicy: "Prior to final workbook handover",
+      menuOrder: 29,
+      showInMenu: true
+    },
+    {
+      id: "srv-monthly-performance-reporting",
+      slug: "monthly-performance-reporting",
+      name: "Monthly Performance & MIS Reporting",
+      category: "Excel and Reporting Services",
+      description: "Recurring executive MIS & commercial performance reporting consolidating lead flow, campaign spend, conversion ratios, and unit margins.",
+      benefits: [
+        "Gives founders one trustworthy monthly scorecard across sales & marketing",
+        "Reduces weekly manual spreadsheet compilation time"
+      ],
+      deliverables: [
+        "Standardized monthly MIS workbook & summary deck",
+        "Lead-to-sale funnel conversion & ROI breakdown"
+      ],
+      workProcess: [
+        "Connect monthly CSV exports from CRM, ads & billing sheets",
+        "Compile clean KPI views, variance notes & action highlights",
+        "Deliver verified monthly report on a fixed calendar date"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "monthly",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "Monthly fixed calendar delivery",
+      revisionLimit: "Monthly KPI layout refinement",
+      additionalDeliverableCharge: 0,
+      subscriptionDuration: "Monthly service",
+      renewalTerms: "Monthly",
+      cancellationPolicy: "7 days notice",
+      menuOrder: 30,
+      showInMenu: true
+    },
+    // =========================================================================
+    // 8. MESSAGING AND COMMUNICATION
+    // =========================================================================
+    {
+      id: "srv-bulk-sms",
+      slug: "bulk-sms",
+      name: "Bulk SMS Marketing",
+      category: "Messaging and Communication",
+      description: "Promotional & transactional bulk SMS campaigns (\u20B93,000 for 10,000 SMS credits; \u20B90.30 effective rate; additional credits calculated using admin-configured rate). Provider API integration is configured per client upon provider credential activation.",
+      benefits: [
+        "Clear credit transparency: \u20B93,000 fixed starter bundle includes 10,000 SMS credits (\u20B90.30/SMS)",
+        "Additional SMS usage calculated dynamically using admin-configured rate",
+        "Supports scheduled broadcasts, contact uploads & provider delivery logs"
+      ],
+      deliverables: [
+        "Bulk promotional SMS",
+        "Transactional SMS, if supported by the selected provider",
+        "Contact list upload",
+        "Campaign scheduling",
+        "Delivery reports, where supported",
+        "SMS credit usage tracking",
+        "Campaign history"
+      ],
+      workProcess: [
+        "Complete DLT / telecom sender ID & template compliance review",
+        "Provision 10,000 starter SMS credits upon quotation approval",
+        "Upload recipient lists, schedule campaigns & monitor usage reports"
+      ],
+      pricingModel: "fixed",
+      setupFee: 0,
+      recurringFee: 3e3,
+      packagePrice: 3e3,
+      oneTimePrice: 3e3,
+      monthlyPrice: 0,
+      includedUnits: 1e4,
+      unitLabel: "SMS",
+      unitRate: 0.3,
+      additionalUnitRate: 0.3,
+      billingCycle: "one-time",
+      addons: [{ name: "Additional 10,000 SMS credit block", price: 3e3 }],
+      internationalPricing: {
+        aed: { setupFee: 0, packagePrice: 140, unitRate: 0.015, additionalUnitRate: 0.015 },
+        usd: { setupFee: 0, packagePrice: 39, unitRate: 4e-3, additionalUnitRate: 4e-3 },
+        notes: "Configurable international SMS pricing per destination route."
+      },
+      disclaimer: MESSAGING_DISCLAIMER,
+      integrationConfigured: false,
+      transactionalSmsEnabled: false,
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "Upon DLT/provider onboarding & credential setup",
+      revisionLimit: "Sender ID and template approval guidance",
+      additionalDeliverableCharge: 3e3,
+      subscriptionDuration: "Credit bundle (validity subject to provider terms)",
+      renewalTerms: "Recharge as needed",
+      cancellationPolicy: "Non-refundable once credits are provisioned with telecom operator",
+      menuOrder: 31,
+      showInMenu: true
+    },
+    {
+      id: "srv-whatsapp-messaging",
+      slug: "whatsapp-business-setup",
+      name: "WhatsApp Business Messaging Setup",
+      category: "Messaging and Communication",
+      description: "Structured WhatsApp Business Messaging onboarding and workflow configuration. One-time setup fee (\u20B94,999) is billed strictly separate from message usage charges (\u20B91.50 per message). Provider API integration is pending client provider credentials & verification.",
+      benefits: [
+        "100% transparent billing separation: \u20B94,999 one-time setup fee kept distinct from \u20B91.50/message usage",
+        "Clean business profile configuration & structured customer reply workflows",
+        "Trackable campaign and per-message billing visibility"
+      ],
+      deliverables: [
+        "WhatsApp Business setup assistance",
+        "Business profile configuration",
+        "Messaging workflow setup",
+        "Customer communication setup",
+        "Campaign and message tracking, where supported",
+        "Usage and billing reports"
+      ],
+      workProcess: [
+        "Verify Meta Business Manager & phone number eligibility",
+        "Configure official business profile, catalog & message workflows",
+        "Activate tracked messaging usage billed strictly separately at \u20B91.50/msg"
+      ],
+      pricingModel: "fixed",
+      setupFee: 4999,
+      recurringFee: 0,
+      packagePrice: 0,
+      oneTimePrice: 4999,
+      monthlyPrice: 0,
+      includedUnits: 0,
+      unitLabel: "message",
+      unitRate: 1.5,
+      additionalUnitRate: 1.5,
+      billingCycle: "one-time",
+      addons: [{ name: "1,000 WhatsApp messages usage allocation", price: 1500 }],
+      internationalPricing: {
+        aed: { setupFee: 225, packagePrice: 0, unitRate: 0.07, additionalUnitRate: 0.07 },
+        usd: { setupFee: 65, packagePrice: 0, unitRate: 0.02, additionalUnitRate: 0.02 },
+        notes: "Setup fee remains separate from per-message international Meta/BSP rates."
+      },
+      disclaimer: MESSAGING_DISCLAIMER,
+      integrationConfigured: false,
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "5\u20137 business days setup (subject to Meta/BSP verification)",
+      revisionLimit: "2 workflow revision cycles",
+      additionalDeliverableCharge: 1500,
+      subscriptionDuration: "One-time onboarding + pay-as-you-go message usage",
+      renewalTerms: "Usage billed as consumed or prepaid per campaign quota",
+      cancellationPolicy: "Setup fee non-refundable once BSP onboarding initiated",
+      menuOrder: 32,
+      showInMenu: true
+    },
+    // =========================================================================
+    // 9. LEAD MANAGEMENT AND CRM
+    // =========================================================================
+    {
+      id: "srv-lead-gen",
+      slug: "lead-filtering",
+      name: "Lead Filtering & Qualification",
+      category: "Lead Management and CRM",
+      description: "Structured telephonic and AI-assisted vetting of existing inbound leads before sales floor handover so sales executives spend time exclusively with verified buyers.",
+      benefits: [
+        "Screens out cold clicks & wrong numbers before they reach your sales team",
+        "Captures product interest, budget readiness, purchase window & booking slot",
+        "Delivers structured Hot, Warm & Future Follow-up classification daily"
+      ],
+      deliverables: [
+        "AI-assisted & human outbound vetting of existing enquiries (up to 1,000 mins/month)",
+        "Budget, timeline & intent verification",
+        "Hot / Warm / Future Lead status tagging & daily Excel reports"
+      ],
+      workProcess: [
+        "Configure custom qualification criteria, script & callback routing in 5 business days",
+        "Initiate outbound verification calls on incoming enquiries immediately",
+        "Deliver Daily Excel pipeline log & Hot buyer escalations"
+      ],
+      pricingModel: "fixed",
+      setupFee: 29998,
+      recurringFee: 24e3,
+      oneTimePrice: 29998,
+      monthlyPrice: 24e3,
+      billingCycle: "monthly",
+      addons: [{ name: "CRM pipeline reporting management", price: 1e4 }],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "5 business days setup",
+      revisionLimit: "Continuous qualification playbook updates",
+      additionalDeliverableCharge: 6e3,
+      subscriptionDuration: "Monthly service",
+      renewalTerms: "Auto-renews monthly",
+      cancellationPolicy: "15 business days notice",
+      menuOrder: 33,
+      showInMenu: true
+    },
+    {
+      id: "srv-crm-pipeline",
+      slug: "crm-lead-pipeline-management",
+      name: "CRM & Lead Pipeline Management",
+      category: "Lead Management and CRM",
+      description: "Disciplined enquiry tracking, duplicate cleanup, stage updates, and daily Excel / pipeline summaries operated internally by AKYIN.",
+      benefits: [
+        "Eliminates forgotten callbacks and scattered Excel sheets",
+        "Operated as a managed agency service\u2014zero SaaS software overhead"
+      ],
+      deliverables: [
+        "Enquiry stage hygiene & duplicate cleanup",
+        "Priority callback routing for Hot & scheduled demos",
+        "Daily Excel reporting sheets & monthly pipeline audit"
+      ],
+      workProcess: [
+        "Standardize enquiry stages & ownership rules across channels",
+        "Clean duplicates and update buyer progression statuses daily",
+        "Deliver executive stage breakdown at end of month"
+      ],
+      pricingModel: "fixed",
+      setupFee: 0,
+      recurringFee: 1e4,
+      oneTimePrice: 0,
+      monthlyPrice: 1e4,
+      billingCycle: "monthly",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "3\u20135 business days setup",
+      revisionLimit: "Weekly pipeline schema adjustment",
+      additionalDeliverableCharge: 2e3,
+      subscriptionDuration: "Monthly managed service",
+      renewalTerms: "Auto-renews monthly",
+      cancellationPolicy: "7 days notice",
+      menuOrder: 34,
+      showInMenu: true
+    },
+    {
+      id: "srv-ai-outbound-workflows",
+      slug: "ai-outbound-calling-workflows",
+      name: "AI-Assisted Outbound Calling & Inquiry Follow-Up Workflows",
+      category: "Lead Management and CRM",
+      description: "Agency-operated AI-assisted outbound enquiry calling scripts and multi-attempt callback workflows designed to keep response times under minutes.",
+      benefits: [
+        "Structured script logic tailored to your buyer objections and language mix",
+        "Zero client-side software setup\u2014managed directly by AKYIN operations"
+      ],
+      deliverables: [
+        "Custom outbound calling script & qualification decision tree",
+        "Multi-attempt inquiry follow-up cadence",
+        "Call outcome disposition log & priority escalation rules"
+      ],
+      workProcess: [
+        "Map common prospect FAQs, eligibility checks & language preferences",
+        "Configure and test calling workflow scripts internally",
+        "Deploy live follow-up cadence with structured outcome reporting"
+      ],
+      pricingModel: "custom",
+      setupFee: 0,
+      recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
+      billingCycle: "monthly",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "5\u20137 business days configuration",
+      revisionLimit: "Iterative script calibration",
+      additionalDeliverableCharge: 0,
+      subscriptionDuration: "Scoped by call volume",
+      renewalTerms: "Monthly",
+      cancellationPolicy: "7 days notice",
+      menuOrder: 35,
+      showInMenu: true
+    },
+    // =========================================================================
+    // 10. BUSINESS CONSULTING AND TRAINING
+    // =========================================================================
+    {
       id: "srv-consulting",
-      name: "1-on-1 Business Advisory Consultation (30 min IST)",
-      category: "Business consulting",
-      description: "Private commercial strategy, feasibility, and unit-economics diagnostic session directly with AKYIN Ventures.",
+      slug: "business-advisory-session",
+      name: "1-on-1 Business Advisory Session (30 min IST)",
+      category: "Business Consulting and Training",
+      description: "Private commercial strategy, feasibility, and unit-economics diagnostic session directly with AKYIN Ventures on India Standard Time.",
+      benefits: [
+        "Direct 1-on-1 founder clarity without multi-month retainer commitments",
+        "Pinpoints acquisition bottlenecks, pricing margin leaks & next steps in 30 minutes"
+      ],
       deliverables: [
         "30-minute private IST video consultation",
         "Unit economics & funnel bottleneck audit",
         "Actionable next-step priorities summary"
       ],
+      workProcess: [
+        "Select your preferred 30-min IST slot and submit business context",
+        "Join focused live diagnostic review directly with AKYIN",
+        "Leave with clear commercial action priorities"
+      ],
       pricingModel: "fixed",
-      setupFee: 1999,
+      setupFee: 3998,
       recurringFee: 0,
+      oneTimePrice: 3998,
+      monthlyPrice: 0,
       billingCycle: "one-time",
       addons: [],
       gstEnabled: true,
       gstRate: 18,
-      deliveryPeriod: "Scheduled 6:00 PM \u2013 7:00 PM IST slot"
-    },
-    {
-      id: "srv-automotive",
-      name: "Automotive Dealership Test-Drive & Floor Sales Program",
-      category: "Automotive dealership marketing",
-      description: "Specialized multi-brand car & EV dealership growth uniting vehicle lead ads, buyer vetting, and showroom floor sales coaching.",
-      deliverables: [
-        "Geo-fenced model & exchange carnival lead drives",
-        "Telephonic & AI buyer readiness qualification",
-        "Showroom floor sales & closing training workshop"
-      ],
-      pricingModel: "fixed",
-      setupFee: 25e3,
-      recurringFee: 0,
-      billingCycle: "one-time",
-      addons: [
-        { name: "Festive / Exchange event campaign", price: 1e4 },
-        { name: "Catalog & pre-owned stock rotation", price: 8e3 }
-      ],
-      gstEnabled: true,
-      gstRate: 18,
-      deliveryPeriod: "On-site / virtual workshop + campaign sprint"
-    },
-    {
-      id: "srv-customer-acquisition",
-      name: "Customer Acquisition & Retention Campaigns",
-      category: "Customer acquisition",
-      description: "Targeted buyer reactivation, B2B outreach campaigns, and seasonal promotion sprints.",
-      deliverables: [
-        "Database reactivation & repeat-visit messaging",
-        "Corporate / institutional B2B buyer acquisition",
-        "Weekly conversion & booking log"
-      ],
-      pricingModel: "fixed",
-      setupFee: 0,
-      recurringFee: 8e3,
-      billingCycle: "monthly",
-      addons: [{ name: "Corporate / B2B campaign sprint", price: 1e4 }],
-      gstEnabled: true,
-      gstRate: 18,
-      deliveryPeriod: "7 business days rollout"
+      deliveryPeriod: "Scheduled 6:00 PM \u2013 7:00 PM IST slot",
+      revisionLimit: "Single dedicated session",
+      additionalDeliverableCharge: 3998,
+      subscriptionDuration: "One-time 30-min advisory session",
+      renewalTerms: "N/A (One-time)",
+      cancellationPolicy: "Reschedule permitted up to 4 hours prior",
+      menuOrder: 36,
+      showInMenu: true
     },
     {
       id: "srv-sales-strategy",
-      name: "Commercial Sales & Marketing Strategy Workshop",
-      category: "Sales and marketing strategy",
-      description: "Hands-on sales playbook, objection handling, personality development, and conversion scripting for commercial teams.",
+      slug: "commercial-dealership-sales-training",
+      name: "Commercial & Dealership Sales Training Workshop",
+      category: "Business Consulting and Training",
+      description: "Practical frontline sales and showroom coaching backed by 16 years of high-trust commercial experience from Maruti Suzuki to Audi.",
+      benefits: [
+        "Equips sales executives with structured product walkthroughs & calm objection handling",
+        "Builds consistent follow-up discipline that increases enquiry-to-closing conversion"
+      ],
       deliverables: [
-        "Showroom / inside-sales closing script framework",
-        "Objection handling & follow-up cadence training",
-        "Team communication & executive etiquette workshop"
+        "Customer greeting & structured discovery walkaround framework",
+        "Objection handling & value-based negotiation drills",
+        "Follow-up cadence & deal closing workbook"
+      ],
+      workProcess: [
+        "Review current team call/floor handling gaps & target conversion goals",
+        "Deliver intensive interactive team workshop (on-site or virtual)",
+        "Follow up with customized closing script summary"
       ],
       pricingModel: "fixed",
-      setupFee: 25e3,
+      setupFee: 5e4,
       recurringFee: 0,
+      oneTimePrice: 5e4,
+      monthlyPrice: 0,
       billingCycle: "one-time",
-      addons: [{ name: "Personality development module", price: 25e3 }],
+      addons: [{ name: "Post-workshop follow-up audit session", price: 15e3 }],
       gstEnabled: true,
       gstRate: 18,
-      deliveryPeriod: "Scheduled intensive session"
+      deliveryPeriod: "Scheduled intensive session",
+      revisionLimit: "Includes customized sales playbook workbook",
+      additionalDeliverableCharge: 15e3,
+      subscriptionDuration: "Single comprehensive workshop session",
+      renewalTerms: "N/A (One-time)",
+      cancellationPolicy: "Reschedule permitted with 5 days advance notice",
+      menuOrder: 37,
+      showInMenu: true
+    },
+    {
+      id: "srv-personality-development",
+      slug: "personality-development-workshop",
+      name: "Personality Development & Executive Etiquette Workshop",
+      category: "Business Consulting and Training",
+      description: "Dedicated grooming, verbal clarity, consultative body language, and executive presence training tailored for customer-facing sales and advisory teams.",
+      benefits: [
+        "Elevates first-impression trust during high-ticket showroom and B2B meetings",
+        "Coaches active listening, voice tone & composed client posture"
+      ],
+      deliverables: [
+        "Executive grooming & showroom hospitality standards",
+        "Verbal clarity, listening & confidence roleplay sessions",
+        "Consistent client representation checklist"
+      ],
+      workProcess: [
+        "Align workshop agenda to team seniority and customer tier",
+        "Conduct hands-on communication & posture coaching drills",
+        "Provide practical daily etiquette scorecard for managers"
+      ],
+      pricingModel: "fixed",
+      setupFee: 5e4,
+      recurringFee: 0,
+      oneTimePrice: 5e4,
+      monthlyPrice: 0,
+      billingCycle: "one-time",
+      addons: [],
+      gstEnabled: true,
+      gstRate: 18,
+      deliveryPeriod: "Scheduled per mutually agreed calendar date",
+      revisionLimit: "Pre-session agenda alignment included",
+      additionalDeliverableCharge: 15e3,
+      subscriptionDuration: "Single workshop session",
+      renewalTerms: "N/A (One-time)",
+      cancellationPolicy: "Reschedule permitted with 5 days advance notice",
+      menuOrder: 38,
+      showInMenu: true
     },
     {
       id: "srv-custom-solutions",
-      name: "Custom International Business & Digital Solutions (India / UAE)",
-      category: "Custom business solutions",
-      description: "Bespoke multi-market operations, CRM automation, B2B trade setup, and custom commercial retainers scoped per requirement.",
+      slug: "custom-international-business-solutions",
+      name: "Custom International Business Solutions (India / UAE)",
+      category: "Business Consulting and Training",
+      description: "Bespoke multi-market operations, commercial feasibility, cross-border India\u2013UAE go-to-market planning, and custom advisory retainers.",
+      benefits: [
+        "Designed for organizations operating or expanding across India and the UAE",
+        "Transparent custom scoping\u2014pay strictly for agreed project milestones"
+      ],
       deliverables: [
         "Tailored technical & commercial scoping dossier",
         "Custom milestone schedule & deliverable SLAs",
-        "Dedicated project lead across India & UAE time zones"
+        "Dedicated cross-border advisory coordination"
+      ],
+      workProcess: [
+        "Conduct discovery call covering India/UAE market goals & constraints",
+        "Prepare milestone-based commercial proposal & deliverables",
+        "Execute agreed sprints with regular leadership check-ins"
       ],
       pricingModel: "custom",
       setupFee: 0,
       recurringFee: 0,
+      oneTimePrice: 0,
+      monthlyPrice: 0,
       billingCycle: "custom",
       addons: [],
       gstEnabled: true,
       gstRate: 18,
-      deliveryPeriod: "Custom milestone timeline"
+      deliveryPeriod: "Custom milestone timeline",
+      revisionLimit: "Milestone-based review cycles",
+      additionalDeliverableCharge: 0,
+      subscriptionDuration: "Project or bespoke retainer",
+      renewalTerms: "Per signed service agreement",
+      cancellationPolicy: "Per signed contract terms",
+      menuOrder: 39,
+      showInMenu: true
     }
   ];
   return list.map((item, idx) => ({
     ...item,
     active: true,
     sortOrder: idx + 1,
+    menuOrder: item.menuOrder ?? idx + 1,
+    showInMenu: item.showInMenu ?? true,
     updatedAt: nowIso
   }));
 }
@@ -2132,9 +3877,11 @@ function buildEmptyDatabase() {
     sessions: [],
     leads: importLegacyLeads(nowIso),
     clients: buildInitialClients(nowIso),
+    serviceCategories: buildInitialServiceCategories(nowIso),
     services: buildInitialServices(nowIso),
     quotations: [],
     invoices: [],
+    subscriptions: [],
     payments: [],
     appointments: [],
     availability: DEFAULT_AVAILABILITY.map((a) => ({ ...a })),
@@ -2180,9 +3927,11 @@ function migrateDatabaseIfNeeded(raw, dbFilePath) {
     sessions: Array.isArray(raw.sessions) ? raw.sessions : [],
     leads: Array.isArray(raw.leads) ? raw.leads : defaults.leads,
     clients: Array.isArray(raw.clients) && raw.clients.length > 0 ? raw.clients : defaults.clients,
+    serviceCategories: oldVersion >= 4 && Array.isArray(raw.serviceCategories) && raw.serviceCategories.length > 0 ? raw.serviceCategories : defaults.serviceCategories,
     services: Array.isArray(raw.services) && raw.services.length > 0 ? raw.services : defaults.services,
     quotations: Array.isArray(raw.quotations) ? raw.quotations : [],
     invoices: Array.isArray(raw.invoices) ? raw.invoices : [],
+    subscriptions: Array.isArray(raw.subscriptions) ? raw.subscriptions : [],
     payments: Array.isArray(raw.payments) ? raw.payments : [],
     appointments: Array.isArray(raw.appointments) ? raw.appointments : [],
     availability: Array.isArray(raw.availability) && raw.availability.length > 0 ? raw.availability : defaults.availability,
@@ -2203,6 +3952,124 @@ function migrateDatabaseIfNeeded(raw, dbFilePath) {
     auditLogs: Array.isArray(raw.auditLogs) ? raw.auditLogs : defaults.auditLogs,
     processedWebhookEvents: Array.isArray(raw.processedWebhookEvents) ? raw.processedWebhookEvents : []
   };
+  if (oldVersion < 3) {
+    const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+    for (const srv of merged.services) {
+      if (srv.id === "srv-bulk-sms" || srv.id === "srv-whatsapp-messaging") {
+        continue;
+      }
+      const alreadyDoubled = srv.priceHistory?.some(
+        (h) => h.changedBy === "System Migration (v3 pricing revision)"
+      );
+      if (!alreadyDoubled) {
+        const oldPrice = srv.setupFee || srv.recurringFee || srv.packagePrice || 0;
+        if (srv.setupFee) srv.setupFee *= 2;
+        if (srv.recurringFee) srv.recurringFee *= 2;
+        if (srv.packagePrice) srv.packagePrice *= 2;
+        if (srv.oneTimePrice) srv.oneTimePrice *= 2;
+        if (srv.monthlyPrice) srv.monthlyPrice *= 2;
+        if (Array.isArray(srv.addons)) {
+          for (const addon of srv.addons) {
+            addon.price = (addon.price || 0) * 2;
+          }
+        }
+        const newPrice = srv.setupFee || srv.recurringFee || srv.packagePrice || 0;
+        if (!srv.priceHistory) srv.priceHistory = [];
+        if (oldPrice > 0 || newPrice > 0) {
+          srv.priceHistory.push({
+            previousPrice: oldPrice,
+            newPrice,
+            changedAt: nowIso,
+            changedBy: "System Migration (v3 pricing revision)",
+            note: "AKYIN commercial price doubling applied"
+          });
+        }
+      }
+    }
+  }
+  const defaultsById = new Map(defaults.services.map((s) => [s.id, s]));
+  const legacyCategoryMap = {
+    "Digital marketing": "Digital Marketing",
+    "Google Ads management": "Digital Marketing",
+    "Meta Ads management": "Digital Marketing",
+    "Website development": "Digital Marketing",
+    SEO: "Digital Marketing",
+    "Customer acquisition": "Digital Marketing",
+    "Lead generation": "Lead Management and CRM",
+    "Social media management": "Social Media Management",
+    Branding: "Creative and Graphic Design",
+    "Business consulting": "Business Consulting and Training",
+    "Sales and marketing strategy": "Business Consulting and Training",
+    "Custom business solutions": "Business Consulting and Training",
+    "Automotive dealership marketing": "Automotive Marketing",
+    "Bulk SMS Marketing": "Messaging and Communication",
+    "WhatsApp Business Messaging": "Messaging and Communication"
+  };
+  if (oldVersion < 4) {
+    merged.serviceCategories = defaults.serviceCategories;
+    const seenIds = /* @__PURE__ */ new Set();
+    const seenSlugs = /* @__PURE__ */ new Set();
+    const migratedServices = [];
+    for (const srv of merged.services) {
+      if (seenIds.has(srv.id)) continue;
+      const def = defaultsById.get(srv.id);
+      if (def) {
+        srv.category = def.category;
+        srv.slug = srv.slug || def.slug;
+        srv.benefits = srv.benefits && srv.benefits.length > 0 ? srv.benefits : def.benefits;
+        srv.workProcess = srv.workProcess && srv.workProcess.length > 0 ? srv.workProcess : def.workProcess;
+        srv.menuOrder = srv.menuOrder ?? def.menuOrder ?? srv.sortOrder;
+        srv.showInMenu = srv.showInMenu ?? def.showInMenu ?? true;
+        if (srv.id === "srv-digital-marketing" && /package\s*[abc]/i.test(srv.name)) {
+          srv.name = def.name;
+          srv.description = def.description;
+        }
+        if (srv.id === "srv-lead-gen" && /package\s*[abc]/i.test(srv.name)) {
+          srv.name = def.name;
+          srv.description = def.description;
+        }
+      } else {
+        if (legacyCategoryMap[srv.category]) {
+          srv.category = legacyCategoryMap[srv.category];
+        } else if (srv.category === "Business Creative & Documentation Services") {
+          srv.category = "Creative and Graphic Design";
+        }
+        srv.name = srv.name.replace(/^Package\s+[A-Z]\s*[—–-]\s*/i, "").trim();
+      }
+      let candidateSlug = srv.slug ? slugifyServiceName(srv.slug) : slugifyServiceName(srv.name);
+      if (seenSlugs.has(candidateSlug)) {
+        candidateSlug = `${candidateSlug}-${srv.id.replace(/^srv-/, "").slice(0, 6)}`;
+      }
+      srv.slug = candidateSlug;
+      seenIds.add(srv.id);
+      seenSlugs.add(candidateSlug);
+      migratedServices.push(srv);
+    }
+    merged.services = migratedServices;
+  }
+  const existingServiceIds = new Set(merged.services.map((s) => s.id));
+  const existingSlugs = new Set(
+    merged.services.map((s) => s.slug ? slugifyServiceName(s.slug) : slugifyServiceName(s.name))
+  );
+  const existingNames = new Set(merged.services.map((s) => s.name.trim().toLowerCase()));
+  for (const srv of merged.services) {
+    if (!srv.slug) {
+      srv.slug = slugifyServiceName(srv.name);
+    }
+    if (srv.menuOrder === void 0) srv.menuOrder = srv.sortOrder;
+    if (srv.showInMenu === void 0) srv.showInMenu = true;
+  }
+  for (const defSrv of defaults.services) {
+    if (!existingServiceIds.has(defSrv.id) && !existingSlugs.has(defSrv.slug) && !existingNames.has(defSrv.name.trim().toLowerCase())) {
+      merged.services.push({
+        ...defSrv,
+        sortOrder: merged.services.length + 1
+      });
+      existingServiceIds.add(defSrv.id);
+      existingSlugs.add(defSrv.slug);
+      existingNames.add(defSrv.name.trim().toLowerCase());
+    }
+  }
   const envAdminPw = (process.env.ADMIN_PASSWORD || "").trim();
   if (merged.users.length === 0 && envAdminPw.length >= 8) {
     const nowIso = (/* @__PURE__ */ new Date()).toISOString();
@@ -2278,57 +4145,204 @@ function appendAuditLog(db, entry) {
   }
 }
 
-// server/types.ts
-import { z } from "zod";
-var USER_ROLES = [
-  "Super Admin",
-  "Sales Manager",
-  "Finance Manager",
-  "Staff"
-];
-var CRM_STAGES = [
-  "NEW",
-  "CONTACTED",
-  "QUALIFIED",
-  "PROPOSAL SENT",
-  "NEGOTIATION",
-  "WON",
-  "LOST"
-];
-var LEAD_SOURCES = [
-  "Website",
-  "Google Ads",
-  "Facebook",
-  "Instagram",
-  "YouTube",
-  "WhatsApp",
-  "Referral",
-  "Direct contact",
-  "Other"
-];
-var SERVICE_CATEGORIES = [
-  "Digital marketing",
-  "Lead generation",
-  "Social media management",
-  "Google Ads management",
-  "Meta Ads management",
-  "Website development",
-  "SEO",
-  "Branding",
-  "Business consulting",
-  "Automotive dealership marketing",
-  "Customer acquisition",
-  "Sales and marketing strategy",
-  "Custom business solutions"
-];
-var quotationLineItemSchema = z.object({
-  id: z.string().trim().min(1).max(60),
-  serviceId: z.string().trim().max(60).optional(),
-  title: z.string().trim().min(1).max(160),
-  description: z.string().trim().max(500).default(""),
-  qty: z.number().finite().positive().max(1e4),
-  unitPrice: z.number().finite().min(0).max(1e8)
-});
+// server/scheduler.ts
+var DEFAULT_RENEWAL_REMINDER_LEAD_DAYS = 3;
+var RENEWAL_SCHEDULER_INTERVAL_MS = 6 * 60 * 60 * 1e3;
+var schedulerInterval = null;
+var initialSweepTimeout = null;
+var lastRunAt = "";
+var nextScheduledRunAt = "";
+var lastResult = null;
+function parseIsoDateUtcMs(isoDate) {
+  const parts = String(isoDate || "").split("-").map(Number);
+  if (parts.length !== 3 || parts.some((n) => !Number.isFinite(n))) {
+    return NaN;
+  }
+  return Date.UTC(parts[0], parts[1] - 1, parts[2]);
+}
+function getDaysUntilRenewalIst(nextBillingDate, refDate = /* @__PURE__ */ new Date()) {
+  const todayIso = getIstDateParts(refDate).isoDate;
+  const todayMs = parseIsoDateUtcMs(todayIso);
+  const dueMs = parseIsoDateUtcMs(nextBillingDate);
+  if (!Number.isFinite(todayMs) || !Number.isFinite(dueMs)) return null;
+  return Math.round((dueMs - todayMs) / 864e5);
+}
+function computeRenewalTotals(sub) {
+  return calculateQuotationTotals(
+    [
+      {
+        id: "reminder-line",
+        serviceId: sub.serviceId,
+        title: `${sub.serviceName} \u2014 Monthly Subscription Renewal`,
+        qty: 1,
+        unitPrice: sub.monthlyAmount,
+        billingType: "monthly"
+      }
+    ],
+    0,
+    sub.gstEnabled,
+    sub.gstRate
+  );
+}
+function findUpcomingRenewals(db, leadDays = DEFAULT_RENEWAL_REMINDER_LEAD_DAYS, refDate = /* @__PURE__ */ new Date()) {
+  const maxDays = Math.min(30, Math.max(0, Math.floor(leadDays)));
+  const candidates = [];
+  for (const sub of db.subscriptions || []) {
+    if (sub.status !== "ACTIVE") continue;
+    if (!sub.customerEmail || !sub.customerEmail.includes("@")) continue;
+    const daysUntil = getDaysUntilRenewalIst(sub.nextBillingDate, refDate);
+    if (daysUntil === null || daysUntil < 0 || daysUntil > maxDays) continue;
+    const totals = computeRenewalTotals(sub);
+    candidates.push({
+      subscriptionId: sub.id,
+      subscriptionCode: sub.subscriptionCode,
+      customerName: sub.customerName,
+      companyName: sub.companyName,
+      customerEmail: sub.customerEmail,
+      serviceName: sub.serviceName,
+      serviceCategory: sub.serviceCategory,
+      nextBillingDate: sub.nextBillingDate,
+      daysUntilRenewal: daysUntil,
+      currency: sub.currency,
+      monthlyAmount: totals.subtotal,
+      gstAmount: totals.gstAmount,
+      totalAmountWithGst: totals.grandTotal,
+      alreadyRemindedForCycle: sub.lastReminderForBillingDate === sub.nextBillingDate,
+      lastReminderSentAt: sub.lastReminderSentAt || ""
+    });
+  }
+  return candidates.sort((a, b) => a.daysUntilRenewal - b.daysUntilRenewal);
+}
+async function runSubscriptionRenewalReminderSweepOnDb(db, options = {}) {
+  const leadDays = Math.min(30, Math.max(0, Math.floor(options.leadDays ?? DEFAULT_RENEWAL_REMINDER_LEAD_DAYS)));
+  const source = options.source || "cron";
+  const refDate = options.refDate || /* @__PURE__ */ new Date();
+  const nowIso = refDate.toISOString();
+  const activeSubs = (db.subscriptions || []).filter((s) => s.status === "ACTIVE");
+  const candidates = findUpcomingRenewals(db, leadDays, refDate);
+  let sentCount = 0;
+  let loggedUnconfiguredCount = 0;
+  let skippedAlreadyRemindedCount = 0;
+  let skippedDisabledCount = 0;
+  let failedCount = 0;
+  const results = [];
+  for (const candidate of candidates) {
+    const sub = (db.subscriptions || []).find((s) => s.id === candidate.subscriptionId);
+    if (!sub) continue;
+    if (!options.forceResend && sub.lastReminderForBillingDate === sub.nextBillingDate) {
+      skippedAlreadyRemindedCount += 1;
+      continue;
+    }
+    const dueLabel = candidate.daysUntilRenewal === 0 ? "today" : candidate.daysUntilRenewal === 1 ? "tomorrow (1 day)" : `in ${candidate.daysUntilRenewal} days`;
+    const taxSummary = sub.gstEnabled ? `${sub.currency} ${candidate.monthlyAmount.toLocaleString("en-IN")} + ${sub.gstRate}% GST (${sub.currency} ${candidate.gstAmount.toLocaleString("en-IN")}) = ${sub.currency} ${candidate.totalAmountWithGst.toLocaleString("en-IN")}` : `${sub.currency} ${candidate.totalAmountWithGst.toLocaleString("en-IN")} (No GST)`;
+    const logEntry = await dispatchNotification(db, {
+      event: "subscription_renewal_reminder",
+      recipient: sub.customerEmail,
+      subject: `Subscription Renewal Reminder: ${sub.serviceName} (${sub.subscriptionCode})`,
+      body: [
+        `Hello ${sub.customerName},`,
+        "",
+        `This is an automated Subscription Renewal Reminder for your active monthly service with AKYIN Ventures.`,
+        "",
+        `Subscription Reference: ${sub.subscriptionCode}`,
+        `Service Name: ${sub.serviceName}`,
+        `Category: ${sub.serviceCategory}`,
+        `Upcoming Renewal Date: ${sub.nextBillingDate} (${dueLabel})`,
+        `Renewal Amount: ${taxSummary}`,
+        "",
+        "If you wish to adjust your deliverables, pause billing, or settle this cycle early, please reply to this email or contact connect@akyin.com.",
+        "",
+        "Warm regards,",
+        "AKYIN Ventures Billing Desk"
+      ].join("\n")
+    });
+    if (logEntry.deliveryStatus === "sent") {
+      sentCount += 1;
+      sub.lastReminderSentAt = nowIso;
+      sub.lastReminderForBillingDate = sub.nextBillingDate;
+      sub.updatedAt = nowIso;
+    } else if (logEntry.deliveryStatus === "logged_unconfigured") {
+      loggedUnconfiguredCount += 1;
+      sub.lastReminderSentAt = nowIso;
+      sub.lastReminderForBillingDate = sub.nextBillingDate;
+      sub.updatedAt = nowIso;
+    } else if (logEntry.deliveryStatus === "skipped_disabled") {
+      skippedDisabledCount += 1;
+    } else {
+      failedCount += 1;
+    }
+    results.push({
+      subscriptionCode: sub.subscriptionCode,
+      customerEmail: sub.customerEmail,
+      serviceName: sub.serviceName,
+      nextBillingDate: sub.nextBillingDate,
+      deliveryStatus: logEntry.deliveryStatus,
+      errorMessage: logEntry.errorMessage
+    });
+  }
+  if (results.length > 0 || source === "manual") {
+    appendAuditLog(db, {
+      actorId: source === "cron" ? "SYSTEM_CRON" : "ADMIN_MANUAL",
+      actorName: options.actorName || (source === "cron" ? "Subscription Reminder Cron" : "Admin"),
+      actorRole: source === "cron" ? "System" : "Super Admin",
+      action: "SUBSCRIPTION_REMINDER_SWEEP",
+      targetId: "SUBSCRIPTIONS",
+      summary: `${source === "cron" ? "Scheduled" : "Manual"} renewal reminder check (${leadDays}d window): ${candidates.length} due, ${sentCount} sent via SMTP, ${loggedUnconfiguredCount} queued (SMTP unconfigured), ${skippedAlreadyRemindedCount} already reminded.`
+    });
+  }
+  return {
+    runAt: nowIso,
+    source,
+    leadDays,
+    checkedActiveCount: activeSubs.length,
+    dueCount: candidates.length,
+    sentCount,
+    loggedUnconfiguredCount,
+    skippedAlreadyRemindedCount,
+    skippedDisabledCount,
+    failedCount,
+    smtpConfigured: Boolean(getSmtpConfig()),
+    results
+  };
+}
+async function runSubscriptionRenewalReminderSweep(options = {}) {
+  const result = await withDbMutation(
+    (db) => runSubscriptionRenewalReminderSweepOnDb(db, options)
+  );
+  lastRunAt = result.runAt;
+  lastResult = result;
+  return result;
+}
+function getSchedulerStatus() {
+  return {
+    active: Boolean(schedulerInterval),
+    intervalHours: RENEWAL_SCHEDULER_INTERVAL_MS / 36e5,
+    defaultLeadDays: DEFAULT_RENEWAL_REMINDER_LEAD_DAYS,
+    lastRunAt,
+    nextScheduledRunAt,
+    lastResult
+  };
+}
+function startSubscriptionReminderScheduler() {
+  if (schedulerInterval) return;
+  const updateNextRunTimestamp = () => {
+    nextScheduledRunAt = new Date(Date.now() + RENEWAL_SCHEDULER_INTERVAL_MS).toISOString();
+  };
+  updateNextRunTimestamp();
+  initialSweepTimeout = setTimeout(() => {
+    void runSubscriptionRenewalReminderSweep({ source: "cron" }).catch((err) => {
+      console.error("[renewal-scheduler] Initial sweep error:", err);
+    });
+  }, 12e3);
+  initialSweepTimeout.unref();
+  schedulerInterval = setInterval(() => {
+    updateNextRunTimestamp();
+    void runSubscriptionRenewalReminderSweep({ source: "cron" }).catch((err) => {
+      console.error("[renewal-scheduler] Periodic sweep error:", err);
+    });
+  }, RENEWAL_SCHEDULER_INTERVAL_MS);
+  schedulerInterval.unref();
+}
 
 // server/routes.ts
 function stripControls(value) {
@@ -2861,11 +4875,38 @@ function registerSuiteRoutes(app) {
       clients: visibleClients
     });
   });
-  app.get("/api/public/services", (_req, res) => {
+  const handlePublicServices = (_req, res) => {
     const db = readDb();
+    const categoryRecords = (db.serviceCategories || []).filter((c) => c.active).slice().sort((a, b) => (a.menuOrder ?? a.sortOrder) - (b.menuOrder ?? b.sortOrder));
+    const categories = categoryRecords.length > 0 ? categoryRecords.map((c) => c.name) : [...SERVICE_CATEGORIES];
+    const services = (db.services || []).filter((s) => s.active).slice().sort((a, b) => (a.menuOrder ?? a.sortOrder) - (b.menuOrder ?? b.sortOrder));
     res.json({
-      categories: SERVICE_CATEGORIES,
-      services: (db.services || []).filter((s) => s.active).sort((a, b) => a.sortOrder - b.sortOrder)
+      categories,
+      categoryRecords,
+      services
+    });
+  };
+  app.get("/api/public/services", handlePublicServices);
+  app.get("/api/public/catalog", handlePublicServices);
+  app.get("/api/public/services/:slug", (req, res) => {
+    const rawSlug = String(req.params.slug || "").trim().toLowerCase();
+    const db = readDb();
+    const activeServices = (db.services || []).filter((s) => s.active);
+    const service = activeServices.find(
+      (s) => s.slug.toLowerCase() === rawSlug || s.id.toLowerCase() === rawSlug
+    );
+    if (!service) {
+      res.status(404).json({ error: "Standalone service not found.", code: "SERVICE_NOT_FOUND" });
+      return;
+    }
+    const categoryRecord = (db.serviceCategories || []).find(
+      (c) => c.name.toLowerCase() === service.category.toLowerCase()
+    ) || null;
+    const relatedServices = activeServices.filter((s) => s.category === service.category && s.id !== service.id).sort((a, b) => (a.menuOrder ?? a.sortOrder) - (b.menuOrder ?? b.sortOrder)).slice(0, 6);
+    res.json({
+      service,
+      categoryRecord,
+      relatedServices
     });
   });
   app.get("/api/public/availability", (req, res) => {
@@ -3202,7 +5243,14 @@ Note: ${quote.customerResponseNote || "None"}`
       return;
     }
     const bodySchema = z2.object({
-      sku: z2.enum(["advisory-session", "package-a-setup", "package-b-setup", "sales-training"]).optional(),
+      sku: z2.enum([
+        "advisory-session",
+        "growth-marketing-setup",
+        "lead-filtering-setup",
+        "sales-training",
+        "bulk-sms-starter",
+        "whatsapp-business-setup"
+      ]).optional(),
       invoiceId: z2.string().trim().max(80).optional(),
       quotationToken: z2.string().trim().max(120).optional(),
       customerName: z2.string().trim().max(120).optional().default(""),
@@ -3363,7 +5411,14 @@ Note: ${quote.customerResponseNote || "None"}`
       razorpay_order_id: z2.string().trim().min(4).max(100),
       razorpay_payment_id: z2.string().trim().min(4).max(100),
       razorpay_signature: z2.string().trim().regex(/^[a-f0-9]{64}$/i),
-      sku: z2.enum(["advisory-session", "package-a-setup", "package-b-setup", "sales-training"]).optional(),
+      sku: z2.enum([
+        "advisory-session",
+        "growth-marketing-setup",
+        "lead-filtering-setup",
+        "sales-training",
+        "bulk-sms-starter",
+        "whatsapp-business-setup"
+      ]).optional(),
       invoiceId: z2.string().trim().optional()
     });
     const parsed = schema.safeParse(req.body);
@@ -3972,14 +6027,273 @@ Stage: ${lead.stage}`
     }
   );
   app.get(
+    "/api/suite/service-categories",
+    requireAuth,
+    requirePermission("services"),
+    (_req, res) => {
+      const db = readDb();
+      const categoryRecords = (db.serviceCategories || []).slice().sort((a, b) => (a.menuOrder ?? a.sortOrder) - (b.menuOrder ?? b.sortOrder));
+      res.json({ categoryRecords });
+    }
+  );
+  app.post(
+    "/api/suite/service-categories",
+    requireAuth,
+    requirePermission("services"),
+    async (req, res) => {
+      const schema = z2.object({
+        name: z2.string().trim().min(2).max(80),
+        slug: z2.string().trim().max(100).optional(),
+        description: z2.string().trim().max(400).optional().default(""),
+        menuOrder: z2.number().finite().int().min(1).max(1e3).optional(),
+        active: z2.boolean().optional().default(true)
+      });
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid category data." });
+        return;
+      }
+      try {
+        const created = await withDbMutation((db) => {
+          if (!Array.isArray(db.serviceCategories)) db.serviceCategories = [];
+          const cleanName = stripControls(parsed.data.name);
+          const cleanSlug = slugifyServiceName(parsed.data.slug || cleanName);
+          const duplicate = db.serviceCategories.find(
+            (c) => c.name.trim().toLowerCase() === cleanName.toLowerCase() || c.slug.toLowerCase() === cleanSlug
+          );
+          if (duplicate) {
+            const err = new Error(`Category '${duplicate.name}' already exists.`);
+            err.statusCode = 409;
+            throw err;
+          }
+          const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+          const nextOrder = db.serviceCategories.length + 1;
+          const record = {
+            id: `cat-${crypto4.randomBytes(4).toString("hex")}`,
+            name: cleanName,
+            slug: cleanSlug,
+            description: stripControls(parsed.data.description),
+            sortOrder: nextOrder,
+            menuOrder: parsed.data.menuOrder ?? nextOrder,
+            active: parsed.data.active,
+            updatedAt: nowIso
+          };
+          db.serviceCategories.push(record);
+          appendAuditLog(db, {
+            actorId: req.suiteUser.id,
+            actorName: req.suiteUser.name,
+            actorRole: req.suiteUser.role,
+            action: "CREATE_SERVICE_CATEGORY",
+            targetId: record.id,
+            summary: `Added service category '${record.name}'.`
+          });
+          return record;
+        });
+        res.status(201).json({ category: created });
+      } catch (err) {
+        res.status(err?.statusCode || 400).json({ error: err?.message || "Category creation failed." });
+      }
+    }
+  );
+  app.put(
+    "/api/suite/service-categories/reorder",
+    requireAuth,
+    requirePermission("services"),
+    async (req, res) => {
+      const schema = z2.object({
+        categoryIds: z2.array(z2.string().trim().min(1)).min(1)
+      });
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ error: "Provide ordered categoryIds." });
+        return;
+      }
+      const ordered = await withDbMutation((db) => {
+        const orderMap = new Map(parsed.data.categoryIds.map((id, idx) => [id, idx + 1]));
+        const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+        for (const cat of db.serviceCategories || []) {
+          const pos = orderMap.get(cat.id);
+          if (pos !== void 0) {
+            cat.menuOrder = pos;
+            cat.sortOrder = pos;
+            cat.updatedAt = nowIso;
+          }
+        }
+        db.serviceCategories.sort((a, b) => (a.menuOrder ?? a.sortOrder) - (b.menuOrder ?? b.sortOrder));
+        appendAuditLog(db, {
+          actorId: req.suiteUser.id,
+          actorName: req.suiteUser.name,
+          actorRole: req.suiteUser.role,
+          action: "REORDER_SERVICE_CATEGORIES",
+          targetId: "CATEGORIES",
+          summary: `Updated menu order across ${db.serviceCategories.length} categories.`
+        });
+        return db.serviceCategories;
+      });
+      res.json({ categoryRecords: ordered });
+    }
+  );
+  app.patch(
+    "/api/suite/service-categories/:catId",
+    requireAuth,
+    requirePermission("services"),
+    async (req, res) => {
+      const catId = String(req.params.catId || "").trim();
+      try {
+        const updated = await withDbMutation((db) => {
+          const cat = (db.serviceCategories || []).find((c) => c.id === catId);
+          if (!cat) {
+            const err = new Error("Service category not found.");
+            err.statusCode = 404;
+            throw err;
+          }
+          const b = req.body || {};
+          const prevName = cat.name;
+          if (typeof b.name === "string" && b.name.trim()) {
+            const cleanName = stripControls(b.name);
+            const dup = db.serviceCategories.find(
+              (c) => c.id !== catId && c.name.trim().toLowerCase() === cleanName.toLowerCase()
+            );
+            if (dup) {
+              const err = new Error(`Category name '${cleanName}' already exists.`);
+              err.statusCode = 409;
+              throw err;
+            }
+            cat.name = cleanName;
+          }
+          if (typeof b.slug === "string" && b.slug.trim()) {
+            const cleanSlug = slugifyServiceName(b.slug);
+            const dupSlug = db.serviceCategories.find(
+              (c) => c.id !== catId && c.slug.toLowerCase() === cleanSlug
+            );
+            if (dupSlug) {
+              const err = new Error(`Category slug '${cleanSlug}' already exists.`);
+              err.statusCode = 409;
+              throw err;
+            }
+            cat.slug = cleanSlug;
+          }
+          if (typeof b.description === "string") cat.description = stripControls(b.description);
+          if (typeof b.menuOrder === "number" && Number.isFinite(b.menuOrder)) {
+            cat.menuOrder = Math.max(1, Math.floor(b.menuOrder));
+            cat.sortOrder = cat.menuOrder;
+          }
+          if (typeof b.active === "boolean") cat.active = b.active;
+          cat.updatedAt = (/* @__PURE__ */ new Date()).toISOString();
+          if (cat.name !== prevName) {
+            for (const srv of db.services) {
+              if (srv.category === prevName) {
+                srv.category = cat.name;
+              }
+            }
+          }
+          appendAuditLog(db, {
+            actorId: req.suiteUser.id,
+            actorName: req.suiteUser.name,
+            actorRole: req.suiteUser.role,
+            action: "UPDATE_SERVICE_CATEGORY",
+            targetId: cat.id,
+            summary: `Updated category '${cat.name}' (active=${cat.active}, order=${cat.menuOrder}).`
+          });
+          return cat;
+        });
+        res.json({ category: updated });
+      } catch (err) {
+        res.status(err?.statusCode || 400).json({ error: err?.message || "Category update failed." });
+      }
+    }
+  );
+  app.delete(
+    "/api/suite/service-categories/:catId",
+    requireAuth,
+    requirePermission("services"),
+    async (req, res) => {
+      const catId = String(req.params.catId || "").trim();
+      try {
+        await withDbMutation((db) => {
+          const cat = (db.serviceCategories || []).find((c) => c.id === catId);
+          if (!cat) {
+            const err = new Error("Category not found.");
+            err.statusCode = 404;
+            throw err;
+          }
+          const linkedCount = db.services.filter((s) => s.category === cat.name).length;
+          if (linkedCount > 0) {
+            const err = new Error(
+              `Cannot delete '${cat.name}' while ${linkedCount} service(s) belong to it. Reassign services first.`
+            );
+            err.statusCode = 409;
+            throw err;
+          }
+          db.serviceCategories = db.serviceCategories.filter((c) => c.id !== catId);
+          appendAuditLog(db, {
+            actorId: req.suiteUser.id,
+            actorName: req.suiteUser.name,
+            actorRole: req.suiteUser.role,
+            action: "DELETE_SERVICE_CATEGORY",
+            targetId: catId,
+            summary: `Removed category '${cat.name}'.`
+          });
+        });
+        res.json({ ok: true });
+      } catch (err) {
+        res.status(err?.statusCode || 400).json({ error: err?.message || "Delete failed." });
+      }
+    }
+  );
+  app.get(
     "/api/suite/services",
     requireAuth,
     requirePermission("services"),
     (_req, res) => {
       const db = readDb();
+      const categoryRecords = (db.serviceCategories || []).slice().sort((a, b) => (a.menuOrder ?? a.sortOrder) - (b.menuOrder ?? b.sortOrder));
+      const categories = categoryRecords.length > 0 ? categoryRecords.map((c) => c.name) : [...SERVICE_CATEGORIES];
       res.json({
-        categories: SERVICE_CATEGORIES,
-        services: (db.services || []).sort((a, b) => a.sortOrder - b.sortOrder)
+        categories,
+        categoryRecords,
+        services: (db.services || []).slice().sort((a, b) => (a.menuOrder ?? a.sortOrder) - (b.menuOrder ?? b.sortOrder))
+      });
+    }
+  );
+  app.get(
+    "/api/suite/services/price-history",
+    requireAuth,
+    requirePermission("services"),
+    (_req, res) => {
+      const db = readDb();
+      const sortedServices = (db.services || []).slice().sort((a, b) => a.sortOrder - b.sortOrder);
+      const revisions = [];
+      for (const srv of sortedServices) {
+        const currentPrice = srv.oneTimePrice ?? srv.setupFee ?? srv.monthlyPrice ?? srv.recurringFee ?? srv.packagePrice ?? 0;
+        const history = Array.isArray(srv.priceHistory) ? srv.priceHistory : [];
+        history.forEach((h, index) => {
+          revisions.push({
+            id: `${srv.id}-rev-${index}`,
+            serviceId: srv.id,
+            serviceName: srv.name,
+            category: srv.category,
+            currentPrice,
+            previousPrice: Number(h.previousPrice) || 0,
+            newPrice: Number(h.newPrice) || 0,
+            effectiveDate: h.changedAt,
+            changedBy: h.changedBy || "Admin",
+            changedByEmail: h.changedByEmail || "",
+            priceField: h.priceField || "Service Rate",
+            note: h.note || ""
+          });
+        });
+      }
+      revisions.sort((a, b) => Date.parse(b.effectiveDate || "") - Date.parse(a.effectiveDate || ""));
+      res.json({
+        revisions,
+        totalRevisions: revisions.length,
+        services: sortedServices.map((s) => ({
+          id: s.id,
+          name: s.name,
+          category: s.category,
+          revisionCount: s.priceHistory?.length || 0
+        }))
       });
     }
   );
@@ -3988,46 +6302,222 @@ Stage: ${lead.stage}`
     requireAuth,
     requirePermission("services"),
     async (req, res) => {
+      const tierSchema = z2.object({
+        setupFee: z2.number().finite().min(0).optional(),
+        packagePrice: z2.number().finite().min(0).optional(),
+        unitRate: z2.number().finite().min(0).optional(),
+        additionalUnitRate: z2.number().finite().min(0).optional()
+      }).optional();
       const schema = z2.object({
         name: z2.string().trim().min(2).max(140),
-        category: z2.enum(SERVICE_CATEGORIES),
+        slug: z2.string().trim().max(140).optional(),
+        category: z2.string().trim().min(2).max(80),
         description: z2.string().trim().max(800).default(""),
+        benefits: z2.array(z2.string().trim().max(220)).optional().default([]),
         deliverables: z2.array(z2.string().trim().max(200)).default([]),
+        workProcess: z2.array(z2.string().trim().max(220)).optional().default([]),
         pricingModel: z2.enum(["fixed", "custom"]).default("fixed"),
         setupFee: z2.number().finite().min(0).default(0),
         recurringFee: z2.number().finite().min(0).default(0),
+        oneTimePrice: z2.number().finite().min(0).optional(),
+        monthlyPrice: z2.number().finite().min(0).optional(),
+        revisionLimit: z2.union([z2.string().trim().max(120), z2.number()]).optional(),
+        additionalDeliverableCharge: z2.number().finite().min(0).optional(),
+        subscriptionDuration: z2.string().trim().max(120).optional(),
+        renewalTerms: z2.string().trim().max(160).optional(),
+        cancellationPolicy: z2.string().trim().max(160).optional(),
+        transactionalSmsEnabled: z2.boolean().optional(),
         billingCycle: z2.enum(["one-time", "monthly", "quarterly", "custom"]).default("monthly"),
         gstEnabled: z2.boolean().default(true),
         gstRate: z2.number().finite().min(0).max(100).default(18),
         deliveryPeriod: z2.string().trim().max(120).default("7 business days"),
-        active: z2.boolean().default(true)
+        active: z2.boolean().default(true),
+        menuOrder: z2.number().finite().int().min(1).max(2e3).optional(),
+        showInMenu: z2.boolean().optional().default(true),
+        packagePrice: z2.number().finite().min(0).optional(),
+        includedUnits: z2.number().finite().min(0).optional(),
+        unitLabel: z2.string().trim().max(40).optional(),
+        unitRate: z2.number().finite().min(0).optional(),
+        additionalUnitRate: z2.number().finite().min(0).optional(),
+        internationalPricing: z2.object({
+          aed: tierSchema,
+          usd: tierSchema,
+          notes: z2.string().trim().max(300).optional()
+        }).optional(),
+        disclaimer: z2.string().trim().max(600).optional(),
+        integrationConfigured: z2.boolean().optional()
       });
       const parsed = schema.safeParse(req.body);
       if (!parsed.success) {
         res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid service item." });
         return;
       }
-      const item = await withDbMutation((db) => {
-        const nowIso = (/* @__PURE__ */ new Date()).toISOString();
-        const srv = {
-          id: `srv-${crypto4.randomBytes(4).toString("hex")}`,
-          ...parsed.data,
-          addons: [],
-          sortOrder: db.services.length + 1,
-          updatedAt: nowIso
-        };
-        db.services.push(srv);
-        appendAuditLog(db, {
-          actorId: req.suiteUser.id,
-          actorName: req.suiteUser.name,
-          actorRole: req.suiteUser.role,
-          action: "CREATE_SERVICE_ITEM",
-          targetId: srv.id,
-          summary: `Added service '${srv.name}' under ${srv.category}.`
+      try {
+        const result = await withDbMutation(async (db) => {
+          const validCats = /* @__PURE__ */ new Set([
+            ...SERVICE_CATEGORIES,
+            ...(db.serviceCategories || []).map((c) => c.name)
+          ]);
+          const cleanCategory = stripControls(parsed.data.category);
+          if (!validCats.has(cleanCategory)) {
+            const err = new Error(`Category '${cleanCategory}' is not configured in Service Categories.`);
+            err.statusCode = 400;
+            throw err;
+          }
+          const cleanName = stripControls(parsed.data.name);
+          const cleanSlug = slugifyServiceName(parsed.data.slug || cleanName);
+          const duplicate = db.services.find(
+            (s) => s.name.trim().toLowerCase() === cleanName.toLowerCase() || (s.slug || slugifyServiceName(s.name)).toLowerCase() === cleanSlug
+          );
+          if (duplicate) {
+            const err = new Error(
+              `Duplicate service prevented: '${duplicate.name}' (/${duplicate.slug}) already exists in the standalone catalogue.`
+            );
+            err.statusCode = 409;
+            throw err;
+          }
+          const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+          const basePrice = parsed.data.oneTimePrice ?? parsed.data.setupFee ?? parsed.data.recurringFee ?? parsed.data.packagePrice ?? 0;
+          const srv = {
+            id: `srv-${crypto4.randomBytes(4).toString("hex")}`,
+            ...parsed.data,
+            name: cleanName,
+            slug: cleanSlug,
+            category: cleanCategory,
+            benefits: parsed.data.benefits.map(stripControls).filter(Boolean),
+            deliverables: parsed.data.deliverables.map(stripControls).filter(Boolean),
+            workProcess: parsed.data.workProcess.map(stripControls).filter(Boolean),
+            oneTimePrice: parsed.data.oneTimePrice ?? parsed.data.setupFee,
+            monthlyPrice: parsed.data.monthlyPrice ?? parsed.data.recurringFee,
+            addons: [],
+            sortOrder: db.services.length + 1,
+            menuOrder: parsed.data.menuOrder ?? db.services.length + 1,
+            showInMenu: parsed.data.showInMenu ?? true,
+            updatedAt: nowIso,
+            priceHistory: [
+              {
+                previousPrice: 0,
+                newPrice: basePrice,
+                changedAt: nowIso,
+                changedBy: req.suiteUser.name,
+                changedByEmail: req.suiteUser.email,
+                priceField: "Initial Base Rate",
+                note: "Initial service creation"
+              }
+            ]
+          };
+          db.services.push(srv);
+          appendAuditLog(db, {
+            actorId: req.suiteUser.id,
+            actorName: req.suiteUser.name,
+            actorRole: req.suiteUser.role,
+            action: "CREATE_SERVICE_ITEM",
+            targetId: srv.id,
+            summary: `Added standalone service '${srv.name}' (/${srv.slug}) under ${srv.category}.`
+          });
+          const oneTimeVal = srv.oneTimePrice ?? srv.setupFee ?? 0;
+          const monthlyVal = srv.monthlyPrice ?? srv.recurringFee ?? srv.packagePrice ?? 0;
+          const alertEntry = await dispatchNotification(db, {
+            event: "service_added",
+            subject: `[AKYIN Admin Alert] New Service Added: ${srv.name}`,
+            body: [
+              "AKYIN Service Catalogue Alert \u2014 New Service Added",
+              "",
+              `Service Name: ${srv.name} (${srv.id})`,
+              `Slug: /services/${srv.slug}`,
+              `Category: ${srv.category}`,
+              `Pricing Model: ${srv.pricingModel} | Billing Cycle: ${srv.billingCycle}`,
+              `One-Time / Setup Fee: INR ${oneTimeVal.toLocaleString("en-IN")}`,
+              `Monthly / Package Price: INR ${monthlyVal.toLocaleString("en-IN")}`,
+              srv.unitRate ? `Usage Rate: INR ${srv.unitRate.toFixed(2)}/${srv.unitLabel || "unit"}` : "Usage Rate: N/A",
+              `GST: ${srv.gstEnabled ? `${srv.gstRate}%` : "Exempt"}`,
+              `Status: ${srv.active ? "Active" : "Disabled"}`,
+              "",
+              `Authorizing Admin: ${req.suiteUser.name} (${req.suiteUser.role})`,
+              `Authorizing Admin Email: ${req.suiteUser.email}`,
+              `Timestamp: ${nowIso}`
+            ].join("\n")
+          });
+          return { service: srv, notification: alertEntry };
         });
-        return srv;
-      });
-      res.status(201).json({ service: item });
+        res.status(201).json(result);
+      } catch (err) {
+        res.status(err?.statusCode || 400).json({ error: err?.message || "Service creation failed." });
+      }
+    }
+  );
+  app.post(
+    "/api/suite/services/:serviceId/duplicate",
+    requireAuth,
+    requirePermission("services"),
+    async (req, res) => {
+      const serviceId = String(req.params.serviceId || "");
+      try {
+        const result = await withDbMutation(async (db) => {
+          const original = db.services.find((s) => s.id === serviceId);
+          if (!original) {
+            const err = new Error("Service item not found.");
+            err.statusCode = 404;
+            throw err;
+          }
+          const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+          const copyId = `srv-${crypto4.randomBytes(4).toString("hex")}`;
+          const copySuffix = copyId.replace(/^srv-/, "").slice(0, 4);
+          const currentPrice = original.oneTimePrice ?? original.setupFee ?? original.recurringFee ?? original.packagePrice ?? 0;
+          const duplicated = {
+            ...JSON.parse(JSON.stringify(original)),
+            id: copyId,
+            name: `${original.name} (Draft ${copySuffix})`,
+            slug: `${original.slug || slugifyServiceName(original.name)}-draft-${copySuffix}`,
+            active: false,
+            showInMenu: false,
+            sortOrder: db.services.length + 1,
+            menuOrder: db.services.length + 1,
+            updatedAt: nowIso,
+            priceHistory: [
+              {
+                previousPrice: 0,
+                newPrice: currentPrice,
+                changedAt: nowIso,
+                changedBy: req.suiteUser.name,
+                changedByEmail: req.suiteUser.email,
+                priceField: "Duplicated Base Rate",
+                note: `Duplicated from '${original.name}' (${original.id})`
+              }
+            ]
+          };
+          db.services.push(duplicated);
+          appendAuditLog(db, {
+            actorId: req.suiteUser.id,
+            actorName: req.suiteUser.name,
+            actorRole: req.suiteUser.role,
+            action: "DUPLICATE_SERVICE_ITEM",
+            targetId: copyId,
+            summary: `Duplicated service '${original.name}' as '${duplicated.name}'.`
+          });
+          const alertEntry = await dispatchNotification(db, {
+            event: "service_added",
+            subject: `[AKYIN Admin Alert] New Service Duplicated: ${duplicated.name}`,
+            body: [
+              "AKYIN Service Catalogue Alert \u2014 Service Duplicated & Added",
+              "",
+              `New Service Name: ${duplicated.name} (${duplicated.id})`,
+              `Duplicated From: ${original.name} (${original.id})`,
+              `Category: ${duplicated.category}`,
+              `One-Time / Setup Fee: INR ${(duplicated.oneTimePrice ?? duplicated.setupFee ?? 0).toLocaleString("en-IN")}`,
+              `Monthly / Package Price: INR ${(duplicated.monthlyPrice ?? duplicated.recurringFee ?? duplicated.packagePrice ?? 0).toLocaleString("en-IN")}`,
+              "",
+              `Authorizing Admin: ${req.suiteUser.name} (${req.suiteUser.role})`,
+              `Authorizing Admin Email: ${req.suiteUser.email}`,
+              `Timestamp: ${nowIso}`
+            ].join("\n")
+          });
+          return { service: duplicated, notification: alertEntry };
+        });
+        res.status(201).json(result);
+      } catch (err) {
+        res.status(err?.statusCode || 400).json({ error: err?.message || "Duplication failed." });
+      }
     }
   );
   app.patch(
@@ -4037,7 +6527,7 @@ Stage: ${lead.stage}`
     async (req, res) => {
       const serviceId = String(req.params.serviceId || "");
       try {
-        const updated = await withDbMutation((db) => {
+        const result = await withDbMutation(async (db) => {
           const srv = db.services.find((s) => s.id === serviceId);
           if (!srv) {
             const err = new Error("Service item not found.");
@@ -4045,13 +6535,69 @@ Stage: ${lead.stage}`
             throw err;
           }
           const b = req.body || {};
-          if (typeof b.name === "string" && b.name.trim()) srv.name = stripControls(b.name);
-          if (typeof b.category === "string" && SERVICE_CATEGORIES.includes(b.category)) {
-            srv.category = b.category;
+          const oldPrimaryPrice = srv.oneTimePrice ?? srv.setupFee ?? srv.recurringFee ?? srv.packagePrice ?? 0;
+          const beforePrices = {
+            oneTime: srv.oneTimePrice ?? srv.setupFee ?? 0,
+            monthly: srv.monthlyPrice ?? srv.recurringFee ?? srv.packagePrice ?? 0,
+            packagePrice: srv.packagePrice ?? 0,
+            includedUnits: srv.includedUnits ?? 0,
+            unitRate: srv.unitRate ?? 0,
+            additionalUnitRate: srv.additionalUnitRate ?? 0,
+            additionalDeliverableCharge: srv.additionalDeliverableCharge ?? 0,
+            gstEnabled: Boolean(srv.gstEnabled),
+            gstRate: srv.gstRate ?? 18,
+            aed: JSON.stringify(srv.internationalPricing?.aed || {}),
+            usd: JSON.stringify(srv.internationalPricing?.usd || {})
+          };
+          if (typeof b.name === "string" && b.name.trim()) {
+            const cleanName = stripControls(b.name);
+            const dupName = db.services.find(
+              (s) => s.id !== serviceId && s.name.trim().toLowerCase() === cleanName.toLowerCase()
+            );
+            if (dupName) {
+              const err = new Error(`Service name '${cleanName}' is already assigned to another service.`);
+              err.statusCode = 409;
+              throw err;
+            }
+            srv.name = cleanName;
+          }
+          if (typeof b.slug === "string" && b.slug.trim()) {
+            const cleanSlug = slugifyServiceName(b.slug);
+            const dupSlug = db.services.find(
+              (s) => s.id !== serviceId && (s.slug || "").toLowerCase() === cleanSlug
+            );
+            if (dupSlug) {
+              const err = new Error(`Service URL slug '${cleanSlug}' is already in use.`);
+              err.statusCode = 409;
+              throw err;
+            }
+            srv.slug = cleanSlug;
+          }
+          if (typeof b.category === "string" && b.category.trim()) {
+            const validCats = /* @__PURE__ */ new Set([
+              ...SERVICE_CATEGORIES,
+              ...(db.serviceCategories || []).map((c) => c.name)
+            ]);
+            const cleanCat = stripControls(b.category);
+            if (validCats.has(cleanCat)) {
+              srv.category = cleanCat;
+            }
           }
           if (typeof b.description === "string") srv.description = stripControls(b.description);
+          if (Array.isArray(b.benefits)) {
+            srv.benefits = b.benefits.map((d) => stripControls(String(d))).filter(Boolean);
+          }
           if (Array.isArray(b.deliverables)) {
             srv.deliverables = b.deliverables.map((d) => stripControls(String(d))).filter(Boolean);
+          }
+          if (Array.isArray(b.workProcess)) {
+            srv.workProcess = b.workProcess.map((d) => stripControls(String(d))).filter(Boolean);
+          }
+          if (typeof b.menuOrder === "number" && Number.isFinite(b.menuOrder)) {
+            srv.menuOrder = Math.max(1, Math.floor(b.menuOrder));
+          }
+          if (typeof b.showInMenu === "boolean") {
+            srv.showInMenu = b.showInMenu;
           }
           if (b.pricingModel === "fixed" || b.pricingModel === "custom") {
             srv.pricingModel = b.pricingModel;
@@ -4062,26 +6608,309 @@ Stage: ${lead.stage}`
           if (typeof b.recurringFee === "number" && Number.isFinite(b.recurringFee)) {
             srv.recurringFee = round2(Math.max(0, b.recurringFee));
           }
+          if (typeof b.oneTimePrice === "number" && Number.isFinite(b.oneTimePrice)) {
+            srv.oneTimePrice = round2(Math.max(0, b.oneTimePrice));
+            if (b.setupFee === void 0 && srv.setupFee !== void 0) {
+              srv.setupFee = srv.oneTimePrice;
+            }
+          }
+          if (typeof b.monthlyPrice === "number" && Number.isFinite(b.monthlyPrice)) {
+            srv.monthlyPrice = round2(Math.max(0, b.monthlyPrice));
+            if (b.recurringFee === void 0 && srv.recurringFee !== void 0) {
+              srv.recurringFee = srv.monthlyPrice;
+            }
+          }
+          if (b.revisionLimit !== void 0) {
+            srv.revisionLimit = typeof b.revisionLimit === "number" ? b.revisionLimit : stripControls(String(b.revisionLimit));
+          }
+          if (typeof b.additionalDeliverableCharge === "number" && Number.isFinite(b.additionalDeliverableCharge)) {
+            srv.additionalDeliverableCharge = round2(Math.max(0, b.additionalDeliverableCharge));
+          }
+          if (typeof b.subscriptionDuration === "string") {
+            srv.subscriptionDuration = stripControls(b.subscriptionDuration);
+          }
+          if (typeof b.renewalTerms === "string") {
+            srv.renewalTerms = stripControls(b.renewalTerms);
+          }
+          if (typeof b.cancellationPolicy === "string") {
+            srv.cancellationPolicy = stripControls(b.cancellationPolicy);
+          }
+          if (typeof b.transactionalSmsEnabled === "boolean") {
+            srv.transactionalSmsEnabled = b.transactionalSmsEnabled;
+          }
+          if (b.billingCycle === "one-time" || b.billingCycle === "monthly" || b.billingCycle === "quarterly" || b.billingCycle === "custom") {
+            srv.billingCycle = b.billingCycle;
+          }
+          if (typeof b.packagePrice === "number" && Number.isFinite(b.packagePrice)) {
+            srv.packagePrice = round2(Math.max(0, b.packagePrice));
+            if (b.recurringFee === void 0) {
+              srv.recurringFee = srv.packagePrice;
+            }
+          }
+          if (typeof b.includedUnits === "number" && Number.isFinite(b.includedUnits)) {
+            srv.includedUnits = Math.max(0, Math.floor(b.includedUnits));
+          }
+          if (typeof b.unitLabel === "string") {
+            srv.unitLabel = stripControls(b.unitLabel);
+          }
+          if (typeof b.unitRate === "number" && Number.isFinite(b.unitRate)) {
+            srv.unitRate = round2(Math.max(0, b.unitRate));
+          }
+          if (typeof b.additionalUnitRate === "number" && Number.isFinite(b.additionalUnitRate)) {
+            srv.additionalUnitRate = round2(Math.max(0, b.additionalUnitRate));
+          }
+          if (b.internationalPricing && typeof b.internationalPricing === "object") {
+            const nextIntl = {
+              ...srv.internationalPricing || {}
+            };
+            for (const curKey of ["aed", "usd"]) {
+              const tier = b.internationalPricing[curKey];
+              if (tier && typeof tier === "object") {
+                nextIntl[curKey] = {
+                  ...nextIntl[curKey] || {},
+                  ...typeof tier.setupFee === "number" && Number.isFinite(tier.setupFee) ? { setupFee: round2(Math.max(0, tier.setupFee)) } : {},
+                  ...typeof tier.packagePrice === "number" && Number.isFinite(tier.packagePrice) ? { packagePrice: round2(Math.max(0, tier.packagePrice)) } : {},
+                  ...typeof tier.unitRate === "number" && Number.isFinite(tier.unitRate) ? { unitRate: round2(Math.max(0, tier.unitRate)) } : {},
+                  ...typeof tier.additionalUnitRate === "number" && Number.isFinite(tier.additionalUnitRate) ? { additionalUnitRate: round2(Math.max(0, tier.additionalUnitRate)) } : {}
+                };
+              }
+            }
+            if (typeof b.internationalPricing.notes === "string") {
+              nextIntl.notes = stripControls(b.internationalPricing.notes);
+            }
+            srv.internationalPricing = nextIntl;
+          }
+          if (typeof b.disclaimer === "string") {
+            srv.disclaimer = stripControls(b.disclaimer);
+          }
+          if (typeof b.integrationConfigured === "boolean") {
+            srv.integrationConfigured = b.integrationConfigured;
+          }
           if (typeof b.gstEnabled === "boolean") srv.gstEnabled = b.gstEnabled;
           if (typeof b.gstRate === "number" && Number.isFinite(b.gstRate)) {
             srv.gstRate = Math.min(100, Math.max(0, b.gstRate));
           }
           if (typeof b.deliveryPeriod === "string") srv.deliveryPeriod = stripControls(b.deliveryPeriod);
           if (typeof b.active === "boolean") srv.active = b.active;
-          srv.updatedAt = (/* @__PURE__ */ new Date()).toISOString();
+          const afterPrices = {
+            oneTime: srv.oneTimePrice ?? srv.setupFee ?? 0,
+            monthly: srv.monthlyPrice ?? srv.recurringFee ?? srv.packagePrice ?? 0,
+            packagePrice: srv.packagePrice ?? 0,
+            includedUnits: srv.includedUnits ?? 0,
+            unitRate: srv.unitRate ?? 0,
+            additionalUnitRate: srv.additionalUnitRate ?? 0,
+            additionalDeliverableCharge: srv.additionalDeliverableCharge ?? 0,
+            gstEnabled: Boolean(srv.gstEnabled),
+            gstRate: srv.gstRate ?? 18,
+            aed: JSON.stringify(srv.internationalPricing?.aed || {}),
+            usd: JSON.stringify(srv.internationalPricing?.usd || {})
+          };
+          const priceChanges = [];
+          if (beforePrices.oneTime !== afterPrices.oneTime) {
+            priceChanges.push(
+              `One-Time / Setup Price: INR ${beforePrices.oneTime.toLocaleString("en-IN")} -> INR ${afterPrices.oneTime.toLocaleString("en-IN")}`
+            );
+          }
+          if (beforePrices.monthly !== afterPrices.monthly) {
+            priceChanges.push(
+              `Monthly / Package Price: INR ${beforePrices.monthly.toLocaleString("en-IN")} -> INR ${afterPrices.monthly.toLocaleString("en-IN")}`
+            );
+          }
+          if (beforePrices.packagePrice !== afterPrices.packagePrice && beforePrices.monthly === afterPrices.monthly) {
+            priceChanges.push(
+              `Package Price: INR ${beforePrices.packagePrice.toLocaleString("en-IN")} -> INR ${afterPrices.packagePrice.toLocaleString("en-IN")}`
+            );
+          }
+          if (beforePrices.includedUnits !== afterPrices.includedUnits) {
+            priceChanges.push(
+              `Included Units (${srv.unitLabel || "units"}): ${beforePrices.includedUnits.toLocaleString("en-IN")} -> ${afterPrices.includedUnits.toLocaleString("en-IN")}`
+            );
+          }
+          if (beforePrices.unitRate !== afterPrices.unitRate) {
+            priceChanges.push(
+              `Per-Unit Usage Rate: INR ${beforePrices.unitRate.toFixed(2)} -> INR ${afterPrices.unitRate.toFixed(2)}`
+            );
+          }
+          if (beforePrices.additionalUnitRate !== afterPrices.additionalUnitRate) {
+            priceChanges.push(
+              `Additional Unit Rate: INR ${beforePrices.additionalUnitRate.toFixed(2)} -> INR ${afterPrices.additionalUnitRate.toFixed(2)}`
+            );
+          }
+          if (beforePrices.additionalDeliverableCharge !== afterPrices.additionalDeliverableCharge) {
+            priceChanges.push(
+              `Additional Deliverable Charge: INR ${beforePrices.additionalDeliverableCharge.toLocaleString("en-IN")} -> INR ${afterPrices.additionalDeliverableCharge.toLocaleString("en-IN")}`
+            );
+          }
+          if (beforePrices.gstEnabled !== afterPrices.gstEnabled || beforePrices.gstRate !== afterPrices.gstRate) {
+            priceChanges.push(
+              `GST Configuration: ${beforePrices.gstEnabled ? `${beforePrices.gstRate}%` : "Exempt"} -> ${afterPrices.gstEnabled ? `${afterPrices.gstRate}%` : "Exempt"}`
+            );
+          }
+          if (beforePrices.aed !== afterPrices.aed) {
+            priceChanges.push("AED International Tier Pricing updated");
+          }
+          if (beforePrices.usd !== afterPrices.usd) {
+            priceChanges.push("USD International Tier Pricing updated");
+          }
+          const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+          const newPrimaryPrice = srv.oneTimePrice ?? srv.setupFee ?? srv.recurringFee ?? srv.packagePrice ?? 0;
+          const auditNote = typeof b.priceChangeNote === "string" && b.priceChangeNote.trim() ? stripControls(b.priceChangeNote) : priceChanges.length > 0 ? priceChanges.join("; ") : "Service price updated via admin catalogue";
+          if (oldPrimaryPrice !== newPrimaryPrice || priceChanges.length > 0) {
+            if (!srv.priceHistory) srv.priceHistory = [];
+            const prevHistPrice = oldPrimaryPrice !== newPrimaryPrice ? oldPrimaryPrice : beforePrices.monthly !== afterPrices.monthly ? beforePrices.monthly : beforePrices.unitRate !== afterPrices.unitRate ? beforePrices.unitRate : oldPrimaryPrice;
+            const nextHistPrice = oldPrimaryPrice !== newPrimaryPrice ? newPrimaryPrice : beforePrices.monthly !== afterPrices.monthly ? afterPrices.monthly : beforePrices.unitRate !== afterPrices.unitRate ? afterPrices.unitRate : newPrimaryPrice;
+            srv.priceHistory.push({
+              previousPrice: prevHistPrice,
+              newPrice: nextHistPrice,
+              changedAt: nowIso,
+              changedBy: req.suiteUser.name,
+              changedByEmail: req.suiteUser.email,
+              priceField: oldPrimaryPrice !== newPrimaryPrice ? "One-Time / Setup Price" : beforePrices.monthly !== afterPrices.monthly ? "Monthly Subscription Price" : beforePrices.unitRate !== afterPrices.unitRate ? "Per-Unit Rate" : "Service Pricing",
+              note: auditNote
+            });
+          }
+          srv.updatedAt = nowIso;
           appendAuditLog(db, {
             actorId: req.suiteUser.id,
             actorName: req.suiteUser.name,
             actorRole: req.suiteUser.role,
             action: "UPDATE_SERVICE_ITEM",
             targetId: srv.id,
-            summary: `Updated '${srv.name}' (active=${srv.active}).`
+            summary: priceChanges.length > 0 ? `Updated '${srv.name}' pricing: ${priceChanges.join("; ")}.` : `Updated '${srv.name}' (active=${srv.active}).`
           });
-          return srv;
+          let alertEntry;
+          if (priceChanges.length > 0) {
+            alertEntry = await dispatchNotification(db, {
+              event: "service_price_updated",
+              subject: `[AKYIN Admin Alert] Service Price Updated: ${srv.name}`,
+              body: [
+                "AKYIN Service Catalogue Alert \u2014 Manual Price Update",
+                "",
+                `Service Name: ${srv.name} (${srv.id})`,
+                `Category: ${srv.category}`,
+                "",
+                "Summary of Changes:",
+                ...priceChanges.map((line) => `- ${line}`),
+                "",
+                `Audit Note: ${auditNote}`,
+                `Authorizing Admin: ${req.suiteUser.name} (${req.suiteUser.role})`,
+                `Authorizing Admin Email: ${req.suiteUser.email}`,
+                `Timestamp: ${nowIso}`
+              ].join("\n")
+            });
+          }
+          return { service: srv, notification: alertEntry };
         });
-        res.json({ service: updated });
+        res.json(result);
       } catch (err) {
         res.status(err?.statusCode || 400).json({ error: err?.message || "Service update failed." });
+      }
+    }
+  );
+  app.post(
+    "/api/suite/services/bulk-update",
+    requireAuth,
+    requirePermission("services"),
+    async (req, res) => {
+      const schema = z2.object({
+        serviceIds: z2.array(z2.string().trim().min(1).max(80)).min(1).max(200),
+        action: z2.enum(["activate", "archive", "adjust_gst"]),
+        gstEnabled: z2.boolean().optional(),
+        gstRate: z2.number().finite().min(0).max(100).optional(),
+        note: z2.string().trim().max(300).optional()
+      });
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid bulk service update payload." });
+        return;
+      }
+      if (parsed.data.action === "adjust_gst" && parsed.data.gstRate === void 0 && parsed.data.gstEnabled === void 0) {
+        res.status(400).json({ error: "Specify gstEnabled or gstRate when adjusting GST rates." });
+        return;
+      }
+      try {
+        const result = await withDbMutation(async (db) => {
+          const targetSet = new Set(parsed.data.serviceIds);
+          const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+          const updatedServices = [];
+          const gstChangeSummaries = [];
+          for (const srv of db.services) {
+            if (!targetSet.has(srv.id)) continue;
+            if (parsed.data.action === "activate") {
+              srv.active = true;
+              srv.updatedAt = nowIso;
+              updatedServices.push(srv);
+            } else if (parsed.data.action === "archive") {
+              srv.active = false;
+              srv.updatedAt = nowIso;
+              updatedServices.push(srv);
+            } else if (parsed.data.action === "adjust_gst") {
+              const prevGstEnabled = srv.gstEnabled;
+              const prevGstRate = srv.gstRate;
+              const nextGstRate = parsed.data.gstRate !== void 0 ? round2(parsed.data.gstRate) : srv.gstRate;
+              const nextGstEnabled = parsed.data.gstEnabled !== void 0 ? parsed.data.gstEnabled : nextGstRate > 0;
+              srv.gstEnabled = nextGstEnabled;
+              srv.gstRate = nextGstEnabled ? nextGstRate : 0;
+              srv.updatedAt = nowIso;
+              if (prevGstEnabled !== srv.gstEnabled || prevGstRate !== srv.gstRate) {
+                if (!srv.priceHistory) srv.priceHistory = [];
+                const beforeLabel = prevGstEnabled ? `${prevGstRate}%` : "Exempt";
+                const afterLabel = srv.gstEnabled ? `${srv.gstRate}%` : "Exempt";
+                const noteText = parsed.data.note ? stripControls(parsed.data.note) : `Bulk GST adjustment: ${beforeLabel} -> ${afterLabel}`;
+                srv.priceHistory.push({
+                  previousPrice: prevGstEnabled ? prevGstRate : 0,
+                  newPrice: srv.gstEnabled ? srv.gstRate : 0,
+                  changedAt: nowIso,
+                  changedBy: req.suiteUser.name,
+                  changedByEmail: req.suiteUser.email,
+                  priceField: "GST Rate (%)",
+                  note: noteText
+                });
+                gstChangeSummaries.push(`${srv.name} (${beforeLabel} -> ${afterLabel})`);
+              }
+              updatedServices.push(srv);
+            }
+          }
+          if (updatedServices.length === 0) {
+            const err = new Error("No matching services found for bulk update.");
+            err.statusCode = 404;
+            throw err;
+          }
+          const actionSummary = parsed.data.action === "activate" ? `Bulk activated ${updatedServices.length} service(s).` : parsed.data.action === "archive" ? `Bulk archived ${updatedServices.length} service(s).` : `Bulk adjusted GST on ${updatedServices.length} service(s): ${gstChangeSummaries.join(", ") || "rate confirmed"}.`;
+          appendAuditLog(db, {
+            actorId: req.suiteUser.id,
+            actorName: req.suiteUser.name,
+            actorRole: req.suiteUser.role,
+            action: "BULK_UPDATE_SERVICES",
+            targetId: `${updatedServices.length}_SERVICES`,
+            summary: actionSummary
+          });
+          let alertEntry;
+          if (parsed.data.action === "adjust_gst" && gstChangeSummaries.length > 0) {
+            alertEntry = await dispatchNotification(db, {
+              event: "service_price_updated",
+              subject: `[AKYIN Admin Alert] Bulk GST Update Applied to ${gstChangeSummaries.length} Service(s)`,
+              body: [
+                "AKYIN Service Catalogue Alert \u2014 Bulk GST Adjustment",
+                "",
+                `Updated Services (${gstChangeSummaries.length}):`,
+                ...gstChangeSummaries.map((line) => `- ${line}`),
+                "",
+                `Authorizing Admin: ${req.suiteUser.name} (${req.suiteUser.role})`,
+                `Authorizing Admin Email: ${req.suiteUser.email}`,
+                `Timestamp: ${nowIso}`
+              ].join("\n")
+            });
+          }
+          return {
+            updatedCount: updatedServices.length,
+            services: updatedServices,
+            notification: alertEntry
+          };
+        });
+        res.json(result);
+      } catch (err) {
+        res.status(err?.statusCode || 400).json({ error: err?.message || "Bulk service update failed." });
       }
     }
   );
@@ -4296,10 +7125,10 @@ Public Portal Link: https://akyin.com/quote?token=${shareToken}`
       const paymentTypeSchema = z2.object({
         paymentType: z2.enum(["advance", "full", "balance"]).default("full"),
         dueDate: z2.string().trim().max(20).optional().default(""),
-        serviceCategory: z2.string().trim().max(100).optional().default("Digital marketing")
+        serviceCategory: z2.string().trim().max(100).optional()
       });
       const parsed = paymentTypeSchema.safeParse(req.body || {});
-      const opts = parsed.success ? parsed.data : { paymentType: "full", dueDate: "", serviceCategory: "Digital marketing" };
+      const opts = parsed.success ? parsed.data : { paymentType: "full", dueDate: "", serviceCategory: void 0 };
       try {
         const result = await withDbMutation((db) => {
           const qt = db.quotations.find((q) => q.id === id);
@@ -4317,6 +7146,22 @@ Public Portal Link: https://akyin.com/quote?token=${shareToken}`
           const seq = String(db.invoices.length + 1).padStart(4, "0");
           const invoiceNumber = `AKY-INV-${(/* @__PURE__ */ new Date()).getUTCFullYear()}-${seq}`;
           const linkedLead = qt.leadId ? db.leads.find((l) => l.leadId === qt.leadId) : void 0;
+          let resolvedCategory = opts.serviceCategory?.trim() || "";
+          if (!resolvedCategory) {
+            const firstMatchedService = qt.items.map((item) => db.services.find((s) => s.id === item.serviceId)).find(Boolean);
+            if (firstMatchedService) {
+              resolvedCategory = firstMatchedService.category;
+            } else {
+              const joinedTitles = qt.items.map((i) => i.title.toLowerCase()).join(" ");
+              if (joinedTitles.includes("whatsapp")) {
+                resolvedCategory = "WhatsApp Business Messaging";
+              } else if (joinedTitles.includes("bulk sms") || joinedTitles.includes("sms credit")) {
+                resolvedCategory = "Bulk SMS Marketing";
+              } else {
+                resolvedCategory = "Digital marketing";
+              }
+            }
+          }
           const inv = {
             id: invId,
             invoiceNumber,
@@ -4324,7 +7169,7 @@ Public Portal Link: https://akyin.com/quote?token=${shareToken}`
             quotationNumber: qt.quoteNumber,
             leadId: qt.leadId,
             clientId: qt.clientId,
-            serviceCategory: opts.serviceCategory,
+            serviceCategory: resolvedCategory,
             leadSource: linkedLead?.campaignSource || "Website",
             customerName: qt.customerName,
             companyName: qt.companyName,
@@ -4630,6 +7475,325 @@ Public Portal Link: https://akyin.com/quote?token=${shareToken}`
       res.status(201).json({ invoice });
     }
   );
+  app.get(
+    "/api/suite/subscriptions",
+    requireAuth,
+    requirePermission("payments"),
+    (_req, res) => {
+      const db = readDb();
+      const monthlyServices = (db.services || []).filter((s) => {
+        const monthlyVal = Number(s.monthlyPrice ?? s.recurringFee ?? 0) || 0;
+        return s.active && (monthlyVal > 0 || s.billingCycle === "monthly" || s.category === "Business Creative & Documentation Services");
+      }).sort((a, b) => a.sortOrder - b.sortOrder);
+      const renewalInvoices = (db.invoices || []).filter((inv) => inv.paymentType === "recurring");
+      res.json({
+        subscriptions: db.subscriptions || [],
+        monthlyServices,
+        clients: db.clients || [],
+        renewalInvoices
+      });
+    }
+  );
+  app.post(
+    "/api/suite/subscriptions",
+    requireAuth,
+    requirePermission("payments"),
+    async (req, res) => {
+      const schema = z2.object({
+        clientId: z2.string().trim().max(80).optional().default(""),
+        customerName: z2.string().trim().min(2).max(120),
+        companyName: z2.string().trim().max(120).optional().default(""),
+        customerEmail: z2.string().trim().email().max(160),
+        customerPhone: z2.string().trim().max(30).optional().default(""),
+        serviceId: z2.string().trim().min(2).max(80),
+        currency: z2.enum(["INR", "AED", "USD"]).default("INR"),
+        monthlyAmount: z2.number().finite().positive().max(1e8).optional(),
+        gstEnabled: z2.boolean().optional(),
+        gstRate: z2.number().finite().min(0).max(100).optional(),
+        billingCycleDay: z2.number().int().min(1).max(28).default(1),
+        startDate: z2.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+        nextBillingDate: z2.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+        notes: z2.string().trim().max(600).optional().default("")
+      });
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid subscription payload." });
+        return;
+      }
+      try {
+        const created = await withDbMutation((db) => {
+          const srv = db.services.find((s) => s.id === parsed.data.serviceId);
+          if (!srv) {
+            const err = new Error("Selected monthly service not found.");
+            err.statusCode = 404;
+            throw err;
+          }
+          const tierKey = parsed.data.currency === "AED" ? "aed" : parsed.data.currency === "USD" ? "usd" : null;
+          const catalogMonthly = (tierKey && srv.internationalPricing?.[tierKey]?.packagePrice !== void 0 ? Number(srv.internationalPricing[tierKey].packagePrice) : void 0) ?? (Number(srv.monthlyPrice ?? srv.recurringFee ?? srv.packagePrice ?? 0) || 0);
+          const monthlyAmount = round2(
+            parsed.data.monthlyAmount && parsed.data.monthlyAmount > 0 ? parsed.data.monthlyAmount : catalogMonthly
+          );
+          if (monthlyAmount <= 0) {
+            const err = new Error("Monthly billing amount must be greater than zero.");
+            err.statusCode = 400;
+            throw err;
+          }
+          const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+          const todayIso = getIstDateParts().isoDate;
+          const startDate = parsed.data.startDate || todayIso;
+          const nextBillingDate = parsed.data.nextBillingDate || startDate;
+          const seq = String((db.subscriptions?.length || 0) + 1).padStart(4, "0");
+          const sub = {
+            id: `SUB-${crypto4.randomBytes(4).toString("hex").toUpperCase()}`,
+            subscriptionCode: `AKY-SUB-${(/* @__PURE__ */ new Date()).getUTCFullYear()}-${seq}`,
+            clientId: stripControls(parsed.data.clientId),
+            customerName: stripControls(parsed.data.customerName),
+            companyName: stripControls(parsed.data.companyName),
+            customerEmail: stripControls(parsed.data.customerEmail).toLowerCase(),
+            customerPhone: stripControls(parsed.data.customerPhone),
+            serviceId: srv.id,
+            serviceName: srv.name,
+            serviceCategory: srv.category,
+            currency: parsed.data.currency,
+            monthlyAmount,
+            gstEnabled: parsed.data.gstEnabled ?? srv.gstEnabled,
+            gstRate: parsed.data.gstEnabled ?? srv.gstEnabled ? parsed.data.gstRate ?? srv.gstRate ?? 18 : 0,
+            status: "ACTIVE",
+            billingCycleDay: parsed.data.billingCycleDay,
+            startDate,
+            nextBillingDate,
+            lastBilledAt: "",
+            lastInvoiceId: "",
+            lastInvoiceNumber: "",
+            renewalCount: 0,
+            notes: stripControls(parsed.data.notes),
+            createdAt: nowIso,
+            updatedAt: nowIso
+          };
+          if (!Array.isArray(db.subscriptions)) db.subscriptions = [];
+          db.subscriptions.unshift(sub);
+          appendAuditLog(db, {
+            actorId: req.suiteUser.id,
+            actorName: req.suiteUser.name,
+            actorRole: req.suiteUser.role,
+            action: "CREATE_SUBSCRIPTION",
+            targetId: sub.subscriptionCode,
+            summary: `Started recurring billing for ${sub.companyName || sub.customerName} on '${sub.serviceName}' (${sub.currency} ${sub.monthlyAmount}/mo).`
+          });
+          return sub;
+        });
+        res.status(201).json({ subscription: created });
+      } catch (err) {
+        res.status(err?.statusCode || 400).json({ error: err?.message || "Unable to create subscription." });
+      }
+    }
+  );
+  app.patch(
+    "/api/suite/subscriptions/:subId/status",
+    requireAuth,
+    requirePermission("payments"),
+    async (req, res) => {
+      const subId = String(req.params.subId || "");
+      const schema = z2.object({
+        status: z2.enum(["ACTIVE", "PAUSED", "CANCELLED"]),
+        note: z2.string().trim().max(300).optional()
+      });
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid status payload." });
+        return;
+      }
+      try {
+        const updated = await withDbMutation((db) => {
+          const sub = (db.subscriptions || []).find((s) => s.id === subId);
+          if (!sub) {
+            const err = new Error("Subscription not found.");
+            err.statusCode = 404;
+            throw err;
+          }
+          const prevStatus = sub.status;
+          sub.status = parsed.data.status;
+          sub.updatedAt = (/* @__PURE__ */ new Date()).toISOString();
+          if (parsed.data.note) {
+            sub.notes = stripControls(parsed.data.note);
+          }
+          appendAuditLog(db, {
+            actorId: req.suiteUser.id,
+            actorName: req.suiteUser.name,
+            actorRole: req.suiteUser.role,
+            action: "UPDATE_SUBSCRIPTION_STATUS",
+            targetId: sub.subscriptionCode,
+            summary: `Changed ${sub.customerName} (${sub.serviceName}) recurring billing status from ${prevStatus} to ${sub.status}.`
+          });
+          return sub;
+        });
+        res.json({ subscription: updated });
+      } catch (err) {
+        res.status(err?.statusCode || 400).json({ error: err?.message || "Unable to update subscription status." });
+      }
+    }
+  );
+  app.post(
+    "/api/suite/subscriptions/:subId/trigger-renewal",
+    requireAuth,
+    requirePermission("payments"),
+    async (req, res) => {
+      const subId = String(req.params.subId || "");
+      try {
+        const result = await withDbMutation(async (db) => {
+          const sub = (db.subscriptions || []).find((s) => s.id === subId);
+          if (!sub) {
+            const err = new Error("Subscription not found.");
+            err.statusCode = 404;
+            throw err;
+          }
+          if (sub.status !== "ACTIVE") {
+            const err = new Error(
+              `Cannot trigger renewal invoice while subscription is ${sub.status}. Resume billing first.`
+            );
+            err.statusCode = 400;
+            throw err;
+          }
+          const totals = calculateQuotationTotals(
+            [
+              {
+                id: "renewal-line-1",
+                serviceId: sub.serviceId,
+                title: `${sub.serviceName} \u2014 Monthly Renewal`,
+                qty: 1,
+                unitPrice: sub.monthlyAmount,
+                billingType: "monthly"
+              }
+            ],
+            0,
+            sub.gstEnabled,
+            sub.gstRate
+          );
+          const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+          const invId = `INV-${crypto4.randomBytes(4).toString("hex").toUpperCase()}`;
+          const seq = String(db.invoices.length + 1).padStart(4, "0");
+          const invoiceNumber = `AKY-INV-${(/* @__PURE__ */ new Date()).getUTCFullYear()}-${seq}`;
+          const renewalCycleNumber = sub.renewalCount + 1;
+          const createdInvoice = {
+            id: invId,
+            invoiceNumber,
+            quotationId: "",
+            quotationNumber: sub.subscriptionCode,
+            leadId: "",
+            clientId: sub.clientId,
+            serviceCategory: sub.serviceCategory,
+            leadSource: "Direct contact",
+            customerName: sub.customerName,
+            companyName: sub.companyName,
+            customerEmail: sub.customerEmail,
+            customerPhone: sub.customerPhone,
+            currency: sub.currency,
+            paymentType: "recurring",
+            subtotal: totals.subtotal,
+            discountAmount: 0,
+            taxableAmount: totals.taxableAmount,
+            gstEnabled: sub.gstEnabled,
+            gstRate: sub.gstEnabled ? sub.gstRate : 0,
+            gstAmount: totals.gstAmount,
+            totalAmount: totals.grandTotal,
+            paidAmount: 0,
+            refundedAmount: 0,
+            status: "UNPAID",
+            dueDate: new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10),
+            notes: `Manual renewal #${renewalCycleNumber} triggered for ${sub.serviceName} (${sub.subscriptionCode}) by ${req.suiteUser.name}.`,
+            createdAt: nowIso,
+            updatedAt: nowIso
+          };
+          db.invoices.unshift(createdInvoice);
+          const baseParts = sub.nextBillingDate.split("-").map(Number);
+          const baseDate = baseParts.length === 3 ? new Date(Date.UTC(baseParts[0], baseParts[1] - 1, baseParts[2])) : /* @__PURE__ */ new Date();
+          const targetMonth = baseDate.getUTCMonth() + 1;
+          const targetYear = baseDate.getUTCFullYear() + Math.floor(targetMonth / 12);
+          const normMonth = targetMonth % 12;
+          const maxDayInMonth = new Date(Date.UTC(targetYear, normMonth + 1, 0)).getUTCDate();
+          const clampedDay = Math.min(sub.billingCycleDay || 1, maxDayInMonth);
+          const nextIsoDate = new Date(Date.UTC(targetYear, normMonth, clampedDay)).toISOString().slice(0, 10);
+          sub.renewalCount = renewalCycleNumber;
+          sub.lastBilledAt = nowIso;
+          sub.lastInvoiceId = createdInvoice.id;
+          sub.lastInvoiceNumber = createdInvoice.invoiceNumber;
+          sub.nextBillingDate = nextIsoDate;
+          sub.updatedAt = nowIso;
+          appendAuditLog(db, {
+            actorId: req.suiteUser.id,
+            actorName: req.suiteUser.name,
+            actorRole: req.suiteUser.role,
+            action: "TRIGGER_RENEWAL_INVOICE",
+            targetId: createdInvoice.invoiceNumber,
+            summary: `Triggered renewal invoice ${createdInvoice.invoiceNumber} (${createdInvoice.currency} ${createdInvoice.totalAmount}) for ${sub.subscriptionCode} (${sub.serviceName}).`
+          });
+          if (db.notificationSettings?.sendClientReceipts && sub.customerEmail) {
+            await dispatchNotification(db, {
+              event: "quotation_created",
+              recipient: sub.customerEmail,
+              subject: `[AKYIN Invoice] Monthly Renewal ${createdInvoice.invoiceNumber} \u2014 ${sub.serviceName}`,
+              body: [
+                `Hello ${sub.customerName},`,
+                "",
+                `A monthly renewal invoice (${createdInvoice.invoiceNumber}) has been generated for your recurring service:`,
+                `Service: ${sub.serviceName}`,
+                `Subscription Reference: ${sub.subscriptionCode}`,
+                `Total Due (incl. taxes): ${createdInvoice.currency} ${createdInvoice.totalAmount.toLocaleString("en-IN")}`,
+                `Due Date: ${createdInvoice.dueDate}`,
+                "",
+                "Thank you for working with AKYIN Ventures."
+              ].join("\n")
+            });
+          }
+          return { subscription: sub, invoice: createdInvoice };
+        });
+        res.status(201).json(result);
+      } catch (err) {
+        res.status(err?.statusCode || 400).json({ error: err?.message || "Unable to trigger renewal invoice." });
+      }
+    }
+  );
+  app.get(
+    "/api/suite/subscriptions/reminders/status",
+    requireAuth,
+    requirePermission("payments"),
+    (_req, res) => {
+      const db = readDb();
+      const scheduler = getSchedulerStatus();
+      const upcomingCandidates = findUpcomingRenewals(db, 7);
+      const reminderLogs = (db.notificationLogs || []).filter((l) => l.event === "subscription_renewal_reminder").slice(0, 20);
+      res.json({
+        scheduler,
+        smtpConfigured: Boolean(getSmtpConfig()),
+        reminderRuleEnabled: Boolean(db.notificationSettings?.events?.subscription_renewal_reminder),
+        upcomingCandidates,
+        reminderLogs
+      });
+    }
+  );
+  app.post(
+    "/api/suite/subscriptions/reminders/run",
+    requireAuth,
+    requirePermission("payments"),
+    async (req, res) => {
+      const schema = z2.object({
+        leadDays: z2.number().int().min(0).max(30).optional(),
+        forceResend: z2.boolean().optional()
+      });
+      const parsed = schema.safeParse(req.body || {});
+      if (!parsed.success) {
+        res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid reminder run parameters." });
+        return;
+      }
+      const result = await runSubscriptionRenewalReminderSweep({
+        leadDays: parsed.data.leadDays,
+        forceResend: parsed.data.forceResend,
+        source: "manual",
+        actorName: req.suiteUser.name
+      });
+      res.json(result);
+    }
+  );
   app.post(
     "/api/suite/invoices/:invoiceId/record-manual",
     requireAuth,
@@ -4858,6 +8022,18 @@ Reason: ${parsed.data.reason}`
     }
   );
   app.get(
+    "/api/suite/reports/recurring-insights",
+    requireAuth,
+    requirePermission("reports"),
+    (req, res) => {
+      const rawMonths = Number(req.query.months || 12);
+      const monthsWindow = Number.isFinite(rawMonths) ? Math.min(24, Math.max(3, Math.floor(rawMonths))) : 12;
+      const db = readDb();
+      const insights = computeRecurringRevenueInsights(db, monthsWindow);
+      res.json(insights);
+    }
+  );
+  app.get(
     "/api/suite/settings",
     requireAuth,
     requirePermission("overview"),
@@ -5037,9 +8213,16 @@ Reason: ${parsed.data.reason}`
     requirePermission("security_audit"),
     async (req, res) => {
       const b = req.body || {};
+      if (typeof b.ownerNotificationEmail === "string" && b.ownerNotificationEmail.trim()) {
+        const emailCheck = z2.string().trim().email().max(160).safeParse(b.ownerNotificationEmail);
+        if (!emailCheck.success) {
+          res.status(400).json({ error: "Please provide a valid administrator notification email." });
+          return;
+        }
+      }
       const updated = await withDbMutation((db) => {
         if (typeof b.ownerNotificationEmail === "string") {
-          db.notificationSettings.ownerNotificationEmail = stripControls(b.ownerNotificationEmail);
+          db.notificationSettings.ownerNotificationEmail = stripControls(b.ownerNotificationEmail).toLowerCase();
         }
         if (typeof b.sendClientReceipts === "boolean") {
           db.notificationSettings.sendClientReceipts = b.sendClientReceipts;
@@ -5064,6 +8247,954 @@ Reason: ${parsed.data.reason}`
       res.json({ notificationSettings: updated });
     }
   );
+  app.post(
+    "/api/suite/notifications/test",
+    requireAuth,
+    requirePermission("security_audit"),
+    async (req, res) => {
+      const result = await withDbMutation(async (db) => {
+        const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+        const log = await dispatchNotification(db, {
+          event: "service_price_updated",
+          subject: "[AKYIN SMTP Test] Automated Admin Price & Service Notification Verified",
+          body: [
+            "This is a live SMTP configuration test from AKYIN Business Suite.",
+            "",
+            `Triggered By: ${req.suiteUser.name} (${req.suiteUser.role})`,
+            `Authorizing Admin Email: ${req.suiteUser.email}`,
+            `Owner Notification Recipient: ${db.notificationSettings.ownerNotificationEmail || "connect@akyin.com"}`,
+            `Timestamp: ${nowIso}`
+          ].join("\n")
+        });
+        return {
+          notification: log,
+          smtpConfigured: Boolean(getSmtpConfig())
+        };
+      });
+      res.json(result);
+    }
+  );
+}
+
+// server/seoRenderer.ts
+var DOMAIN = "https://akyin.com";
+var DEFAULT_ROBOTS = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+function escapeHtml(value) {
+  return String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function safeJsonLd(value) {
+  return JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e").replace(/&/g, "\\u0026");
+}
+function formatInr(amount) {
+  return `\u20B9${Math.round(amount).toLocaleString("en-IN")}`;
+}
+var ROUTE_SEO_META = {
+  "/": {
+    title: "AKYIN Ventures \u2014 Multi-Business Group & Marketing Agency",
+    description: "AKYIN Ventures is a diversified multi-business group & marketing agency spanning publishing, automotive growth, retail, AI tools, B2B trade, and advisory.",
+    h1: "AKYIN Ventures \u2014 Multi-Business Group & Full-Service Standalone Marketing Agency",
+    summary: "AKYIN Ventures operates core divisions across digital marketing, automotive dealership growth, publishing, and fashion retail while offering modular standalone services for businesses across India and the UAE.",
+    highlights: [
+      { label: "Explore Standalone Marketing Services", href: "/ventures/marketing" },
+      { label: "Automotive Dealership Marketing", href: "/marketing/automotive" },
+      { label: "Transparent INR Pricing & Quotation Builder", href: "/pricing" },
+      { label: "Book 1-on-1 Business Advisory", href: "/advisory" }
+    ],
+    structuredData: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://akyin.com/#organization",
+          name: "AKYIN Ventures",
+          alternateName: ["AKYIN", "AKYIN MARKETINGS"],
+          url: "https://akyin.com/",
+          logo: "https://akyin.com/assets/aistudio/akyin_logo_clean.png",
+          description: "Multi-business parent group and full-service marketing agency operating core ventures in publishing, performance marketing, and fashion retail while supporting 58+ client businesses across AI utilities, B2B wholesale trade, automotive growth, and business consulting.",
+          email: "connect@akyin.com",
+          founder: { "@type": "Person", name: "Shaikh Nazir" },
+          areaServed: ["IN", "AE"],
+          sameAs: [
+            "https://www.facebook.com/profile.php?id=61595204474890",
+            "https://youtube.com/@akyinmarketing?si=hgB_tEfczt79H7wW",
+            "https://www.instagram.com/akyinventures/",
+            "https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U",
+            "https://www.amazon.com/stores/author/B0DT3L2T15/allbooks",
+            "https://play.google.com/store/books/details/Akyin_s_THE_DISCIPLINE_CODE?id=seHuEQAAQBAJ",
+            "https://aicalc.in"
+          ],
+          contactPoint: [
+            {
+              "@type": "ContactPoint",
+              url: "https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U",
+              email: "connect@akyin.com",
+              contactType: "customer service",
+              availableLanguage: ["English", "Hindi", "Telugu"]
+            }
+          ]
+        },
+        {
+          "@type": "LocalBusiness",
+          "@id": "https://akyin.com/#localbusiness",
+          name: "AKYIN Ventures & Marketing Agency",
+          image: "https://akyin.com/assets/aistudio/akyin_logo_clean.png",
+          url: "https://akyin.com/",
+          email: "connect@akyin.com",
+          priceRange: "\u20B93,000 - \u20B999,998",
+          address: {
+            "@type": "PostalAddress",
+            addressCountry: "IN"
+          },
+          sameAs: [
+            "https://www.facebook.com/profile.php?id=61595204474890",
+            "https://youtube.com/@akyinmarketing?si=hgB_tEfczt79H7wW",
+            "https://www.instagram.com/akyinventures/",
+            "https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://akyin.com/#website",
+          url: "https://akyin.com/",
+          name: "AKYIN Ventures",
+          publisher: { "@id": "https://akyin.com/#organization" }
+        },
+        {
+          "@type": "Service",
+          name: "AKYIN Standalone Marketing, Lead Qualification & Business Services",
+          provider: { "@id": "https://akyin.com/#organization" },
+          serviceType: "Performance Marketing, Creative Design & Lead Qualification",
+          areaServed: ["IN", "AE", "US", "GB"],
+          offers: [
+            {
+              "@type": "Offer",
+              name: "Meta Ads Management",
+              price: "40000",
+              priceCurrency: "INR",
+              url: "https://akyin.com/services/meta-ads-management"
+            },
+            {
+              "@type": "Offer",
+              name: "Lead Filtering & Qualification",
+              price: "24000",
+              priceCurrency: "INR",
+              url: "https://akyin.com/services/lead-filtering"
+            },
+            {
+              "@type": "Offer",
+              name: "Bulk SMS Marketing (10,000 Credits)",
+              price: "3000",
+              priceCurrency: "INR",
+              url: "https://akyin.com/services/bulk-sms"
+            },
+            {
+              "@type": "Offer",
+              name: "WhatsApp Business Messaging Setup (One-Time Setup)",
+              price: "4999",
+              priceCurrency: "INR",
+              url: "https://akyin.com/services/whatsapp-business-setup"
+            },
+            {
+              "@type": "Offer",
+              name: "Commercial & Dealership Sales Training Workshop",
+              price: "50000",
+              priceCurrency: "INR",
+              url: "https://akyin.com/services/commercial-dealership-sales-training"
+            },
+            {
+              "@type": "Offer",
+              name: "1-on-1 Business Advisory Consultation (30 min IST)",
+              price: "3998",
+              priceCurrency: "INR",
+              url: "https://akyin.com/advisory"
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "What businesses operate under AKYIN Ventures?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "AKYIN Ventures operates core ventures including AKYIN Publishing, AKYIN MARKETINGS (Agency), and AKYIN Store / AKYIN Thrift, alongside client showcases including AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar."
+              }
+            },
+            {
+              "@type": "Question",
+              name: "Are AKYIN Marketing services sold as forced bundles or standalone options?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Every AKYIN Marketing service across all 10 service categories\u2014from Automotive Marketing, Google & Meta Ads, and Lead Filtering to Logo Design, PPT Decks, Excel Reporting, Bulk SMS, and WhatsApp Business Setup\u2014is strictly standalone and selectable individually."
+              }
+            },
+            {
+              "@type": "Question",
+              name: "How does ad billing work with AKYIN Marketing?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Advertising budgets are paid directly by clients to Meta or Google. AKYIN fees cover strategy, campaign setup, creative production, lead qualification, and showroom sales training."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "/about": {
+    title: "About AKYIN Ventures \u2014 Vision, Ventures & Track Record",
+    description: "Corporate profile of AKYIN Ventures: 16+ years across marketing, publishing, retail, AI tools, and B2B commerce serving India and UAE businesses.",
+    h1: "About AKYIN Ventures \u2014 16+ Years of Commercial, Automotive & Digital Execution",
+    summary: "Founded by Shaikh Nazir, AKYIN Ventures unites practical commercial leadership with independent ventures spanning performance marketing, automotive sales training, publishing, retail, and B2B trade.",
+    highlights: [
+      { label: "Explore Our Ventures", href: "/ventures" },
+      { label: "Standalone Marketing Services", href: "/ventures/marketing" },
+      { label: "Contact AKYIN Ventures", href: "/contact" }
+    ],
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      name: "About AKYIN Ventures",
+      url: "https://akyin.com/about",
+      description: "Corporate profile of AKYIN Ventures: 16+ years across marketing, publishing, retail, AI tools, and B2B commerce serving India and UAE businesses.",
+      mainEntity: {
+        "@type": "Corporation",
+        name: "AKYIN Ventures",
+        url: "https://akyin.com"
+      }
+    }
+  },
+  "/ventures": {
+    title: "Our Ventures & Client Ecosystem | AKYIN Ventures",
+    description: "Explore AKYIN Publishing, AKYIN Marketing Agency, AKYIN Store, and showcased platforms AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar.",
+    h1: "AKYIN Ventures Portfolio & Client Business Ecosystem",
+    summary: "Discover operating ventures owned and incubated by AKYIN Ventures alongside digital commerce and business platforms we actively support.",
+    highlights: [
+      { label: "AKYIN MARKETINGS (Agency)", href: "/ventures/marketing" },
+      { label: "AKYIN Publishing", href: "/ventures/publishing" },
+      { label: "AKYIN Store / Thrift", href: "/ventures/store" },
+      { label: "AICalc.in", href: "/ventures/aicalc" }
+    ],
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Our Ventures & Client Ecosystem \u2014 AKYIN Ventures",
+      url: "https://akyin.com/ventures",
+      description: "Explore core operating ventures under AKYIN Ventures and featured client showcases."
+    }
+  },
+  "/ventures/publishing": {
+    title: "AKYIN Publishing \u2014 Books & Digital Guides | AKYIN.com",
+    description: "Explore eight published books on Amazon and three digital productivity & finance kits including The Discipline Code and The Money OS by AKYIN Publishing.",
+    h1: "AKYIN Publishing \u2014 Books, Practical Guides & Productivity Systems",
+    summary: "Independent publishing house by Akyin S. featuring titles on execution discipline, resilience, dopamine recovery, and personal finance toolkits across Amazon, Google Play Books, and Gumroad.",
+    highlights: [
+      { label: "Back to Our Ventures", href: "/ventures" },
+      { label: "1-on-1 Business Advisory", href: "/advisory" }
+    ],
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "AKYIN Publishing",
+      url: "https://akyin.com/ventures/publishing",
+      parentOrganization: { "@type": "Corporation", name: "AKYIN Ventures" }
+    }
+  },
+  "/ventures/marketing": {
+    title: "AKYIN MARKETINGS \u2014 Standalone Marketing & Business Services",
+    description: "Full-service standalone agency catalogue across 10 specialized categories: Automotive Marketing, Digital Ads, Social Media, Creative Design, Video, PPT, Excel, Bulk SMS, WhatsApp Setup, CRM & Training.",
+    h1: "AKYIN MARKETINGS \u2014 10-Category Standalone Service Marketplace",
+    summary: "Every marketing, creative, messaging, reporting, and advisory capability at AKYIN MARKETINGS is offered strictly standalone\u2014zero forced bundles\u2014so businesses select only what drives measurable outcomes.",
+    highlights: [
+      { label: "Automotive Marketing Division", href: "/marketing/automotive" },
+      { label: "Logo Design Service", href: "/services/logo-design" },
+      { label: "Bulk SMS Marketing", href: "/services/bulk-sms" },
+      { label: "WhatsApp Business Setup", href: "/services/whatsapp-business-setup" },
+      { label: "Interactive Quotation Builder", href: "/pricing#quotation-builder" }
+    ],
+    structuredData: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "ProfessionalService",
+          "@id": "https://akyin.com/ventures/marketing#service",
+          name: "AKYIN Marketing Agency",
+          alternateName: "AKYIN MARKETINGS",
+          url: "https://akyin.com/ventures/marketing",
+          parentOrganization: { "@type": "Corporation", name: "AKYIN Ventures" },
+          description: "Standalone agency marketplace spanning 10 categories: Automotive Marketing, Digital Marketing, Social Media Management, Creative & Graphic Design, Video & Content, Business Documents, Excel Reporting, Messaging, Lead Management & CRM, and Consulting & Training.",
+          priceRange: "\u20B93,000 - \u20B999,998",
+          areaServed: ["IN", "AE", "US", "GB"],
+          email: "connect@akyin.com"
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://akyin.com/ventures/marketing#agency-faq",
+          name: "AKYIN MARKETINGS \u2014 Standalone Agency Services, Messaging & Pricing FAQ",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "What service categories does AKYIN MARKETINGS offer?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "AKYIN MARKETINGS organizes all services cleanly across 10 standalone categories: Automotive Marketing, Digital Marketing, Social Media Management, Creative and Graphic Design, Video and Content Services, Business Documents and Presentations, Excel and Reporting Services, Messaging and Communication, Lead Management and CRM, and Business Consulting and Training."
+              }
+            },
+            {
+              "@type": "Question",
+              name: "Can clients purchase individual services without mandatory bundles?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Yes. Every service is 100% standalone. There are no compulsory combined packages\u2014clients can commission a single logo design, presentation deck, Meta Ads retainer, lead qualification workflow, Bulk SMS pack, or WhatsApp setup independently."
+              }
+            },
+            {
+              "@type": "Question",
+              name: "How are Bulk SMS Marketing and WhatsApp Business Messaging priced?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Bulk SMS Marketing is offered as a \u20B93,000 package including 10,000 SMS credits (\u20B90.30 effective per SMS, additional usage at admin-configured rate). WhatsApp Business Messaging separates the \u20B94,999 one-time setup fee from \u20B91.50 per message usage. Messaging rates are subject to provider charges, applicable taxes, message category, destination, and delivery conditions confirmed in the written quotation."
+              }
+            },
+            {
+              "@type": "Question",
+              name: "How are Lead Generation and Lead Filtering separated?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Online Lead Generation captures fresh buyer enquiries via Meta or Google Ads (ad spend paid directly by clients to platforms), while Lead Filtering and Qualification vets existing incoming enquiries by phone and intent scoring as a separate standalone service."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "/marketing/automotive": {
+    title: "Car Dealership Marketing & Test-Drive Leads | AKYIN",
+    description: "Book qualified showroom test drives, not cold clicks. Targeted Meta & Google auto ads, lead vetting, and floor sales coaching for dealers. Get a quote.",
+    h1: "Car Dealership Marketing, Test-Drive Lead Generation & Showroom Sales Coaching",
+    summary: "Built on 16 years of frontline showroom and dealership commercial experience\u2014choose standalone automotive marketing, test-drive acquisition, lead filtering, exchange event drives, or sales team coaching.",
+    highlights: [
+      { label: "Automotive Dealership Strategy", href: "/services/automotive-marketing" },
+      { label: "Test-Drive Lead Generation", href: "/services/test-drive-lead-generation" },
+      { label: "Lead Filtering & Qualification", href: "/services/lead-filtering" },
+      { label: "Build Automotive Quotation", href: "/pricing#quotation-builder" }
+    ],
+    structuredData: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "ProfessionalService",
+          "@id": "https://akyin.com/marketing/automotive#service",
+          name: "AKYIN Marketing \u2014 Automotive Division",
+          url: "https://akyin.com/marketing/automotive",
+          parentOrganization: { "@type": "Corporation", name: "AKYIN Ventures" },
+          description: "Book qualified showroom test drives, not cold clicks. Targeted Meta & Google auto ads, lead vetting, and floor sales coaching for dealers.",
+          priceRange: "\u20B915,000 - \u20B950,000",
+          areaServed: ["IN", "AE", "US", "GB"],
+          email: "connect@akyin.com"
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://akyin.com/marketing/automotive#lead-qualification-faq",
+          name: "Lead Qualification FAQ \u2014 AKYIN Automotive Marketing",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "How does AKYIN filter high-intent automotive test-drive leads?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "AKYIN enforces strict separation between Meta/Google lead generation and multi-tier lead qualification so dealership sales executives receive vetted test-drive appointments classified as Hot, Warm, Future Follow-up, Unreachable, or Not Interested."
+              }
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://akyin.com/marketing/automotive#lead-impact-tracker-faq",
+          name: "Lead Impact Tracker FAQ \u2014 AKYIN Automotive Marketing",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "What does the AKYIN Lead Impact Tracker measure for automotive dealerships?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "The Lead Impact Tracker lets dealerships simulate monthly ad budgets (\u20B930,000 to \u20B95,00,000) across Hatchback/Compact Sedan, Midsize/Compact SUV, and Luxury/EV tiers to forecast Cost Per Test Drive (CPTD), showroom conversion rate, projected monthly test drives, and estimated car bookings."
+              }
+            },
+            {
+              "@type": "Question",
+              name: "Can auto dealers download CSV reports from the Lead Impact Tracker?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Yes. Clicking Export CSV Report downloads a structured 30-day performance CSV containing daily Cost Per Test Drive (INR), estimated inbound leads, monthly ad budget, and selected vehicle tier for internal dealership records and management review."
+              }
+            },
+            {
+              "@type": "Question",
+              name: "How do the Cost Per Test Drive trend chart and zoom controls work?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "The interactive Recharts trend chart visualizes 30-day Cost Per Test Drive performance with 7D, 14D, and 30D zoom-in toggles and a draggable range brush in the 30-day view so dealers can inspect daily acquisition efficiency closely."
+              }
+            },
+            {
+              "@type": "Question",
+              name: "What does the 30-day moving average alert badge in the Lead Impact Tracker indicate?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "The benchmark alert badge automatically compares current Cost Per Test Drive against the 30-day moving average, notifying the dealership whenever CPTD exceeds the 30-day benchmark or confirming when efficiency is running below average."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "/ventures/store": {
+    title: "AKYIN Store & AKYIN Thrift \u2014 Value Fashion Retail",
+    description: "Shop curated men\u2019s and women\u2019s everyday fashion, apparel, and seasonal wardrobe collections at accessible discounted prices through AKYIN Thrift.",
+    h1: "AKYIN Store & AKYIN Thrift \u2014 Value-First Apparel & Wardrobe Retail",
+    summary: "Accessible everyday fashion and curated wardrobe staples designed for shoppers seeking reliable quality at practical prices.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "ClothingStore",
+      name: "AKYIN STORE \xB7 AKYIN THRIFT",
+      url: "https://akyin.com/ventures/store",
+      parentOrganization: { "@type": "Corporation", name: "AKYIN Ventures" }
+    }
+  },
+  "/ventures/aicalc": {
+    title: "AICalc.in \u2014 Smart AI & Manual Calculators | AKYIN",
+    description: "Explore AICalc.in: combining natural-language AI calculation queries with classic manual financial, business, and everyday calculators online.",
+    h1: "AICalc.in \u2014 AI-Assisted & Manual Financial Calculation Platform",
+    summary: "Built to simplify financial, commercial, and everyday math through both natural-language queries and precision deterministic calculators.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "AICalc.in",
+      url: "https://aicalc.in",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "All",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" }
+    }
+  },
+  "/ventures/kartigo": {
+    title: "Kartigo \u2014 B2B Stock Supply & Wholesale Trade",
+    description: "Connect with wholesale commercial inventory, bulk stock lots, and reliable B2B trade distribution opportunities across categories with Kartigo.",
+    h1: "Kartigo \u2014 B2B Wholesale Inventory & Commercial Stock Supply",
+    summary: "Structured B2B wholesale supply desk connecting distributors, bulk traders, and retail merchants with curated commercial stock lots.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "WholesaleStore",
+      name: "Kartigo",
+      url: "https://akyin.com/ventures/kartigo"
+    }
+  },
+  "/ventures/biznxt": {
+    title: "BizNXT \u2014 Business Clarity & Consulting",
+    description: "Practical business clarity, commercial feasibility analysis, and structured opportunity exploration for founders and SMEs with BizNXT.",
+    h1: "BizNXT \u2014 Founder Feasibility, Unit Economics & Business Clarity",
+    summary: "Advisory and feasibility exploration helping emerging entrepreneurs evaluate commercial viability before deploying capital.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "ConsultingService",
+      name: "BizNXT",
+      url: "https://akyin.com/ventures/biznxt"
+    }
+  },
+  "/ventures/budget-bazaar": {
+    title: "Budget Bazaar \u2014 Everyday Value Retail | AKYIN Ventures",
+    description: "Discover affordable household goods, everyday essentials, and value-first consumer retail selections curated by Budget Bazaar.",
+    h1: "Budget Bazaar \u2014 Affordable Household Essentials & Consumer Retail",
+    summary: "Value-focused retail selection offering practical everyday household items directly to cost-conscious shoppers.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      name: "Budget Bazaar",
+      url: "https://akyin.com/ventures/budget-bazaar"
+    }
+  },
+  "/pricing": {
+    title: "Standalone Service Pricing & Quotation Builder (INR) | AKYIN Ventures",
+    description: "Transparent INR pricing across every standalone AKYIN service\u2014digital marketing, lead filtering, design, documents, Excel, Bulk SMS, WhatsApp setup, and training.",
+    h1: "Transparent Standalone Service Pricing (INR) & Interactive Quotation Builder",
+    summary: "Select only the exact standalone services your business requires, review transparent INR project and monthly pricing, and generate an itemized quotation with GST clarity.",
+    highlights: [
+      { label: "Full 10-Category Service Catalogue", href: "/ventures/marketing" },
+      { label: "Bulk SMS Marketing (\u20B93,000 / 10,000 SMS)", href: "/services/bulk-sms" },
+      { label: "WhatsApp Business Setup (\u20B94,999 Setup)", href: "/services/whatsapp-business-setup" },
+      { label: "Book Business Advisory (\u20B93,998)", href: "/advisory" }
+    ],
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Standalone Service Pricing & Quotation Builder \u2014 AKYIN Ventures",
+      url: "https://akyin.com/pricing"
+    }
+  },
+  "/tools": {
+    title: "20 Free Business, Marketing & Sales Tools | AKYIN.com",
+    description: "Calculate marketing ROI, ROAS, CAC, CPL, break-even, GST, margins, commissions, and campaign quotes with 20 free interactive AKYIN business tools.",
+    h1: "20 Free Interactive Business, Marketing & Sales Calculators",
+    summary: "Instant calculators for marketing ROI, ROAS, CAC, cost per qualified lead, GST breakdown, margin math, sales commission, and break-even planning.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "AKYIN Business, Marketing & Sales Calculators Suite",
+      url: "https://akyin.com/tools",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "All",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "INR" }
+    }
+  },
+  "/quote": {
+    title: "Official Quotation & Invoice Portal | AKYIN Ventures",
+    description: "Review your AKYIN Ventures itemized commercial quotation, approve online, print an A4 PDF dossier, and complete verified Razorpay invoice payments.",
+    robots: "noindex, nofollow",
+    h1: "AKYIN Ventures \u2014 Client Quotation & Invoice Portal",
+    summary: "Private itemized commercial quotation approval, PDF dossier generation, and verified Razorpay invoice checkout.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "AKYIN Ventures Quotation Portal",
+      url: "https://akyin.com/quote"
+    }
+  },
+  "/advisory": {
+    title: "Book 1-on-1 Business Advisory (IST) | AKYIN Ventures",
+    description: "Schedule a private 30-minute IST business advisory consultation with AKYIN Ventures for strategy, unit economics, feasibility, and sales conversion.",
+    h1: "Book 1-on-1 Business Advisory Consultation (30 Min IST \u2014 \u20B93,998)",
+    summary: "Focused executive consultation on commercial feasibility, marketing unit economics, dealership processes, and growth execution.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: "AKYIN Business Advisory & Consultation",
+      url: "https://akyin.com/advisory",
+      provider: { "@type": "Organization", name: "AKYIN Ventures" },
+      offers: { "@type": "Offer", price: "3998", priceCurrency: "INR" }
+    }
+  },
+  "/insights": {
+    title: "Business Insights & Automotive Trends | AKYIN Ventures",
+    description: "Read practical perspectives on performance marketing, dealership test-drive conversion, publishing, retail positioning, and digital commerce from AKYIN.",
+    ogType: "article",
+    h1: "AKYIN Insights \u2014 Performance Marketing, Dealership Conversion & Commerce",
+    summary: "Practical notes and live automotive retail intelligence spanning lead quality control, floor sales execution, and B2B commerce.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Insights & Business Philosophy \u2014 AKYIN Ventures",
+      url: "https://akyin.com/insights"
+    }
+  },
+  "/terms": {
+    title: "Terms of Service & Billing Policy | AKYIN Ventures",
+    description: "Read AKYIN Ventures Terms of Service, direct Meta & Google ad billing transparency, scope separation rules, and international commercial policies.",
+    h1: "Terms of Service, Ad Billing Transparency & Scope Separation Policy",
+    summary: "Commercial engagement rules governing standalone services, direct client payment to Meta/Google ad platforms, and written quotation scope.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Terms of Service \u2014 AKYIN Ventures",
+      url: "https://akyin.com/terms"
+    }
+  },
+  "/privacy": {
+    title: "Privacy Policy & Data Protection | AKYIN Ventures",
+    description: "Learn how AKYIN Ventures protects enquiry data with strict CSP rules, zero data-broker sharing, and verified security standards across akyin.com.",
+    h1: "Privacy Policy & Enquiry Data Protection Standards",
+    summary: "How AKYIN Ventures safeguards client contact records, enforces strict Content Security Policy rules, and prohibits third-party broker sharing.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Privacy Policy \u2014 AKYIN Ventures",
+      url: "https://akyin.com/privacy"
+    }
+  },
+  "/contact": {
+    title: "Contact AKYIN Ventures \u2014 Enquiry & Advisory Desk",
+    description: "Connect directly with AKYIN Ventures for standalone marketing services, automotive lead systems, creative work, B2B commerce, and advisory across India and the UAE.",
+    h1: "Contact AKYIN Ventures \u2014 Direct Enquiry & Proposal Desk",
+    summary: "Submit your exact service requirements for fast commercial follow-up via email (connect@akyin.com) or official WhatsApp Connect.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      name: "Contact AKYIN Ventures",
+      url: "https://akyin.com/contact",
+      mainEntity: {
+        "@type": "Corporation",
+        name: "AKYIN Ventures",
+        url: "https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U",
+        email: "connect@akyin.com"
+      }
+    }
+  },
+  "/sitemap": {
+    title: "Site Map & Complete Service Directory | AKYIN Ventures",
+    description: "Browse all corporate pages, standalone marketing service pages across 10 categories, business calculators, venture showcases, and pricing schedules.",
+    h1: "AKYIN Ventures Site Map & Complete Standalone Service Directory",
+    summary: "Unified HTML directory of every public corporate route, operating venture page, free calculator, and individual /services/:slug offering.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "ItemPage",
+      name: "Site Map & Directory \u2014 AKYIN Ventures",
+      url: "https://akyin.com/sitemap"
+    }
+  },
+  "/admin": {
+    title: "AKYIN Ventures \u2014 Admin Management Console",
+    description: "Restricted internal CRM, quotation, payment, and operational administration console for authorized AKYIN Ventures personnel.",
+    robots: "noindex, nofollow",
+    h1: "AKYIN Ventures \u2014 Restricted Management Console",
+    summary: "Authorized internal operations portal.",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "AKYIN Ventures Admin Console",
+      url: "https://akyin.com/admin"
+    }
+  }
+};
+function buildBreadcrumbList(routePath, titleLabel, extraParent) {
+  const items = [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: `${DOMAIN}/`
+    }
+  ];
+  if (extraParent) {
+    items.push({
+      "@type": "ListItem",
+      position: 2,
+      name: extraParent.name,
+      item: extraParent.url
+    });
+  }
+  items.push({
+    "@type": "ListItem",
+    position: items.length + 1,
+    name: titleLabel,
+    item: `${DOMAIN}${routePath}`
+  });
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: items
+  };
+}
+function resolveServicePriceSummary(service) {
+  if (service.id === "srv-bulk-sms") {
+    const base = service.packagePrice || service.oneTimePrice || service.setupFee || 3e3;
+    const credits = service.includedUnits || 1e4;
+    const rate = service.unitRate ?? service.additionalUnitRate ?? 0.3;
+    return `${formatInr(base)} package (${credits.toLocaleString("en-IN")} SMS credits included \xB7 \u20B9${rate.toFixed(2)} effective/SMS)`;
+  }
+  if (service.id === "srv-whatsapp-messaging") {
+    const setup = service.setupFee || service.oneTimePrice || 4999;
+    const perMsg = service.unitRate ?? service.additionalUnitRate ?? 1.5;
+    return `${formatInr(setup)} one-time setup fee (strictly separate from \u20B9${perMsg.toFixed(2)}/message usage)`;
+  }
+  const oneTime = (service.oneTimePrice ?? 0) > 0 ? service.oneTimePrice ?? 0 : service.setupFee;
+  const monthly = (service.monthlyPrice ?? 0) > 0 ? service.monthlyPrice ?? 0 : service.recurringFee;
+  const parts = [];
+  if (oneTime > 0) parts.push(`${formatInr(oneTime)} one-time`);
+  if (monthly > 0) parts.push(`${formatInr(monthly)}/month`);
+  if (parts.length === 0) return "Custom Quote on Request";
+  return parts.join(" + ");
+}
+function buildServiceSeoPayload(service) {
+  const title = `${service.name} \u2014 ${service.category} | AKYIN MARKETINGS`;
+  const description = service.description.slice(0, 220);
+  const canonicalUrl = `${DOMAIN}/services/${encodeURIComponent(service.slug)}`;
+  const priceLabel = resolveServicePriceSummary(service);
+  const primaryOfferPrice = (service.monthlyPrice ?? 0) > 0 ? service.monthlyPrice ?? 0 : service.recurringFee > 0 ? service.recurringFee : (service.oneTimePrice ?? 0) > 0 ? service.oneTimePrice ?? 0 : service.setupFee > 0 ? service.setupFee : 0;
+  const offerSchema = primaryOfferPrice > 0 ? {
+    "@type": "Offer",
+    name: service.name,
+    price: String(primaryOfferPrice),
+    priceCurrency: "INR",
+    availability: "https://schema.org/InStock",
+    url: canonicalUrl
+  } : {
+    "@type": "Offer",
+    name: `${service.name} (Custom Quote on Request)`,
+    priceCurrency: "INR",
+    availability: "https://schema.org/InStock",
+    url: canonicalUrl
+  };
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Service",
+        "@id": `${canonicalUrl}#service`,
+        name: service.name,
+        category: service.category,
+        serviceType: service.category,
+        description: service.description,
+        url: canonicalUrl,
+        provider: {
+          "@type": "Organization",
+          name: "AKYIN Ventures",
+          url: `${DOMAIN}/`
+        },
+        areaServed: ["IN", "AE", "US", "GB"],
+        offers: offerSchema
+      },
+      buildBreadcrumbList(`/services/${service.slug}`, service.name, {
+        name: "Marketing Services",
+        url: `${DOMAIN}/ventures/marketing`
+      })
+    ]
+  };
+  const benefitsHtml = (service.benefits || []).map((b) => `<li>${escapeHtml(b)}</li>`).join("");
+  const deliverablesHtml = (service.deliverables || []).map((d) => `<li>${escapeHtml(d)}</li>`).join("");
+  const processHtml = (service.workProcess || []).map((step) => `<li>${escapeHtml(step)}</li>`).join("");
+  const rootHtml = buildShellRootHtml({
+    h1: service.name,
+    categoryEyebrow: `${service.category} \xB7 Standalone Service`,
+    summary: service.description,
+    bodyExtra: `
+      <section>
+        <h2>Pricing &amp; Commercial Terms</h2>
+        <p><strong>${escapeHtml(priceLabel)}</strong>${service.gstEnabled ? ` \xB7 Applicable ${escapeHtml(String(service.gstRate))}% GST extra` : ""}</p>
+        ${service.deliveryPeriod ? `<p>Turnaround / Duration: ${escapeHtml(service.deliveryPeriod)}</p>` : ""}
+        ${service.revisionLimit ? `<p>Revisions Included: ${escapeHtml(String(service.revisionLimit))}</p>` : ""}
+        ${service.id === "srv-bulk-sms" || service.id === "srv-whatsapp-messaging" ? "<p><em>Messaging rates are subject to provider charges, applicable taxes, message category, destination and delivery conditions. Final charges are confirmed in the quotation.</em></p>" : ""}
+      </section>
+      ${benefitsHtml ? `<section><h2>Key Benefits</h2><ul>${benefitsHtml}</ul></section>` : ""}
+      ${deliverablesHtml ? `<section><h2>Included Deliverables</h2><ul>${deliverablesHtml}</ul></section>` : ""}
+      ${processHtml ? `<section><h2>Execution Process</h2><ol>${processHtml}</ol></section>` : ""}
+    `,
+    highlights: [
+      { label: "Customize in Quotation Builder", href: "/pricing#quotation-builder" },
+      { label: "All 10 Service Categories", href: "/ventures/marketing" },
+      { label: "Submit Enquiry", href: "/contact" }
+    ]
+  });
+  return {
+    title,
+    description,
+    canonicalUrl,
+    robots: DEFAULT_ROBOTS,
+    ogType: "website",
+    structuredData,
+    rootHtml
+  };
+}
+function buildShellRootHtml(opts) {
+  const linksHtml = (opts.highlights || []).map((item) => `<li><a href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a></li>`).join("");
+  return `
+      <main style="max-width:960px;margin:0 auto;padding:32px 20px;font-family:system-ui,sans-serif;line-height:1.6;">
+        <header style="border-bottom:1px solid #E8E8ED;padding-bottom:16px;margin-bottom:24px;">
+          <p><strong>AKYIN Ventures</strong> \u2014 Building Ideas Into Businesses</p>
+          <nav aria-label="Primary links">
+            <a href="/">Home</a> \xB7
+            <a href="/about">About</a> \xB7
+            <a href="/ventures">Our Ventures</a> \xB7
+            <a href="/ventures/marketing">Marketing Services</a> \xB7
+            <a href="/marketing/automotive">Automotive Marketing</a> \xB7
+            <a href="/pricing">Pricing</a> \xB7
+            <a href="/tools">Business Tools</a> \xB7
+            <a href="/advisory">Advisory</a> \xB7
+            <a href="/insights">Insights</a> \xB7
+            <a href="/contact">Contact</a> \xB7
+            <a href="/terms">Terms</a> \xB7
+            <a href="/privacy">Privacy</a> \xB7
+            <a href="/sitemap">Sitemap</a>
+          </nav>
+        </header>
+        ${opts.categoryEyebrow ? `<p style="font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#6E6E73;margin-bottom:8px;">${escapeHtml(opts.categoryEyebrow)}</p>` : ""}
+        <h1>${escapeHtml(opts.h1)}</h1>
+        <p>${escapeHtml(opts.summary)}</p>
+        ${opts.bodyExtra || ""}
+        ${linksHtml ? `<section><h2>Explore Next</h2><ul>${linksHtml}</ul></section>` : ""}
+        <footer style="margin-top:32px;border-top:1px solid #E8E8ED;padding-top:16px;">
+          <p>Email: <a href="mailto:connect@akyin.com">connect@akyin.com</a> | <a href="https://whatsapp.com/channel/0029VbCz1qOJ3jurZuI6cM3U" target="_blank" rel="noopener noreferrer">WhatsApp Connect</a></p>
+          <p><a href="/ventures/marketing">Service Catalogue</a> \xB7 <a href="/pricing">Pricing</a> \xB7 <a href="/terms">Terms of Service</a> \xB7 <a href="/privacy">Privacy Policy</a></p>
+        </footer>
+      </main>`;
+}
+function renderSeoHtml(baseHtml, rawPath, db) {
+  const cleaned = rawPath.split("?")[0].replace(/\/+$/, "") || "/";
+  if (cleaned.startsWith("/services/") && db) {
+    const requestedSlug = decodeURIComponent(cleaned.slice("/services/".length)).trim().toLowerCase();
+    const matchedService = db.services.find(
+      (s) => s.active && (s.slug || "").trim().toLowerCase() === requestedSlug
+    );
+    if (matchedService) {
+      const payload = buildServiceSeoPayload(matchedService);
+      return injectSeoIntoTemplate(baseHtml, {
+        title: payload.title,
+        description: payload.description,
+        canonicalUrl: payload.canonicalUrl,
+        robotsValue: payload.robots,
+        ogType: payload.ogType,
+        structuredData: payload.structuredData,
+        rootHtml: payload.rootHtml
+      });
+    }
+  }
+  const meta = ROUTE_SEO_META[cleaned] || ROUTE_SEO_META["/"];
+  const canonicalUrl = `${DOMAIN}${cleaned === "/" ? "/" : cleaned}`;
+  const robotsValue = meta.robots || DEFAULT_ROBOTS;
+  const ogType = meta.ogType || "website";
+  let structuredData = meta.structuredData;
+  if (cleaned !== "/" && cleaned !== "/admin" && ROUTE_SEO_META[cleaned]) {
+    const label = meta.title.split("\u2014")[0].split("|")[0].trim();
+    const breadcrumb = buildBreadcrumbList(cleaned, label);
+    if (Array.isArray(structuredData["@graph"])) {
+      structuredData = {
+        "@context": "https://schema.org",
+        "@graph": [
+          ...structuredData["@graph"] || [],
+          breadcrumb
+        ]
+      };
+    } else {
+      const { ["@context"]: _ctx, ...rest } = structuredData;
+      structuredData = {
+        "@context": "https://schema.org",
+        "@graph": [rest, breadcrumb]
+      };
+    }
+  }
+  let bodyExtra = "";
+  if ((cleaned === "/ventures/marketing" || cleaned === "/sitemap") && db) {
+    const activeServices = db.services.filter((s) => s.active && s.slug).slice().sort((a, b) => (a.menuOrder ?? a.sortOrder) - (b.menuOrder ?? b.sortOrder));
+    if (activeServices.length > 0) {
+      const itemsHtml = activeServices.map(
+        (s) => `<li><a href="/services/${encodeURIComponent(s.slug)}">${escapeHtml(s.name)}</a> \u2014 ${escapeHtml(s.category)} (${escapeHtml(resolveServicePriceSummary(s))})</li>`
+      ).join("");
+      bodyExtra = `<section><h2>Standalone Services Directory</h2><ul>${itemsHtml}</ul></section>`;
+    }
+  }
+  const rootHtml = buildShellRootHtml({
+    h1: meta.h1,
+    summary: meta.summary,
+    bodyExtra,
+    highlights: meta.highlights
+  });
+  return injectSeoIntoTemplate(baseHtml, {
+    title: meta.title,
+    description: meta.description,
+    canonicalUrl,
+    robotsValue,
+    ogType,
+    structuredData,
+    rootHtml
+  });
+}
+function injectSeoIntoTemplate(baseHtml, opts) {
+  const exactTitle = opts.title;
+  const exactDesc = opts.description;
+  let html = baseHtml.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(exactTitle)}</title>`).replace(
+    /<meta\s+name="robots"\s+content="[^"]*"\s*\/?>/i,
+    `<meta name="robots" content="${escapeHtml(opts.robotsValue)}" />`
+  ).replace(
+    /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i,
+    `<meta name="description" content="${escapeHtml(exactDesc)}" />`
+  ).replace(
+    /<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>/i,
+    `<link rel="canonical" href="${escapeHtml(opts.canonicalUrl)}" />`
+  ).replace(
+    /<meta\s+property="og:type"\s+content="[^"]*"\s*\/?>/i,
+    `<meta property="og:type" content="${escapeHtml(opts.ogType)}" />`
+  ).replace(
+    /<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i,
+    `<meta property="og:title" content="${escapeHtml(exactTitle)}" />`
+  ).replace(
+    /<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i,
+    `<meta property="og:description" content="${escapeHtml(exactDesc)}" />`
+  ).replace(
+    /<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/i,
+    `<meta property="og:url" content="${escapeHtml(opts.canonicalUrl)}" />`
+  ).replace(
+    /<meta\s+property="og:image:alt"\s+content="[^"]*"\s*\/?>/i,
+    `<meta property="og:image:alt" content="${escapeHtml(exactTitle)}" />`
+  ).replace(
+    /<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i,
+    `<meta name="twitter:title" content="${escapeHtml(exactTitle)}" />`
+  ).replace(
+    /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/i,
+    `<meta name="twitter:description" content="${escapeHtml(exactDesc)}" />`
+  ).replace(
+    /<meta\s+name="twitter:image:alt"\s+content="[^"]*"\s*\/?>/i,
+    `<meta name="twitter:image:alt" content="${escapeHtml(exactTitle)}" />`
+  ).replace(
+    /<script\s+id="akyin-schema-jsonld"\s+type="application\/ld\+json">[\s\S]*?<\/script>/i,
+    `<script id="akyin-schema-jsonld" type="application/ld+json">${safeJsonLd(opts.structuredData)}</script>`
+  );
+  html = html.replace(
+    /<div id="root">[\s\S]*?<\/div>(?=\s*(?:<script|<!--|<\/body>))/i,
+    `<div id="root">${opts.rootHtml}
+    </div>`
+  );
+  return html;
+}
+function buildDynamicSitemapXml(db) {
+  const fallbackDate = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+  const staticEntries = [
+    { path: "/", changefreq: "weekly", priority: "1.0" },
+    { path: "/about", changefreq: "monthly", priority: "0.9" },
+    { path: "/ventures", changefreq: "weekly", priority: "0.9" },
+    { path: "/ventures/publishing", changefreq: "monthly", priority: "0.8" },
+    { path: "/ventures/marketing", changefreq: "weekly", priority: "0.95" },
+    { path: "/marketing/automotive", changefreq: "weekly", priority: "0.95" },
+    { path: "/ventures/store", changefreq: "monthly", priority: "0.8" },
+    { path: "/ventures/aicalc", changefreq: "monthly", priority: "0.8" },
+    { path: "/ventures/kartigo", changefreq: "monthly", priority: "0.8" },
+    { path: "/ventures/biznxt", changefreq: "monthly", priority: "0.8" },
+    { path: "/ventures/budget-bazaar", changefreq: "monthly", priority: "0.8" },
+    { path: "/pricing", changefreq: "weekly", priority: "0.9" },
+    { path: "/tools", changefreq: "weekly", priority: "0.9" },
+    { path: "/advisory", changefreq: "weekly", priority: "0.9" },
+    { path: "/insights", changefreq: "weekly", priority: "0.8" },
+    { path: "/contact", changefreq: "monthly", priority: "0.9" },
+    { path: "/terms", changefreq: "monthly", priority: "0.7" },
+    { path: "/privacy", changefreq: "monthly", priority: "0.7" },
+    { path: "/sitemap", changefreq: "weekly", priority: "0.7" }
+  ];
+  const seenUrls = /* @__PURE__ */ new Set();
+  const urlNodes = [];
+  for (const entry of staticEntries) {
+    if (entry.path === "/admin" || entry.path === "/quote") continue;
+    const loc = `${DOMAIN}${entry.path === "/" ? "/" : entry.path}`;
+    seenUrls.add(loc);
+    urlNodes.push(
+      `  <url>
+    <loc>${escapeHtml(loc)}</loc>
+    <lastmod>${fallbackDate}</lastmod>
+    <changefreq>${entry.changefreq}</changefreq>
+    <priority>${entry.priority}</priority>
+  </url>`
+    );
+  }
+  const activeServices = (db?.services || []).filter((s) => s.active && Boolean(s.slug)).slice().sort((a, b) => (a.menuOrder ?? a.sortOrder) - (b.menuOrder ?? b.sortOrder));
+  for (const service of activeServices) {
+    const cleanSlug = service.slug.trim();
+    if (!cleanSlug) continue;
+    const loc = `${DOMAIN}/services/${encodeURIComponent(cleanSlug)}`;
+    if (seenUrls.has(loc)) continue;
+    seenUrls.add(loc);
+    const lastmod = typeof service.updatedAt === "string" && /^\d{4}-\d{2}-\d{2}/.test(service.updatedAt) ? service.updatedAt.slice(0, 10) : fallbackDate;
+    urlNodes.push(
+      `  <url>
+    <loc>${escapeHtml(loc)}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>`
+    );
+  }
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urlNodes.join("\n")}
+</urlset>
+`;
 }
 
 // server.ts
@@ -5076,75 +9207,17 @@ var TOPIC_PROMPTS = {
   ev: "latest electric vehicle EV dealership marketing trends, online car buying journeys, digital showroom tools, and customer acquisition strategies in 2025 and 2026",
   crm: "latest automotive dealership CRM automation, AI lead qualification, WhatsApp showroom follow-up, and automotive sales training trends in 2025 and 2026"
 };
-var ROUTE_SEO_META = {
-  "/": {
-    title: "AKYIN Ventures \u2014 Multi-Business Group & Marketing Agency",
-    description: "AKYIN Ventures is a diversified multi-business group and marketing agency spanning publishing, automotive growth, retail, AI tools, B2B trade, and advisory."
-  },
-  "/about": {
-    title: "About AKYIN Ventures \u2014 One Vision. Multiple Business Ventures.",
-    description: "Corporate profile of AKYIN Ventures and its seven operating divisions across publishing, performance marketing, retail, AI tools, and B2B commerce."
-  },
-  "/ventures": {
-    title: "Our Businesses \u2014 AKYIN Ventures Portfolio",
-    description: "Explore Akyin Publishing, Akyin Marketing Agency, Akyin Store, AICalc.in, Kartigo.online, BizNXT.online, and Budget Bazaar."
-  },
-  "/ventures/publishing": {
-    title: "AKYIN Publishing \u2014 Ideas That Inspire. Knowledge That Empowers. | akyin.com",
-    description: "Explore eight books on Amazon and three digital guides & productivity tools published by AKYIN."
-  },
-  "/ventures/marketing": {
-    title: "AKYIN MARKETINGS \u2014 Full-Service Marketing Agency & Growth Solutions",
-    description: "Full-service digital marketing agency delivering Meta lead generation, brand campaigns, AI-assisted lead qualification, and commercial sales training."
-  },
-  "/marketing/automotive": {
-    title: "Car Dealership Marketing & Test-Drive Leads | AKYIN",
-    description: "Book qualified showroom test drives, not cold clicks. Targeted Meta & Google auto ads, lead vetting, and floor sales coaching. Get a quote.",
-    ogTitle: "More Showroom Test Drives. Zero Cold Leads. | AKYIN",
-    ogDescription: "High-intent Meta & Google auto ads, automated lead vetting, and dealer sales coaching built to fill your showroom floor faster."
-  },
-  "/pricing": {
-    title: "Pricing & Rate Card \u2014 AKYIN Ventures & Marketing Agency",
-    description: "Transparent INR pricing for AKYIN Marketing Agency packages, lead filtering retainers, dealership sales training, and 1-on-1 business advisory."
-  },
-  "/advisory": {
-    title: "Business Advisory & Consultation Booking \u2014 AKYIN Ventures",
-    description: "Schedule a 1-on-1 30-minute IST Business Advisory consultation with AKYIN Ventures."
-  },
-  "/terms": {
-    title: "Terms of Service \u2014 AKYIN Ventures | akyin.com",
-    description: "Terms of Service, direct ad platform billing rules, service scope separation, and governance policies for AKYIN Ventures."
-  },
-  "/privacy": {
-    title: "Privacy Policy \u2014 AKYIN Ventures | akyin.com",
-    description: "Zero-broker data privacy, enquiry validation, and security standards across AKYIN Ventures."
-  },
-  "/contact": {
-    title: "Contact AKYIN Ventures \u2014 Let\u2019s Start a Conversation",
-    description: "Direct enquiry desk for AKYIN Ventures and all seven operating verticals."
-  },
-  "/tools": {
-    title: "Business, Marketing & Sales Calculators Suite | AKYIN.com",
-    description: "20 free transparent interactive marketing ROI, ROAS, CPL, CAC, sales forecast, quotation, GST, and business growth tools by AKYIN Ventures."
-  },
-  "/quote": {
-    title: "Client Quotation & Payment Portal \u2014 AKYIN Ventures",
-    description: "Review, accept, print A4 dossier, or settle your AKYIN Ventures commercial quotation online."
-  }
-};
-function escapeHtmlAttr(value) {
-  return value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-function createGeminiClient() {
+async function createGeminiClient() {
   let apiKey = (process.env.GEMINI_API_KEY ?? "").trim().replace(/^(['"])(.*)\1$/, "$2").trim().replace(/^Bearer\s+/i, "").trim();
   if (!apiKey || apiKey === "MY_GEMINI_API_KEY" || /^(your_|replace_|test_|changeme|<.*>)/i.test(apiKey)) {
-    return { client: null, reason: "API_KEY_MISSING" };
+    return { client: null, ThinkingLevel: null, reason: "API_KEY_MISSING" };
   }
   if (/\s/.test(apiKey) || apiKey.startsWith("ya29.")) {
-    return { client: null, reason: "API_KEY_INVALID_FORMAT" };
+    return { client: null, ThinkingLevel: null, reason: "API_KEY_INVALID_FORMAT" };
   }
+  const { GoogleGenAI: GenAIClient, ThinkingLevel } = await import("@google/genai");
   return {
-    client: new GoogleGenAI({
+    client: new GenAIClient({
       apiKey,
       httpOptions: {
         headers: {
@@ -5152,6 +9225,7 @@ function createGeminiClient() {
         }
       }
     }),
+    ThinkingLevel,
     reason: null
   };
 }
@@ -5294,6 +9368,9 @@ async function startServer() {
       'camera=(), geolocation=(), microphone=(self), payment=(self "https://checkout.razorpay.com")'
     );
     res.setHeader("Content-Signal", "search=yes, ai-input=yes, ai-train=no");
+    if (req.path.startsWith("/api/") || req.path === "/admin" || req.path.startsWith("/admin/") || req.path === "/quote" || req.path.startsWith("/quote/")) {
+      res.setHeader("X-Robots-Tag", "noindex, nofollow");
+    }
     if (process.env.NODE_ENV === "production" && (req.secure || req.headers["x-forwarded-proto"] === "https")) {
       res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
     }
@@ -5332,7 +9409,7 @@ async function startServer() {
       res.type("text/plain; charset=utf-8").sendFile(file);
       return;
     }
-    res.type("text/plain; charset=utf-8").send("User-agent: *\nAllow: /\nDisallow: /admin\nContent-Signal: search=yes, ai-input=yes, ai-train=no\nSitemap: https://akyin.com/sitemap.xml\n");
+    res.type("text/plain; charset=utf-8").send("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /quote\nDisallow: /api/\nContent-Signal: search=yes, ai-input=yes, ai-train=no\nSitemap: https://akyin.com/sitemap.xml\n");
   });
   app.get("/llms.txt", (_req, res) => {
     const file = resolvePublicOrDistFile("llms.txt");
@@ -5343,12 +9420,18 @@ async function startServer() {
     res.type("text/markdown; charset=utf-8").send(buildMarkdownForRoute("/"));
   });
   app.get("/sitemap.xml", (_req, res) => {
-    const file = resolvePublicOrDistFile("sitemap.xml");
-    if (file) {
-      res.type("application/xml; charset=utf-8").sendFile(file);
-      return;
+    try {
+      const db = readDb();
+      const xml = buildDynamicSitemapXml(db);
+      res.type("application/xml; charset=utf-8").send(xml);
+    } catch {
+      const file = resolvePublicOrDistFile("sitemap.xml");
+      if (file) {
+        res.type("application/xml; charset=utf-8").sendFile(file);
+        return;
+      }
+      res.status(404).send("Sitemap not found.");
     }
-    res.status(404).send("Sitemap not found.");
   });
   app.get("/.well-known/mcp/server-card.json", (_req, res) => {
     const file = resolvePublicOrDistFile(path2.join(".well-known", "mcp", "server-card.json"));
@@ -5359,10 +9442,16 @@ async function startServer() {
     }
     res.status(404).json({ error: "MCP server card not found." });
   });
-  app.get("/downloads/:filename", (req, res, next) => {
+  const DOWNLOAD_PDF_ALIASES = {
+    "AKYIN_All_Businesses_Presentation_Updated.pdf": "assets/aistudio/All_Businesses_Presentation_72c79302.pdf",
+    "AKYIN_Marketing_All_Businesses_Presentation.pdf": "assets/aistudio/All_Businesses_Presentation_72c79302.pdf",
+    "AKYIN_Automotive_Marketing_Presentation_Updated.pdf": "assets/aistudio/Automotive_Presentation_4a4e967e.pdf"
+  };
+  app.get("/downloads/:filename", (req, res) => {
     const rawFilename = req.params.filename;
     const sanitizedFilename = path2.basename(rawFilename);
-    const resolvedPath = resolvePublicOrDistFile(path2.join("downloads", sanitizedFilename));
+    const aliasRelPath = DOWNLOAD_PDF_ALIASES[sanitizedFilename];
+    const resolvedPath = resolvePublicOrDistFile(path2.join("downloads", sanitizedFilename)) || (aliasRelPath ? resolvePublicOrDistFile(aliasRelPath) : null);
     if (resolvedPath && fs2.existsSync(resolvedPath)) {
       if (sanitizedFilename.toLowerCase().endsWith(".pdf")) {
         res.setHeader("Content-Type", "application/pdf");
@@ -5371,7 +9460,7 @@ async function startServer() {
       res.setHeader("Cache-Control", "public, max-age=86400");
       return res.sendFile(resolvedPath);
     }
-    next();
+    res.status(404).json({ error: "Download file not found.", code: "DOWNLOAD_NOT_FOUND" });
   });
   app.use((req, res, next) => {
     if (wantsMarkdown(req)) {
@@ -5438,7 +9527,7 @@ async function startServer() {
             },
             {
               name: "get_marketing_pricing",
-              description: "Retrieve transparent INR pricing for AKYIN MARKETINGS retainers (Package A & B), sales training, and the 21-item rate card.",
+              description: "Retrieve transparent INR standalone service catalogue and pricing across all 10 AKYIN MARKETINGS categories.",
               inputSchema: {
                 type: "object",
                 properties: {
@@ -5448,7 +9537,7 @@ async function startServer() {
             },
             {
               name: "get_contact_channels",
-              description: "Get official corporate email, telephone, WhatsApp, legal links, and social handles for AKYIN Ventures.",
+              description: "Get official corporate email, WhatsApp Connect, legal links, and social handles for AKYIN Ventures.",
               inputSchema: {
                 type: "object",
                 properties: {}
@@ -5493,8 +9582,19 @@ async function startServer() {
         return;
       }
       if (toolName === "get_marketing_pricing") {
+        const db = readDb();
         const cat = typeof args.category === "string" ? args.category.trim().toLowerCase() : "";
-        const items = cat ? RATE_CARD_ITEMS.filter((i) => i.category.toLowerCase().includes(cat)) : RATE_CARD_ITEMS;
+        const activeServices = db.services.filter((s) => s.active).filter((s) => !cat || s.category.toLowerCase().includes(cat)).sort((a, b) => (a.menuOrder ?? a.sortOrder) - (b.menuOrder ?? b.sortOrder)).map((s) => ({
+          id: s.id,
+          slug: s.slug,
+          name: s.name,
+          category: s.category,
+          pricingModel: s.pricingModel,
+          oneTimePrice: s.oneTimePrice,
+          monthlyPrice: s.monthlyPrice,
+          billingCycle: s.billingCycle,
+          url: `${OFFICIAL_CONTACT.domain}/services/${s.slug}`
+        }));
         res.json({
           jsonrpc: "2.0",
           id,
@@ -5506,8 +9606,8 @@ async function startServer() {
                   {
                     currency: "INR",
                     pricingUrl: `${OFFICIAL_CONTACT.domain}/pricing`,
-                    packages: PRICING_PACKAGES,
-                    rateCard: items
+                    categories: (db.serviceCategories || []).filter((c) => c.active).map((c) => c.name),
+                    services: activeServices
                   },
                   null,
                   2
@@ -5530,7 +9630,7 @@ async function startServer() {
                   {
                     organization: OFFICIAL_CONTACT.parentBrand,
                     email: OFFICIAL_CONTACT.email,
-                    telephone: OFFICIAL_CONTACT.phoneDisplay,
+                    whatsappConnect: OFFICIAL_CONTACT.whatsappUrl,
                     whatsappUrl: OFFICIAL_CONTACT.whatsappUrl,
                     socials: OFFICIAL_CONTACT.marketingSocials,
                     termsUrl: `${OFFICIAL_CONTACT.domain}/terms`,
@@ -5579,7 +9679,15 @@ async function startServer() {
       error: { code: -32601, message: `Unsupported MCP method: ${method}` }
     });
   });
+  app.get("/api/health", (_req, res) => {
+    res.json({
+      ok: true,
+      status: "healthy",
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    });
+  });
   registerSuiteRoutes(app);
+  startSubscriptionReminderScheduler();
   app.get("/api/automotive-news", newsRateLimiter, async (req, res) => {
     const topicKey = typeof req.query.topic === "string" && req.query.topic in TOPIC_PROMPTS ? req.query.topic : "all";
     const cached = automotiveNewsCache.get(topicKey);
@@ -5587,8 +9695,8 @@ async function startServer() {
       res.json(cached.payload);
       return;
     }
-    const { client: ai, reason } = createGeminiClient();
-    if (!ai) {
+    const { client: ai, ThinkingLevel, reason } = await createGeminiClient();
+    if (!ai || !ThinkingLevel) {
       res.status(503).json({
         error: reason === "API_KEY_INVALID_FORMAT" ? "Configured GEMINI_API_KEY is not a valid API key format. Please update GEMINI_API_KEY in Settings > Secrets." : "Live Google Search headlines require GEMINI_API_KEY to be configured in Settings > Secrets.",
         code: reason
@@ -5695,58 +9803,68 @@ Return ONLY a valid JSON array (no extra commentary) where each object contains:
       });
     }
   });
+  app.use("/api", (_req, res) => {
+    res.status(404).json({ error: "API route not found.", code: "NOT_FOUND" });
+  });
   if (process.env.NODE_ENV === "production") {
     const distDir = path2.resolve(__dirname, "dist");
     const indexFile = path2.join(distDir, "index.html");
     const cachedIndexHtml = fs2.existsSync(indexFile) ? fs2.readFileSync(indexFile, "utf8") : null;
     app.use(express.static(distDir, { dotfiles: "ignore" }));
     app.get("*", (req, res) => {
+      const reqPath = req.path || "/";
+      if (reqPath.startsWith("/api/") || reqPath.startsWith("/assets/") || reqPath.startsWith("/downloads/") || /\.[a-z0-9]{1,8}$/i.test(reqPath)) {
+        res.status(404).end("Resource not found.");
+        return;
+      }
       if (!cachedIndexHtml) {
         res.status(404).send("Build output not found.");
         return;
       }
-      const cleaned = req.path.replace(/\/+$/, "") || "/";
-      const routeMeta = ROUTE_SEO_META[cleaned];
-      if (!routeMeta) {
-        res.type("text/html; charset=utf-8").send(cachedIndexHtml);
-        return;
-      }
-      const canonicalUrl = `https://akyin.com${cleaned === "/" ? "/" : cleaned}`;
-      const ogTitleValue = routeMeta.ogTitle || routeMeta.title;
-      const ogDescValue = routeMeta.ogDescription || routeMeta.description;
-      let html = cachedIndexHtml;
-      html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtmlAttr(routeMeta.title)}</title>`).replace(
-        /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i,
-        `<meta name="description" content="${escapeHtmlAttr(routeMeta.description)}" />`
-      ).replace(
-        /<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>/i,
-        `<link rel="canonical" href="${escapeHtmlAttr(canonicalUrl)}" />`
-      ).replace(
-        /<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i,
-        `<meta property="og:title" content="${escapeHtmlAttr(ogTitleValue)}" />`
-      ).replace(
-        /<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i,
-        `<meta property="og:description" content="${escapeHtmlAttr(ogDescValue)}" />`
-      ).replace(
-        /<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/i,
-        `<meta property="og:url" content="${escapeHtmlAttr(canonicalUrl)}" />`
-      ).replace(
-        /<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i,
-        `<meta name="twitter:title" content="${escapeHtmlAttr(ogTitleValue)}" />`
-      ).replace(
-        /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/i,
-        `<meta name="twitter:description" content="${escapeHtmlAttr(ogDescValue)}" />`
-      );
+      const renderedHtml = renderSeoHtml(cachedIndexHtml, req.path, readDb());
       res.setHeader("Vary", "Accept");
-      res.type("text/html; charset=utf-8").send(html);
+      res.type("text/html; charset=utf-8").send(renderedHtml);
     });
   } else {
-    const { createServer: createViteServer } = await import("vite");
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa"
+    const vitePromise = import("vite").then(
+      ({ createServer: createViteServer }) => createViteServer({
+        server: {
+          middlewareMode: true,
+          hmr: false,
+          watch: null
+        },
+        appType: "spa"
+      })
+    );
+    vitePromise.catch((err) => {
+      console.error("[Vite initialization error]", err);
     });
-    app.use(vite.middlewares);
+    const devIndexPath = path2.resolve(__dirname, "index.html");
+    app.use(async (req, res, next) => {
+      try {
+        const reqPath = req.path || "/";
+        if (reqPath.startsWith("/assets/")) {
+          const publicAssetPath = path2.resolve(__dirname, "public", reqPath.slice(1));
+          if (!fs2.existsSync(publicAssetPath)) {
+            res.status(404).end("Asset not found.");
+            return;
+          }
+        }
+        const vite = await vitePromise;
+        const isPageNavigation = (req.method === "GET" || req.method === "HEAD") && !reqPath.startsWith("/api/") && !reqPath.startsWith("/assets/") && !reqPath.startsWith("/downloads/") && !reqPath.startsWith("/@") && !reqPath.startsWith("/src/") && !reqPath.startsWith("/node_modules/") && !reqPath.startsWith("/.well-known/") && !/\.[a-z0-9]{1,8}$/i.test(reqPath);
+        if (isPageNavigation && fs2.existsSync(devIndexPath)) {
+          const baseTemplate = fs2.readFileSync(devIndexPath, "utf8");
+          const ssrHtml = renderSeoHtml(baseTemplate, req.originalUrl, readDb());
+          const transformedHtml = await vite.transformIndexHtml(req.originalUrl, ssrHtml);
+          res.setHeader("Vary", "Accept");
+          res.status(200).type("text/html; charset=utf-8").end(transformedHtml);
+          return;
+        }
+        vite.middlewares(req, res, next);
+      } catch (err) {
+        next(err);
+      }
+    });
   }
   app.use((err, _req, res, _next) => {
     console.error("[Server Error]", err instanceof Error ? err.message : err);

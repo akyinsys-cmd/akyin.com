@@ -175,43 +175,21 @@ export function Navbar({
     onNavigate(route);
   };
 
-  const navigateToQuote = (serviceName?: string) => {
+  const navigateToQuote = (_serviceName?: string) => {
     setDropdownOpen(false);
     setServicesMenuOpen(false);
     setMobileMenuOpen(false);
     setMobileServicesOpen(false);
     setNavDropdownOpen(false);
     setMegaDropdownOpen(false);
-    onNavigate('/pricing');
-    setTimeout(() => {
-      const el = document.getElementById('quotation-builder');
-      if (el) {
-        el.scrollIntoView({
-          behavior: shouldReduceMotion ? 'auto' : 'smooth',
-          block: 'start',
-        });
-      }
-    }, 180);
+    onNavigate('/pricing#quotation-builder' as AppRoute);
   };
 
   const handleClientsClick = () => {
     setDropdownOpen(false);
     setServicesMenuOpen(false);
     setMobileMenuOpen(false);
-    if (window.location.pathname !== '/') {
-      onNavigate('/');
-      setTimeout(() => {
-        document.getElementById('our-clients')?.scrollIntoView({
-          behavior: shouldReduceMotion ? 'auto' : 'smooth',
-          block: 'start',
-        });
-      }, 300);
-    } else {
-      document.getElementById('our-clients')?.scrollIntoView({
-        behavior: shouldReduceMotion ? 'auto' : 'smooth',
-        block: 'start',
-      });
-    }
+    onNavigate('/#our-clients' as AppRoute);
   };
 
   const orderedCategories = useMemo(() => {

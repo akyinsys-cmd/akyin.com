@@ -84,8 +84,16 @@ export function PresentationDeckViewer({
       disableAutoFetch: false,
     });
 
+    const loadTimeoutId = window.setTimeout(() => {
+      if (cancelled) return;
+      void loadingTask.destroy();
+      setPdfError('Presentation preview timed out; switch to PDF Frame or Download PDF.');
+      setLoadingPdf(false);
+    }, 15000);
+
     loadingTask.promise
       .then((doc) => {
+        window.clearTimeout(loadTimeoutId);
         if (cancelled) {
           void doc.cleanup();
           return;
@@ -97,6 +105,7 @@ export function PresentationDeckViewer({
         setLoadingPdf(false);
       })
       .catch((err) => {
+        window.clearTimeout(loadTimeoutId);
         if (cancelled) return;
         console.error('Failed to load PDF presentation:', err);
         setPdfError('Interactive slide rendering unavailable; switch to PDF Frame or Download PDF.');
@@ -105,6 +114,7 @@ export function PresentationDeckViewer({
 
     return () => {
       cancelled = true;
+      window.clearTimeout(loadTimeoutId);
       if (loadedDoc) {
         void loadedDoc.cleanup();
       } else {
@@ -297,10 +307,16 @@ export function PresentationDeckViewer({
   const handleDownloadPdf = async () => {
     if (downloading) return;
     setDownloading(true);
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 15000);
     try {
-      const response = await fetch(activeDeck.pdfUrl);
+      const response = await fetch(activeDeck.pdfUrl, { signal: controller.signal });
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
+      }
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('text/html')) {
+        throw new Error('Unexpected HTML response instead of PDF');
       }
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
@@ -310,7 +326,7 @@ export function PresentationDeckViewer({
       document.body.appendChild(a);
       a.click();
       a.remove();
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
     } catch {
       const a = document.createElement('a');
       a.href = activeDeck.pdfUrl;
@@ -319,6 +335,7 @@ export function PresentationDeckViewer({
       a.click();
       a.remove();
     } finally {
+      window.clearTimeout(timeoutId);
       setDownloading(false);
     }
   };

@@ -240,14 +240,12 @@ const VERTICAL_SECTION_INDEX: VerticalSectionItem[] = [
     name: 'Kartigo',
     route: '/ventures/kartigo',
     sector: 'Client Showcase · B2B Stock Supply',
-    externalUrl: EXTERNAL_VERTICAL_URLS.kartigo,
-    externalLabel: 'kartigo.online',
     keySections: [
       'Kartigo Client Showcase Hero',
       'Focused Wholesale & Stock Trade Concept',
       'Business Buyer Benefits & Supplier Opportunities',
       '3-Step How Businesses Engage With Kartigo Workflow',
-      'Direct Gateway to Kartigo.online & B2B Supply Enquiries',
+      'Direct B2B Supply & Partnership Enquiries',
     ],
   },
   {
@@ -256,10 +254,8 @@ const VERTICAL_SECTION_INDEX: VerticalSectionItem[] = [
     name: 'BizNXT.online',
     route: '/ventures/biznxt',
     sector: 'Client Showcase · Business Guidance & Consulting',
-    externalUrl: EXTERNAL_VERTICAL_URLS.biznxt,
-    externalLabel: 'biznxt.online',
     keySections: [
-      'Hero Introduction & BizNXT.online Gateway',
+      'Hero Introduction & Consulting Overview',
       'About BizNXT & Entrepreneurial Focus',
       'Business Guidance & Feasibility Evaluation',
       'Consulting Services & Commercial Structuring',
@@ -272,12 +268,9 @@ const VERTICAL_SECTION_INDEX: VerticalSectionItem[] = [
     name: 'Budget Bazaar',
     route: '/ventures/budget-bazaar',
     sector: 'Client Showcase · B2C E-commerce',
-    externalUrl: EXTERNAL_VERTICAL_URLS.budgetBazaar,
-    externalLabel: 'budgetbazaar.org',
     keySections: [
-      'Budget Bazaar Client Showcase Hero & Storefront CTA',
+      'Budget Bazaar Client Showcase Hero',
       'Value-First Merchandising Principles',
-      'Direct Gateway to budgetbazaar.org',
       'Budget Bazaar Retail & Product Enquiries',
     ],
   },
@@ -338,7 +331,7 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
             </span>
             <span aria-hidden="true">·</span>
             <span className="font-mono-num font-bold text-[#1D1D1F]">
-              6 External Storefronts &amp; Platforms
+              3 External Storefronts &amp; Platforms
             </span>
           </div>
         </div>
@@ -578,51 +571,6 @@ export function SitemapPage({ onNavigate }: SitemapPageProps) {
                       className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline whitespace-nowrap"
                     >
                       aicalc.in
-                      <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
-                    </a>
-                  </li>
-                  <li className="py-3 flex items-center justify-between gap-4">
-                    <div>
-                      <p className="font-semibold text-[#1D1D1F]">Kartigo.online</p>
-                      <p className="text-xs text-[#6E6E73]">B2B Stock Supply &amp; Commerce Platform</p>
-                    </div>
-                    <a
-                      href={EXTERNAL_VERTICAL_URLS.kartigo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline whitespace-nowrap"
-                    >
-                      kartigo.online
-                      <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
-                    </a>
-                  </li>
-                  <li className="py-3 flex items-center justify-between gap-4">
-                    <div>
-                      <p className="font-semibold text-[#1D1D1F]">BizNXT.online</p>
-                      <p className="text-xs text-[#6E6E73]">Business Guidance &amp; Consulting Platform</p>
-                    </div>
-                    <a
-                      href={EXTERNAL_VERTICAL_URLS.biznxt}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline whitespace-nowrap"
-                    >
-                      biznxt.online
-                      <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
-                    </a>
-                  </li>
-                  <li className="py-3 flex items-center justify-between gap-4">
-                    <div>
-                      <p className="font-semibold text-[#1D1D1F]">BudgetBazaar.org</p>
-                      <p className="text-xs text-[#6E6E73]">Affordable Consumer Retail Storefront</p>
-                    </div>
-                    <a
-                      href={EXTERNAL_VERTICAL_URLS.budgetBazaar}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D1D1F] hover:underline whitespace-nowrap"
-                    >
-                      budgetbazaar.org
                       <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
                     </a>
                   </li>

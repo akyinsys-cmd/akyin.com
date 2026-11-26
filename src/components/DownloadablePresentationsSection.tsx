@@ -60,10 +60,19 @@ export function DownloadablePresentationsSection({
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const renderTaskRef = useRef<pdfjsLib.RenderTask | null>(null);
+  const successTimerRef = useRef<number | null>(null);
 
   // Cover canvas rendering for each card
   const coverCanvasRef1 = useRef<HTMLCanvasElement | null>(null);
   const coverCanvasRef2 = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (successTimerRef.current !== null) {
+        window.clearTimeout(successTimerRef.current);
+      }
+    };
+  }, []);
 
   // Load PDF when preview modal opens
   useEffect(() => {
@@ -88,8 +97,18 @@ export function DownloadablePresentationsSection({
       disableAutoFetch: false,
     });
 
+    const loadTimeoutId = window.setTimeout(() => {
+      if (cancelled) return;
+      void task.destroy();
+      setRenderError(
+        'PDF preview timed out. Switch to PDF Frame or use the direct download button.'
+      );
+      setLoadingDoc(false);
+    }, 15000);
+
     task.promise
       .then((doc) => {
+        window.clearTimeout(loadTimeoutId);
         if (cancelled) {
           void doc.cleanup();
           return;
@@ -101,6 +120,7 @@ export function DownloadablePresentationsSection({
         setLoadingDoc(false);
       })
       .catch((err) => {
+        window.clearTimeout(loadTimeoutId);
         if (cancelled) return;
         console.error('Failed to open PDF in preview mode:', err);
         setRenderError(
@@ -111,6 +131,7 @@ export function DownloadablePresentationsSection({
 
     return () => {
       cancelled = true;
+      window.clearTimeout(loadTimeoutId);
       if (loaded) {
         void loaded.cleanup();
       } else {
@@ -247,10 +268,16 @@ export function DownloadablePresentationsSection({
   const handleDownload = async (doc: DownloadablePdfDocument) => {
     if (downloadingId === doc.id) return;
     setDownloadingId(doc.id);
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 15000);
     try {
-      const response = await fetch(doc.downloadPath);
+      const response = await fetch(doc.downloadPath, { signal: controller.signal });
       if (!response.ok) {
         throw new Error(`Failed to download: HTTP ${response.status}`);
+      }
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('text/html')) {
+        throw new Error('Unexpected HTML response instead of PDF');
       }
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
@@ -260,22 +287,23 @@ export function DownloadablePresentationsSection({
       document.body.appendChild(link);
       link.click();
       link.remove();
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
 
       setDownloadSuccessId(doc.id);
-      setTimeout(() => setDownloadSuccessId(null), 3500);
+      if (successTimerRef.current !== null) {
+        window.clearTimeout(successTimerRef.current);
+      }
+      successTimerRef.current = window.setTimeout(() => setDownloadSuccessId(null), 3500);
     } catch {
       // Direct anchor click fallback
       const link = document.createElement('a');
       link.href = doc.downloadPath;
       link.download = doc.filename;
-      link.target = '_blank';
       document.body.appendChild(link);
       link.click();
       link.remove();
-      setDownloadSuccessId(doc.id);
-      setTimeout(() => setDownloadSuccessId(null), 3500);
     } finally {
+      window.clearTimeout(timeoutId);
       setDownloadingId(null);
     }
   };
