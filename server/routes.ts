@@ -1720,6 +1720,83 @@ export function registerSuiteRoutes(app: Express): void {
     }
   );
 
+  // --- Unified customer directory: combines existing CRM, client, invoice and booking contacts ---
+  app.get(
+    '/api/suite/customers',
+    requireAuth,
+    requirePermission('clients'),
+    (_req: Request, res: Response) => {
+      const db = readDb();
+      type CustomerView = {
+        customerKey: string; name: string; companyName: string; email: string; phone: string;
+        city: string; country: string; clientId: string; clientStatus: string;
+        leadIds: string[]; invoiceCount: number; appointmentCount: number;
+        sources: string[]; lastActivityAt: string;
+      };
+      const byKey = new Map<string, CustomerView>();
+      const keyFor = (email: string, phone: string, fallback: string) => {
+        const cleanEmail = String(email || '').trim().toLowerCase();
+        const cleanPhone = String(phone || '').replace(/\D/g, '');
+        return cleanEmail ? `email:${cleanEmail}` : cleanPhone ? `phone:${cleanPhone}` : fallback;
+      };
+      const upsert = (input: Partial<CustomerView> & { email?: string; phone?: string; fallback: string; source: string; activity?: string }) => {
+        const key = keyFor(input.email || '', input.phone || '', input.fallback);
+        const existing = byKey.get(key);
+        if (existing) {
+          if (!existing.name && input.name) existing.name = input.name;
+          if (!existing.companyName && input.companyName) existing.companyName = input.companyName;
+          if (!existing.email && input.email) existing.email = input.email;
+          if (!existing.phone && input.phone) existing.phone = input.phone;
+          if (!existing.city && input.city) existing.city = input.city;
+          if (!existing.country && input.country) existing.country = input.country;
+          if (!existing.clientId && input.clientId) existing.clientId = input.clientId;
+          if (input.clientStatus) existing.clientStatus = input.clientStatus;
+          if (input.leadIds?.length) existing.leadIds = Array.from(new Set([...existing.leadIds, ...input.leadIds]));
+          if (input.source && !existing.sources.includes(input.source)) existing.sources.push(input.source);
+          if (input.activity && input.activity > existing.lastActivityAt) existing.lastActivityAt = input.activity;
+          return existing;
+        }
+        const created: CustomerView = {
+          customerKey: key, name: input.name || '', companyName: input.companyName || '',
+          email: input.email || '', phone: input.phone || '', city: input.city || '', country: input.country || '',
+          clientId: input.clientId || '', clientStatus: input.clientStatus || '',
+          leadIds: input.leadIds || [], invoiceCount: 0, appointmentCount: 0,
+          sources: [input.source], lastActivityAt: input.activity || '',
+        };
+        byKey.set(key, created);
+        return created;
+      };
+      for (const client of db.clients || []) {
+        upsert({ fallback: `client:${client.id}`, source: 'Client', name: client.name,
+          companyName: client.companyName, email: client.email, phone: client.phone,
+          city: client.city, country: client.country, clientId: client.id,
+          clientStatus: client.status, activity: client.updatedAt || client.createdAt });
+      }
+      for (const lead of db.leads || []) {
+        upsert({ fallback: `lead:${lead.leadId}`, source: 'Lead / Enquiry', name: lead.fullName,
+          companyName: lead.companyName, email: lead.email, phone: lead.mobileNumber,
+          city: lead.city, country: lead.country, leadIds: [lead.leadId], activity: lead.updatedAt || lead.receivedAt });
+      }
+      for (const invoice of db.invoices || []) {
+        const customer = upsert({ fallback: `invoice:${invoice.id}`, source: 'Invoice',
+          name: invoice.customerName, companyName: invoice.companyName, email: invoice.customerEmail,
+          phone: invoice.customerPhone, activity: invoice.updatedAt || invoice.createdAt });
+        customer.invoiceCount += 1;
+      }
+      for (const appointment of db.appointments || []) {
+        const customer = upsert({ fallback: `appointment:${appointment.bookingId}`, source: 'Appointment',
+          name: appointment.customerName, companyName: appointment.businessName, email: appointment.email,
+          phone: appointment.phone, city: appointment.city, country: appointment.country,
+          activity: appointment.updatedAt || appointment.createdAt });
+        customer.appointmentCount += 1;
+      }
+      const customers = Array.from(byKey.values()).sort((a, b) =>
+        b.lastActivityAt.localeCompare(a.lastActivityAt)
+      );
+      res.json({ customers, total: customers.length, note: 'Unified directory of existing lead, client, invoice and appointment contacts. No customer login accounts are created.' });
+    }
+  );
+
   // --- Clients & Ticker Directory ---
   app.get(
     '/api/suite/clients',
