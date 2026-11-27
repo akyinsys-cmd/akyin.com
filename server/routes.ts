@@ -3425,6 +3425,115 @@ export function registerSuiteRoutes(app: Express): void {
     }
   );
 
+  // --- Read-only Razorpay account reconciliation (never mutates ledger records) ---
+  app.post(
+    '/api/suite/payments/razorpay-reconcile',
+    requireAuth,
+    requirePermission('payments'),
+    async (req: AuthenticatedRequest, res: Response) => {
+      const creds = getRazorpayCredentials();
+      if (!creds) {
+        res.status(503).json({ error: 'Razorpay API credentials are not configured.' });
+        return;
+      }
+      const days = Math.min(90, Math.max(1, Number(req.body?.days) || 30));
+      const to = Math.floor(Date.now() / 1000);
+      const from = to - days * 24 * 60 * 60;
+      const authHeader = Buffer.from(`${creds.keyId}:${creds.keySecret}`).toString('base64');
+      const gatewayPayments: Array<{
+        id: string; order_id?: string; amount: number; currency: string;
+        status: string; captured: boolean; created_at: number;
+      }> = [];
+      try {
+        // Razorpay caps each page at 100. Bound the scan to five pages / 500 records.
+        for (let skip = 0; skip < 500; skip += 100) {
+          const url = new URL('https://api.razorpay.com/v1/payments');
+          url.searchParams.set('from', String(from));
+          url.searchParams.set('to', String(to));
+          url.searchParams.set('count', '100');
+          url.searchParams.set('skip', String(skip));
+          const response = await fetch(url, {
+            headers: { Authorization: `Basic ${authHeader}` },
+            signal: AbortSignal.timeout(20000),
+          });
+          const body = await response.json().catch(() => ({})) as {
+            items?: typeof gatewayPayments;
+            error?: { description?: string };
+          };
+          if (!response.ok) {
+            res.status(502).json({
+              error: body.error?.description || 'Unable to retrieve Razorpay payment records.',
+              code: 'RAZORPAY_RECONCILIATION_FAILED',
+            });
+            return;
+          }
+          const items = Array.isArray(body.items) ? body.items : [];
+          gatewayPayments.push(...items);
+          if (items.length < 100) break;
+        }
+        const db = readDb();
+        const localGatewayPayments = db.payments.filter(
+          (payment) => payment.gateway === 'razorpay' && payment.mode === creds.mode
+        );
+        const localByGatewayId = new Map(
+          localGatewayPayments
+            .filter((payment) => payment.razorpayPaymentId)
+            .map((payment) => [payment.razorpayPaymentId, payment])
+        );
+        const gatewayIds = new Set(gatewayPayments.map((payment) => payment.id));
+        const missingLocally = gatewayPayments
+          .filter((payment) => !localByGatewayId.has(payment.id))
+          .map((payment) => ({
+            paymentId: payment.id, orderId: payment.order_id || '',
+            amount: payment.amount / 100, currency: payment.currency,
+            status: payment.status, captured: payment.captured,
+            createdAt: new Date(payment.created_at * 1000).toISOString(),
+          }));
+        const localNotInWindow = localGatewayPayments
+          .filter((payment) => payment.razorpayPaymentId && !gatewayIds.has(payment.razorpayPaymentId))
+          .filter((payment) => {
+            const stamp = Date.parse(payment.createdAt);
+            return Number.isFinite(stamp) && stamp >= from * 1000 && stamp <= to * 1000;
+          })
+          .map((payment) => ({
+            paymentId: payment.razorpayPaymentId, orderId: payment.razorpayOrderId,
+            amount: payment.amount, currency: payment.currency, status: payment.status,
+            verified: payment.verified, createdAt: payment.createdAt,
+          }));
+        appendAuditLog(db, {
+          actorId: req.suiteUser!.id,
+          actorName: req.suiteUser!.name,
+          actorRole: req.suiteUser!.role,
+          action: 'RAZORPAY_RECONCILIATION_RUN',
+          targetId: `RAZORPAY-${creds.mode.toUpperCase()}`,
+          summary: `Read-only reconciliation scanned ${gatewayPayments.length} Razorpay payments over ${days} days; ${missingLocally.length} gateway-only and ${localNotInWindow.length} local-only candidates.`,
+        });
+        await withDbMutation((mutableDb) => {
+          appendAuditLog(mutableDb, {
+            actorId: req.suiteUser!.id,
+            actorName: req.suiteUser!.name,
+            actorRole: req.suiteUser!.role,
+            action: 'RAZORPAY_RECONCILIATION_RUN',
+            targetId: `RAZORPAY-${creds.mode.toUpperCase()}`,
+            summary: `Read-only reconciliation scanned ${gatewayPayments.length} Razorpay payments over ${days} days.`,
+          });
+        });
+        res.json({
+          mode: creds.mode, days, scanned: gatewayPayments.length,
+          truncated: gatewayPayments.length === 500,
+          gatewayOnly: missingLocally, localOnly: localNotInWindow,
+          matchedCount: gatewayPayments.length - missingLocally.length,
+          note: 'Read-only comparison only. No payment, invoice, refund or ledger records were changed.',
+        });
+      } catch (err) {
+        res.status(502).json({
+          error: err instanceof Error ? err.message : 'Razorpay reconciliation failed.',
+          code: 'RAZORPAY_RECONCILIATION_NETWORK_ERROR',
+        });
+      }
+    }
+  );
+
   // --- Payments & Invoices ---
   app.get(
     '/api/suite/payments',
