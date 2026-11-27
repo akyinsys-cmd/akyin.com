@@ -546,6 +546,12 @@ async function apiJson<T>(
 
 export const suiteApi = {
   // Public
+  getPublicRouteMeta() {
+    return apiJson<{ routeMetaOverrides: Record<string, Partial<{
+      title: string; description: string; ogTitle: string; ogDescription: string;
+      structuredData: Record<string, unknown>;
+    }>> }>('/api/public/route-meta');
+  },
   fetchPublicTicker(): Promise<PublicTickerResponse> {
     return apiJson<PublicTickerResponse>('/api/public/ticker');
   },
