@@ -3500,14 +3500,6 @@ export function registerSuiteRoutes(app: Express): void {
             amount: payment.amount, currency: payment.currency, status: payment.status,
             verified: payment.verified, createdAt: payment.createdAt,
           }));
-        appendAuditLog(db, {
-          actorId: req.suiteUser!.id,
-          actorName: req.suiteUser!.name,
-          actorRole: req.suiteUser!.role,
-          action: 'RAZORPAY_RECONCILIATION_RUN',
-          targetId: `RAZORPAY-${creds.mode.toUpperCase()}`,
-          summary: `Read-only reconciliation scanned ${gatewayPayments.length} Razorpay payments over ${days} days; ${missingLocally.length} gateway-only and ${localNotInWindow.length} local-only candidates.`,
-        });
         await withDbMutation((mutableDb) => {
           appendAuditLog(mutableDb, {
             actorId: req.suiteUser!.id,
