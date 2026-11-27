@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { CheckCircle2, Plus, Shield, UserCheck, UserX } from 'lucide-react';
+import { CheckCircle2, Plus, Shield, UserCheck, UserX, Trash2 } from 'lucide-react';
 import { PublicSuiteUser, UserRole, suiteApi } from '../../services/suiteApi';
 import { GlassButton, GlassModal } from '../liquid-glass';
 
@@ -87,6 +87,25 @@ export function AdminUsersPanel({ currentUserId }: AdminUsersPanelProps) {
       await loadUsers();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Status toggle failed.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteUser = async (user: PublicSuiteUser) => {
+    const confirmed = window.confirm(
+      `Permanently delete the internal account for ${user.email}? Their active sessions will be revoked. This does not delete customer, lead, quotation or payment records.`
+    );
+    if (!confirmed) return;
+    setSaving(true);
+    setError('');
+    setNotice('');
+    try {
+      await suiteApi.deleteUser(user.id);
+      setNotice(`Deleted internal account for ${user.email}. Related business records were preserved.`);
+      await loadUsers();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'User deletion failed.');
     } finally {
       setSaving(false);
     }
@@ -196,6 +215,15 @@ export function AdminUsersPanel({ currentUserId }: AdminUsersPanelProps) {
                               <UserCheck className="w-3 h-3 text-[#067647]" /> Activate
                             </>
                           )}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={saving}
+                          onClick={() => void handleDeleteUser(u)}
+                          className="ml-2 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#FECDCA] bg-white hover:bg-[#FEF3F2] text-[11px] font-semibold text-[#B42318] cursor-pointer"
+                          aria-label={`Delete account for ${u.email}`}
+                        >
+                          <Trash2 className="w-3 h-3" /> Delete
                         </button>
                       )}
                     </td>
