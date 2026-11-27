@@ -883,8 +883,33 @@ export function renderSeoHtml(baseHtml: string, rawPath: string, db?: SuiteDatab
     }
   }
 
-  // 2. Check static routes
-  const meta = ROUTE_SEO_META[cleaned] || ROUTE_SEO_META['/'];
+  // 2. Check static routes and apply Super Admin-published route metadata from the server database.
+  const baseMeta = ROUTE_SEO_META[cleaned] || ROUTE_SEO_META['/'];
+  let routeOverride: Record<string, unknown> = {};
+  const rawOverrides = db?.websiteSettings?.routeMetaOverrides;
+  if (typeof rawOverrides === 'string' && rawOverrides.length <= 500_000) {
+    try {
+      const allOverrides = JSON.parse(rawOverrides) as Record<string, unknown>;
+      const candidate = allOverrides && typeof allOverrides === 'object' ? allOverrides[cleaned] : undefined;
+      if (candidate && typeof candidate === 'object' && !Array.isArray(candidate)) {
+        routeOverride = candidate as Record<string, unknown>;
+      }
+    } catch {
+      routeOverride = {};
+    }
+  }
+  const meta: ServerRouteSeoMeta = {
+    ...baseMeta,
+    title: typeof routeOverride.title === 'string' && routeOverride.title.trim()
+      ? routeOverride.title.slice(0, 180) : baseMeta.title,
+    description: typeof routeOverride.description === 'string' && routeOverride.description.trim()
+      ? routeOverride.description.slice(0, 320) : baseMeta.description,
+    ogType: baseMeta.ogType,
+    robots: baseMeta.robots,
+    structuredData: routeOverride.structuredData && typeof routeOverride.structuredData === 'object' &&
+      !Array.isArray(routeOverride.structuredData)
+      ? routeOverride.structuredData as Record<string, unknown> : baseMeta.structuredData,
+  };
   const canonicalUrl = `${DOMAIN}${cleaned === '/' ? '/' : cleaned}`;
   const robotsValue = meta.robots || DEFAULT_ROBOTS;
   const ogType = meta.ogType || 'website';
