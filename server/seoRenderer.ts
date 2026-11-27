@@ -4,6 +4,8 @@ export interface ServerRouteSeoMeta {
   title: string;
   description: string;
   ogType?: 'website' | 'article';
+  ogTitle?: string;
+  ogDescription?: string;
   robots?: string;
   h1: string;
   summary: string;
@@ -905,6 +907,8 @@ export function renderSeoHtml(baseHtml: string, rawPath: string, db?: SuiteDatab
     description: typeof routeOverride.description === 'string' && routeOverride.description.trim()
       ? routeOverride.description.slice(0, 320) : baseMeta.description,
     ogType: baseMeta.ogType,
+    ogTitle: typeof routeOverride.ogTitle === 'string' ? routeOverride.ogTitle.slice(0, 180) : baseMeta.ogTitle,
+    ogDescription: typeof routeOverride.ogDescription === 'string' ? routeOverride.ogDescription.slice(0, 320) : baseMeta.ogDescription,
     robots: baseMeta.robots,
     structuredData: routeOverride.structuredData && typeof routeOverride.structuredData === 'object' &&
       !Array.isArray(routeOverride.structuredData)
@@ -966,6 +970,8 @@ export function renderSeoHtml(baseHtml: string, rawPath: string, db?: SuiteDatab
     canonicalUrl,
     robotsValue,
     ogType,
+    ogTitle: meta.ogTitle,
+    ogDescription: meta.ogDescription,
     structuredData,
     rootHtml,
   });
@@ -979,6 +985,8 @@ function injectSeoIntoTemplate(
     canonicalUrl: string;
     robotsValue: string;
     ogType: string;
+    ogTitle?: string;
+    ogDescription?: string;
     structuredData: Record<string, unknown>;
     rootHtml: string;
   }
@@ -1007,11 +1015,11 @@ function injectSeoIntoTemplate(
     )
     .replace(
       /<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i,
-      `<meta property="og:title" content="${escapeHtml(exactTitle)}" />`
+      `<meta property="og:title" content="${escapeHtml(opts.ogTitle || exactTitle)}" />`
     )
     .replace(
       /<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i,
-      `<meta property="og:description" content="${escapeHtml(exactDesc)}" />`
+      `<meta property="og:description" content="${escapeHtml(opts.ogDescription || exactDesc)}" />`
     )
     .replace(
       /<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/i,
