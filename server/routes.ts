@@ -4307,19 +4307,37 @@ export function registerSuiteRoutes(app: Express): void {
             throw err;
           }
           const b = req.body || {};
-          if (typeof b.active === 'boolean') {
-            if (!b.active && user.id === req.suiteUser!.id) {
-              const err = new Error('You cannot deactivate your own active session.');
-              (err as any).statusCode = 400;
-              throw err;
-            }
-            user.active = b.active;
+          const actorId = req.suiteUser!.id;
+          if (b.role !== undefined && !USER_ROLES.includes(b.role as UserRole)) {
+            const err = new Error('Invalid user role.');
+            (err as any).statusCode = 400;
+            throw err;
           }
-          if (typeof b.role === 'string' && USER_ROLES.includes(b.role as UserRole)) {
-            user.role = b.role as UserRole;
+          if (b.resetPassword !== undefined &&
+              (typeof b.resetPassword !== 'string' || b.resetPassword.length < 8 || b.resetPassword.length > 128)) {
+            const err = new Error('Reset password must be between 8 and 128 characters.');
+            (err as any).statusCode = 400;
+            throw err;
           }
-          if (typeof b.resetPassword === 'string' && b.resetPassword.length >= 8) {
-            user.passwordHash = hashPassword(b.resetPassword);
+          if (user.id === actorId && (b.active === false || b.role !== undefined || b.resetPassword !== undefined)) {
+            const err = new Error('You cannot change your own access, role or password from team management.');
+            (err as any).statusCode = 400;
+            throw err;
+          }
+          const willRemainSuperAdmin = user.role === 'Super Admin' &&
+            (b.active === false || (b.role !== undefined && b.role !== 'Super Admin'));
+          if (willRemainSuperAdmin &&
+              db.users.filter((candidate) => candidate.active && candidate.role === 'Super Admin' && candidate.id !== user.id).length === 0) {
+            const err = new Error('At least one active Super Admin must remain.');
+            (err as any).statusCode = 400;
+            throw err;
+          }
+          if (typeof b.active === 'boolean') user.active = b.active;
+          if (typeof b.role === 'string') user.role = b.role as UserRole;
+          if (typeof b.resetPassword === 'string') user.passwordHash = hashPassword(b.resetPassword);
+          // Revoke every existing session whenever credentials or privileges change.
+          if (typeof b.active === 'boolean' || typeof b.role === 'string' || typeof b.resetPassword === 'string') {
+            db.sessions = db.sessions.filter((session) => session.userId !== user.id);
           }
           user.updatedAt = new Date().toISOString();
           appendAuditLog(db, {
@@ -4335,6 +4353,49 @@ export function registerSuiteRoutes(app: Express): void {
         res.json({ user: updated });
       } catch (err: any) {
         res.status(err?.statusCode || 400).json({ error: err?.message || 'User update failed.' });
+      }
+    }
+  );
+
+  app.delete(
+    '/api/suite/users/:userId',
+    requireAuth,
+    requireRole(['Super Admin']),
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = String(req.params.userId || '').trim();
+      try {
+        await withDbMutation((db) => {
+          const user = db.users.find((candidate) => candidate.id === userId);
+          if (!user) {
+            const err = new Error('User not found.');
+            (err as any).statusCode = 404;
+            throw err;
+          }
+          if (user.id === req.suiteUser!.id) {
+            const err = new Error('You cannot delete your own account.');
+            (err as any).statusCode = 400;
+            throw err;
+          }
+          if (user.active && user.role === 'Super Admin' &&
+              db.users.filter((candidate) => candidate.active && candidate.role === 'Super Admin' && candidate.id !== user.id).length === 0) {
+            const err = new Error('The last active Super Admin cannot be deleted.');
+            (err as any).statusCode = 400;
+            throw err;
+          }
+          db.users = db.users.filter((candidate) => candidate.id !== user.id);
+          db.sessions = db.sessions.filter((session) => session.userId !== user.id);
+          appendAuditLog(db, {
+            actorId: req.suiteUser!.id,
+            actorName: req.suiteUser!.name,
+            actorRole: req.suiteUser!.role,
+            action: 'DELETE_USER',
+            targetId: user.id,
+            summary: `Deleted internal account ${user.email} (${user.role}). All sessions revoked.`,
+          });
+        });
+        res.json({ ok: true, deletedUserId: userId });
+      } catch (err: any) {
+        res.status(err?.statusCode || 400).json({ error: err?.message || 'User deletion failed.' });
       }
     }
   );
