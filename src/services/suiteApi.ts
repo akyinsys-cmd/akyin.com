@@ -690,6 +690,20 @@ export const suiteApi = {
     );
   },
 
+  // Unified customer directory (read-only aggregation of existing records)
+  getCustomers() {
+    return apiJson<{
+      customers: Array<{
+        customerKey: string; name: string; companyName: string; email: string; phone: string;
+        city: string; country: string; clientId: string; clientStatus: string;
+        leadIds: string[]; invoiceCount: number; appointmentCount: number;
+        sources: string[]; lastActivityAt: string;
+      }>;
+      total: number;
+      note: string;
+    }>('/api/suite/customers', {}, true);
+  },
+
   // Clients
   getClients() {
     return apiJson<{ clients: SuiteClientRecord[]; reportedClientsHandled: number }>(
