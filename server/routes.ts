@@ -638,6 +638,20 @@ export function registerSuiteRoutes(app: Express): void {
   // =========================================================================
   // 2. PUBLIC DISCOVERY, TICKER, SERVICES, QUOTATION PORTAL & BOOKINGS
   // =========================================================================
+  app.get('/api/public/route-meta', (_req: Request, res: Response) => {
+    const raw = readDb().websiteSettings?.routeMetaOverrides;
+    if (typeof raw !== 'string' || !raw.trim()) {
+      res.json({ routeMetaOverrides: {} });
+      return;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      res.json({ routeMetaOverrides: parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {} });
+    } catch {
+      res.json({ routeMetaOverrides: {} });
+    }
+  });
+
   app.get('/api/public/ticker', (_req: Request, res: Response) => {
     const db = readDb();
     const visibleClients = (db.clients || [])
