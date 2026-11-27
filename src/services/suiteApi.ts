@@ -1014,6 +1014,13 @@ export const suiteApi = {
       body: JSON.stringify(patch),
     }, true);
   },
+  deleteUser(userId: string) {
+    return apiJson<{ ok: boolean; deletedUserId: string }>(
+      `/api/suite/users/${encodeURIComponent(userId)}`,
+      { method: 'DELETE' },
+      true
+    );
+  },
   getAuditLogs() {
     return apiJson<{
       auditLogs: Array<{
