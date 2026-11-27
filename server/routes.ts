@@ -616,6 +616,10 @@ export function registerSuiteRoutes(app: Express): void {
         }
         user.passwordHash = hashPassword(parsed.data.newPassword);
         user.updatedAt = new Date().toISOString();
+        // Keep the current session alive, but revoke all other sessions after password rotation.
+        db.sessions = db.sessions.filter(
+          (session) => session.userId !== user.id || session.tokenHash === req.suiteTokenHash
+        );
         appendAuditLog(db, {
           actorId: user.id,
           actorName: user.name,
