@@ -878,6 +878,21 @@ export const suiteApi = {
       uaeGatewayEnabled: boolean;
     }>('/api/suite/payments', {}, true);
   },
+  reconcileRazorpay(days = 30) {
+    return apiJson<{
+      mode: 'test' | 'live';
+      days: number;
+      scanned: number;
+      truncated: boolean;
+      matchedCount: number;
+      gatewayOnly: Array<{ paymentId: string; orderId: string; amount: number; currency: string; status: string; captured: boolean; createdAt: string }>;
+      localOnly: Array<{ paymentId: string; orderId: string; amount: number; currency: string; status: string; verified: boolean; createdAt: string }>;
+      note: string;
+    }>('/api/suite/payments/razorpay-reconcile', {
+      method: 'POST',
+      body: JSON.stringify({ days }),
+    }, true);
+  },
   createInvoice(payload: Record<string, unknown>) {
     return apiJson<{ invoice: SuiteInvoice }>('/api/suite/invoices', {
       method: 'POST',
