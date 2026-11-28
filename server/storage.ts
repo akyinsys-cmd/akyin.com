@@ -2326,11 +2326,15 @@ export function readDb(): SuiteDatabase {
     }
     return migrated;
   } catch (err) {
-    console.error('[suite-storage] Failed parsing suite-db.json, backing up and reinitializing:', err);
+    // Never replace an unreadable database with an empty one: doing so can silently
+    // destroy live CRM, invoice, payment and booking data. Preserve a forensic copy
+    // and fail closed so an operator can restore the database before writes resume.
+    console.error('[suite-storage] Failed reading suite-db.json; preserving the original database:', err);
     backupDatabaseFile(dbPath, 'corrupt');
-    const fresh = buildEmptyDatabase();
-    writeDbAtomic(fresh);
-    return fresh;
+    throw new Error(
+      'The AKYIN database could not be read. The original file has been preserved; restore it from backup before resuming writes.',
+      { cause: err }
+    );
   }
 }
 
