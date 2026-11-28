@@ -323,6 +323,21 @@ export async function handleRazorpayWebhook(req: Request, res: Response): Promis
         (orderId && p.razorpayOrderId === orderId)
     );
 
+    if (
+      (eventName === 'payment.captured' || eventName === 'order.paid') &&
+      !targetPayment
+    ) {
+      appendAuditLog(db, {
+        actorId: 'razorpay_webhook',
+        actorName: 'Razorpay Webhook',
+        actorRole: 'Webhook',
+        action: 'WEBHOOK_PAYMENT_UNMATCHED',
+        targetId: paymentId || orderId || dedupeKey,
+        summary: 'Received a valid Razorpay capture event that does not match an AKYIN payment order; no ledger changes were made.',
+      });
+      return { duplicate: false, ignored: true };
+    }
+
     if (eventName === 'payment.captured' || eventName === 'order.paid') {
       const amountMinor = Number(paymentEntity?.amount);
       const amountInMajor = Number.isSafeInteger(amountMinor) && amountMinor > 0 ? round2(amountMinor / 100) : 0;
