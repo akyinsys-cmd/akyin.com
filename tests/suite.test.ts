@@ -32,6 +32,28 @@ after(() => {
 });
 
 describe('AKYIN Business Management Suite — Core Financial, Security & Booking Tests', () => {
+  it('preserves a corrupt database instead of silently replacing live data with an empty database', () => {
+    const isolatedDir = fs.mkdtempSync(path.join(os.tmpdir(), 'akyin-corrupt-db-test-'));
+    const previousDataDir = process.env.AKYIN_DATA_DIR;
+    const dbPath = path.join(isolatedDir, 'suite-db.json');
+    const originalContents = '{"schemaVersion":4,"payments":[broken-json';
+    fs.writeFileSync(dbPath, originalContents, 'utf8');
+
+    try {
+      process.env.AKYIN_DATA_DIR = isolatedDir;
+      assert.throws(() => readDb(), /database could not be read/i);
+      assert.equal(fs.readFileSync(dbPath, 'utf8'), originalContents);
+      const backupsDir = path.join(isolatedDir, 'backups');
+      const backups = fs.readdirSync(backupsDir).filter((name) => name.startsWith('suite-db-corrupt-'));
+      assert.equal(backups.length, 1);
+      assert.equal(fs.readFileSync(path.join(backupsDir, backups[0]), 'utf8'), originalContents);
+    } finally {
+      if (previousDataDir === undefined) delete process.env.AKYIN_DATA_DIR;
+      else process.env.AKYIN_DATA_DIR = previousDataDir;
+      fs.rmSync(isolatedDir, { recursive: true, force: true });
+    }
+  });
+
   it('calculates quotation line items, clamped discounts, and GST totals accurately', () => {
     const withGst = calculateQuotationTotals(
       [
