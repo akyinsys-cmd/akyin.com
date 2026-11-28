@@ -1,12 +1,14 @@
 name: AKYIN production build check
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: akyin-production-build
@@ -26,21 +28,14 @@ jobs:
         with:
           node-version: 24
 
-      - name: Generate package lockfile
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
 
-      - name: Commit generated lockfile when changed
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if ! git diff --quiet -- package-lock.json; then
-            git add package-lock.json
-            git commit -m "chore: generate npm lockfile for reproducible deployment"
-            git push
-          fi
+      - name: TypeScript validation
+        run: npm run lint
 
-      - name: Install exact locked dependencies
-        run: npm ci --no-audit --no-fund
+      - name: Run backend and security tests
+        run: npm test
 
       - name: Build production frontend
         run: npm run build

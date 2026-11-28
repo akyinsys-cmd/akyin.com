@@ -304,7 +304,10 @@ export async function handleRazorpayWebhook(req: Request, res: Response): Promis
   const refundEntity = (payload.payload as Record<string, any> | undefined)?.refund?.entity;
   const orderId = String(paymentEntity?.order_id || '');
   const paymentId = String(paymentEntity?.id || refundEntity?.payment_id || '');
-  const dedupeKey = eventIdHeader || `${eventName}:${paymentId || orderId}:${rawBody.length}`;
+  const refundId = String(refundEntity?.id || '');
+  const dedupeKey =
+    eventIdHeader ||
+    (refundId ? `${eventName}:${refundId}` : `${eventName}:${paymentId || orderId}:${crypto.createHash('sha256').update(rawBody).digest('hex')}`);
 
   const outcome = await withDbMutation(async (db) => {
     if (db.processedWebhookEvents.includes(dedupeKey)) {
@@ -320,9 +323,47 @@ export async function handleRazorpayWebhook(req: Request, res: Response): Promis
         (orderId && p.razorpayOrderId === orderId)
     );
 
+    if (
+      (eventName === 'payment.captured' || eventName === 'order.paid') &&
+      !targetPayment
+    ) {
+      appendAuditLog(db, {
+        actorId: 'razorpay_webhook',
+        actorName: 'Razorpay Webhook',
+        actorRole: 'Webhook',
+        action: 'WEBHOOK_PAYMENT_UNMATCHED',
+        targetId: paymentId || orderId || dedupeKey,
+        summary: 'Received a valid Razorpay capture event that does not match an AKYIN payment order; no ledger changes were made.',
+      });
+      return { duplicate: false, ignored: true };
+    }
+
     if (eventName === 'payment.captured' || eventName === 'order.paid') {
-      const amountInMajor = paymentEntity?.amount ? round2(Number(paymentEntity.amount) / 100) : 0;
-      const feeInMajor = paymentEntity?.fee ? round2(Number(paymentEntity.fee) / 100) : 0;
+      const amountMinor = Number(paymentEntity?.amount);
+      const amountInMajor = Number.isSafeInteger(amountMinor) && amountMinor > 0 ? round2(amountMinor / 100) : 0;
+      const feeMinor = Number(paymentEntity?.fee);
+      const feeInMajor = Number.isSafeInteger(feeMinor) && feeMinor >= 0 ? round2(feeMinor / 100) : 0;
+      const eventCurrency = String(paymentEntity?.currency || '').toUpperCase();
+      if (
+        targetPayment &&
+        (!amountInMajor ||
+          eventCurrency !== String(targetPayment.currency || '').toUpperCase() ||
+          Math.round(amountInMajor * 100) !== Math.round(targetPayment.amount * 100) ||
+          (targetPayment.status === 'captured' &&
+            targetPayment.verified &&
+            targetPayment.razorpayPaymentId &&
+            targetPayment.razorpayPaymentId !== paymentId))
+      ) {
+        appendAuditLog(db, {
+          actorId: 'razorpay_webhook',
+          actorName: 'Razorpay Webhook',
+          actorRole: 'Webhook',
+          action: 'WEBHOOK_PAYMENT_MISMATCH',
+          targetId: paymentId || orderId || dedupeKey,
+          summary: 'Ignored a captured-payment webhook because its order, amount, currency, or payment ID did not match the stored payment.',
+        });
+        return { duplicate: false, ignored: true };
+      }
       if (targetPayment) {
         if (!targetPayment.webhookEventIds.includes(dedupeKey)) {
           targetPayment.webhookEventIds.push(dedupeKey);
@@ -377,11 +418,14 @@ export async function handleRazorpayWebhook(req: Request, res: Response): Promis
         body: `Razorpay reported payment.failed for order ${orderId}, payment ${paymentId}.`,
       });
     } else if (eventName === 'refund.processed' && targetPayment) {
-      const refundAmt = refundEntity?.amount ? round2(Number(refundEntity.amount) / 100) : 0;
-      if (refundAmt > 0) {
-        targetPayment.refundedAmount = round2(
-          Math.min(targetPayment.amount, targetPayment.refundedAmount + refundAmt)
-        );
+      const refundMinor = Number(refundEntity?.amount);
+      const refundAmt = Number.isSafeInteger(refundMinor) && refundMinor > 0 ? round2(refundMinor / 100) : 0;
+      const appliedRefund = round2(Math.min(
+        refundAmt,
+        Math.max(0, targetPayment.amount - targetPayment.refundedAmount)
+      ));
+      if (appliedRefund > 0) {
+        targetPayment.refundedAmount = round2(targetPayment.refundedAmount + appliedRefund);
         if (targetPayment.refundedAmount >= targetPayment.amount) {
           targetPayment.status = 'refunded';
         }
@@ -389,8 +433,9 @@ export async function handleRazorpayWebhook(req: Request, res: Response): Promis
         if (targetPayment.invoiceId) {
           const inv = db.invoices.find((i) => i.id === targetPayment.invoiceId);
           if (inv) {
-            inv.refundedAmount = round2(inv.refundedAmount + refundAmt);
-            inv.paidAmount = round2(Math.max(0, inv.paidAmount - refundAmt));
+            const invoiceRefund = round2(Math.min(appliedRefund, Math.max(0, inv.paidAmount)));
+            inv.refundedAmount = round2(inv.refundedAmount + invoiceRefund);
+            inv.paidAmount = round2(Math.max(0, inv.paidAmount - invoiceRefund));
             recalculateInvoiceStatus(inv);
           }
         }
@@ -399,8 +444,8 @@ export async function handleRazorpayWebhook(req: Request, res: Response): Promis
           actorName: 'Razorpay Webhook',
           actorRole: 'Webhook',
           action: 'WEBHOOK_REFUND_PROCESSED',
-          targetId: paymentId,
-          summary: `Refund of ${refundAmt} processed via Razorpay webhook.`,
+          targetId: refundId || paymentId,
+          summary: `Refund of ${appliedRefund} processed via Razorpay webhook.`,
         });
       }
     }
@@ -408,7 +453,7 @@ export async function handleRazorpayWebhook(req: Request, res: Response): Promis
     return { duplicate: false };
   });
 
-  res.json({ ok: true, duplicate: outcome.duplicate });
+  res.json({ ok: true, duplicate: outcome.duplicate, ignored: Boolean(outcome.ignored) });
 }
 
 export function createSimpleRateLimiter(windowMs: number, max: number, code: string, message: string) {
@@ -616,6 +661,10 @@ export function registerSuiteRoutes(app: Express): void {
         }
         user.passwordHash = hashPassword(parsed.data.newPassword);
         user.updatedAt = new Date().toISOString();
+        // Keep the current session alive, but revoke all other sessions after password rotation.
+        db.sessions = db.sessions.filter(
+          (session) => session.userId !== user.id || session.tokenHash === req.suiteTokenHash
+        );
         appendAuditLog(db, {
           actorId: user.id,
           actorName: user.name,
@@ -634,6 +683,20 @@ export function registerSuiteRoutes(app: Express): void {
   // =========================================================================
   // 2. PUBLIC DISCOVERY, TICKER, SERVICES, QUOTATION PORTAL & BOOKINGS
   // =========================================================================
+  app.get('/api/public/route-meta', (_req: Request, res: Response) => {
+    const raw = readDb().websiteSettings?.routeMetaOverrides;
+    if (typeof raw !== 'string' || !raw.trim()) {
+      res.json({ routeMetaOverrides: {} });
+      return;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      res.json({ routeMetaOverrides: parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {} });
+    } catch {
+      res.json({ routeMetaOverrides: {} });
+    }
+  });
+
   app.get('/api/public/ticker', (_req: Request, res: Response) => {
     const db = readDb();
     const visibleClients = (db.clients || [])
@@ -1290,14 +1353,35 @@ export function registerSuiteRoutes(app: Express): void {
       return;
     }
 
+    const knownPayment = readDb().payments.find((p) => p.razorpayOrderId === razorpay_order_id);
+    if (!knownPayment || knownPayment.gateway !== 'razorpay' || knownPayment.mode !== creds.mode) {
+      res.status(404).json({
+        verified: false,
+        error: 'This Razorpay order was not created by the current AKYIN payment configuration.',
+        code: 'ORDER_NOT_FOUND',
+      });
+      return;
+    }
+
     const settled = await withDbMutation(async (db) => {
       const nowIso = new Date().toISOString();
-      const paymentRec = db.payments.find(
-        (p) =>
-          p.razorpayOrderId === razorpay_order_id ||
-          (razorpay_payment_id && p.razorpayPaymentId === razorpay_payment_id)
-      );
-      if (paymentRec) {
+      const paymentRec = db.payments.find((p) => p.razorpayOrderId === razorpay_order_id);
+      if (!paymentRec || paymentRec.gateway !== 'razorpay' || paymentRec.mode !== creds.mode) {
+        const err = new Error('Razorpay order is no longer available for verification.');
+        (err as any).statusCode = 404;
+        throw err;
+      }
+      if (
+        paymentRec.status === 'captured' &&
+        paymentRec.verified &&
+        paymentRec.razorpayPaymentId &&
+        paymentRec.razorpayPaymentId !== razorpay_payment_id
+      ) {
+        const err = new Error('A different payment has already settled this Razorpay order.');
+        (err as any).statusCode = 409;
+        throw err;
+      }
+      {
         const wasSettled = paymentRec.status === 'captured' && paymentRec.verified;
         paymentRec.razorpayPaymentId = razorpay_payment_id;
         paymentRec.razorpaySignatureVerified = true;
@@ -1328,8 +1412,16 @@ export function registerSuiteRoutes(app: Express): void {
         body: `Order ID: ${razorpay_order_id}\nPayment ID: ${razorpay_payment_id}\nMode: ${creds.mode}`,
       });
       return paymentRec;
+    }).catch((err: any) => {
+      res.status(err?.statusCode || 500).json({
+        verified: false,
+        error: err?.message || 'Unable to verify payment.',
+        code: err?.statusCode === 404 ? 'ORDER_NOT_FOUND' : err?.statusCode === 409 ? 'ORDER_ALREADY_SETTLED' : 'PAYMENT_VERIFICATION_FAILED',
+      });
+      return null;
     });
 
+    if (!settled) return;
     const item = sku ? PAYMENT_CATALOG_BY_SKU[sku] : undefined;
     res.json({
       verified: true,
@@ -1713,6 +1805,83 @@ export function registerSuiteRoutes(app: Express): void {
       } catch (err: any) {
         res.status(err?.statusCode || 400).json({ error: err?.message || 'Conversion failed.' });
       }
+    }
+  );
+
+  // --- Unified customer directory: combines existing CRM, client, invoice and booking contacts ---
+  app.get(
+    '/api/suite/customers',
+    requireAuth,
+    requirePermission('clients'),
+    (_req: Request, res: Response) => {
+      const db = readDb();
+      type CustomerView = {
+        customerKey: string; name: string; companyName: string; email: string; phone: string;
+        city: string; country: string; clientId: string; clientStatus: string;
+        leadIds: string[]; invoiceCount: number; appointmentCount: number;
+        sources: string[]; lastActivityAt: string;
+      };
+      const byKey = new Map<string, CustomerView>();
+      const keyFor = (email: string, phone: string, fallback: string) => {
+        const cleanEmail = String(email || '').trim().toLowerCase();
+        const cleanPhone = String(phone || '').replace(/\D/g, '');
+        return cleanEmail ? `email:${cleanEmail}` : cleanPhone ? `phone:${cleanPhone}` : fallback;
+      };
+      const upsert = (input: Partial<CustomerView> & { email?: string; phone?: string; fallback: string; source: string; activity?: string }) => {
+        const key = keyFor(input.email || '', input.phone || '', input.fallback);
+        const existing = byKey.get(key);
+        if (existing) {
+          if (!existing.name && input.name) existing.name = input.name;
+          if (!existing.companyName && input.companyName) existing.companyName = input.companyName;
+          if (!existing.email && input.email) existing.email = input.email;
+          if (!existing.phone && input.phone) existing.phone = input.phone;
+          if (!existing.city && input.city) existing.city = input.city;
+          if (!existing.country && input.country) existing.country = input.country;
+          if (!existing.clientId && input.clientId) existing.clientId = input.clientId;
+          if (input.clientStatus) existing.clientStatus = input.clientStatus;
+          if (input.leadIds?.length) existing.leadIds = Array.from(new Set([...existing.leadIds, ...input.leadIds]));
+          if (input.source && !existing.sources.includes(input.source)) existing.sources.push(input.source);
+          if (input.activity && input.activity > existing.lastActivityAt) existing.lastActivityAt = input.activity;
+          return existing;
+        }
+        const created: CustomerView = {
+          customerKey: key, name: input.name || '', companyName: input.companyName || '',
+          email: input.email || '', phone: input.phone || '', city: input.city || '', country: input.country || '',
+          clientId: input.clientId || '', clientStatus: input.clientStatus || '',
+          leadIds: input.leadIds || [], invoiceCount: 0, appointmentCount: 0,
+          sources: [input.source], lastActivityAt: input.activity || '',
+        };
+        byKey.set(key, created);
+        return created;
+      };
+      for (const client of db.clients || []) {
+        upsert({ fallback: `client:${client.id}`, source: 'Client', name: client.name,
+          companyName: client.companyName, email: client.email, phone: client.phone,
+          city: client.city, country: client.country, clientId: client.id,
+          clientStatus: client.status, activity: client.updatedAt || client.createdAt });
+      }
+      for (const lead of db.leads || []) {
+        upsert({ fallback: `lead:${lead.leadId}`, source: 'Lead / Enquiry', name: lead.fullName,
+          companyName: lead.companyName, email: lead.email, phone: lead.mobileNumber,
+          city: lead.city, country: lead.country, leadIds: [lead.leadId], activity: lead.updatedAt || lead.receivedAt });
+      }
+      for (const invoice of db.invoices || []) {
+        const customer = upsert({ fallback: `invoice:${invoice.id}`, source: 'Invoice',
+          name: invoice.customerName, companyName: invoice.companyName, email: invoice.customerEmail,
+          phone: invoice.customerPhone, activity: invoice.updatedAt || invoice.createdAt });
+        customer.invoiceCount += 1;
+      }
+      for (const appointment of db.appointments || []) {
+        const customer = upsert({ fallback: `appointment:${appointment.bookingId}`, source: 'Appointment',
+          name: appointment.customerName, companyName: appointment.businessName, email: appointment.email,
+          phone: appointment.phone, city: appointment.city, country: appointment.country,
+          activity: appointment.updatedAt || appointment.createdAt });
+        customer.appointmentCount += 1;
+      }
+      const customers = Array.from(byKey.values()).sort((a, b) =>
+        b.lastActivityAt.localeCompare(a.lastActivityAt)
+      );
+      res.json({ customers, total: customers.length, note: 'Unified directory of existing lead, client, invoice and appointment contacts. No customer login accounts are created.' });
     }
   );
 
@@ -3421,6 +3590,107 @@ export function registerSuiteRoutes(app: Express): void {
     }
   );
 
+  // --- Read-only Razorpay account reconciliation (never mutates ledger records) ---
+  app.post(
+    '/api/suite/payments/razorpay-reconcile',
+    requireAuth,
+    requirePermission('payments'),
+    async (req: AuthenticatedRequest, res: Response) => {
+      const creds = getRazorpayCredentials();
+      if (!creds) {
+        res.status(503).json({ error: 'Razorpay API credentials are not configured.' });
+        return;
+      }
+      const days = Math.min(90, Math.max(1, Number(req.body?.days) || 30));
+      const to = Math.floor(Date.now() / 1000);
+      const from = to - days * 24 * 60 * 60;
+      const authHeader = Buffer.from(`${creds.keyId}:${creds.keySecret}`).toString('base64');
+      const gatewayPayments: Array<{
+        id: string; order_id?: string; amount: number; currency: string;
+        status: string; captured: boolean; created_at: number;
+      }> = [];
+      try {
+        // Razorpay caps each page at 100. Bound the scan to five pages / 500 records.
+        for (let skip = 0; skip < 500; skip += 100) {
+          const url = new URL('https://api.razorpay.com/v1/payments');
+          url.searchParams.set('from', String(from));
+          url.searchParams.set('to', String(to));
+          url.searchParams.set('count', '100');
+          url.searchParams.set('skip', String(skip));
+          const response = await fetch(url, {
+            headers: { Authorization: `Basic ${authHeader}` },
+            signal: AbortSignal.timeout(20000),
+          });
+          const body = await response.json().catch(() => ({})) as {
+            items?: typeof gatewayPayments;
+            error?: { description?: string };
+          };
+          if (!response.ok) {
+            res.status(502).json({
+              error: body.error?.description || 'Unable to retrieve Razorpay payment records.',
+              code: 'RAZORPAY_RECONCILIATION_FAILED',
+            });
+            return;
+          }
+          const items = Array.isArray(body.items) ? body.items : [];
+          gatewayPayments.push(...items);
+          if (items.length < 100) break;
+        }
+        const db = readDb();
+        const localGatewayPayments = db.payments.filter(
+          (payment) => payment.gateway === 'razorpay' && payment.mode === creds.mode
+        );
+        const localByGatewayId = new Map(
+          localGatewayPayments
+            .filter((payment) => payment.razorpayPaymentId)
+            .map((payment) => [payment.razorpayPaymentId, payment])
+        );
+        const gatewayIds = new Set(gatewayPayments.map((payment) => payment.id));
+        const missingLocally = gatewayPayments
+          .filter((payment) => !localByGatewayId.has(payment.id))
+          .map((payment) => ({
+            paymentId: payment.id, orderId: payment.order_id || '',
+            amount: payment.amount / 100, currency: payment.currency,
+            status: payment.status, captured: payment.captured,
+            createdAt: new Date(payment.created_at * 1000).toISOString(),
+          }));
+        const localNotInWindow = localGatewayPayments
+          .filter((payment) => payment.razorpayPaymentId && !gatewayIds.has(payment.razorpayPaymentId))
+          .filter((payment) => {
+            const stamp = Date.parse(payment.createdAt);
+            return Number.isFinite(stamp) && stamp >= from * 1000 && stamp <= to * 1000;
+          })
+          .map((payment) => ({
+            paymentId: payment.razorpayPaymentId, orderId: payment.razorpayOrderId,
+            amount: payment.amount, currency: payment.currency, status: payment.status,
+            verified: payment.verified, createdAt: payment.createdAt,
+          }));
+        await withDbMutation((mutableDb) => {
+          appendAuditLog(mutableDb, {
+            actorId: req.suiteUser!.id,
+            actorName: req.suiteUser!.name,
+            actorRole: req.suiteUser!.role,
+            action: 'RAZORPAY_RECONCILIATION_RUN',
+            targetId: `RAZORPAY-${creds.mode.toUpperCase()}`,
+            summary: `Read-only reconciliation scanned ${gatewayPayments.length} Razorpay payments over ${days} days.`,
+          });
+        });
+        res.json({
+          mode: creds.mode, days, scanned: gatewayPayments.length,
+          truncated: gatewayPayments.length === 500,
+          gatewayOnly: missingLocally, localOnly: localNotInWindow,
+          matchedCount: gatewayPayments.length - missingLocally.length,
+          note: 'Read-only comparison only. No payment, invoice, refund or ledger records were changed.',
+        });
+      } catch (err) {
+        res.status(502).json({
+          error: err instanceof Error ? err.message : 'Razorpay reconciliation failed.',
+          code: 'RAZORPAY_RECONCILIATION_NETWORK_ERROR',
+        });
+      }
+    }
+  );
+
   // --- Payments & Invoices ---
   app.get(
     '/api/suite/payments',
@@ -4307,19 +4577,37 @@ export function registerSuiteRoutes(app: Express): void {
             throw err;
           }
           const b = req.body || {};
-          if (typeof b.active === 'boolean') {
-            if (!b.active && user.id === req.suiteUser!.id) {
-              const err = new Error('You cannot deactivate your own active session.');
-              (err as any).statusCode = 400;
-              throw err;
-            }
-            user.active = b.active;
+          const actorId = req.suiteUser!.id;
+          if (b.role !== undefined && !USER_ROLES.includes(b.role as UserRole)) {
+            const err = new Error('Invalid user role.');
+            (err as any).statusCode = 400;
+            throw err;
           }
-          if (typeof b.role === 'string' && USER_ROLES.includes(b.role as UserRole)) {
-            user.role = b.role as UserRole;
+          if (b.resetPassword !== undefined &&
+              (typeof b.resetPassword !== 'string' || b.resetPassword.length < 8 || b.resetPassword.length > 128)) {
+            const err = new Error('Reset password must be between 8 and 128 characters.');
+            (err as any).statusCode = 400;
+            throw err;
           }
-          if (typeof b.resetPassword === 'string' && b.resetPassword.length >= 8) {
-            user.passwordHash = hashPassword(b.resetPassword);
+          if (user.id === actorId && (b.active === false || b.role !== undefined || b.resetPassword !== undefined)) {
+            const err = new Error('You cannot change your own access, role or password from team management.');
+            (err as any).statusCode = 400;
+            throw err;
+          }
+          const willRemainSuperAdmin = user.role === 'Super Admin' &&
+            (b.active === false || (b.role !== undefined && b.role !== 'Super Admin'));
+          if (willRemainSuperAdmin &&
+              db.users.filter((candidate) => candidate.active && candidate.role === 'Super Admin' && candidate.id !== user.id).length === 0) {
+            const err = new Error('At least one active Super Admin must remain.');
+            (err as any).statusCode = 400;
+            throw err;
+          }
+          if (typeof b.active === 'boolean') user.active = b.active;
+          if (typeof b.role === 'string') user.role = b.role as UserRole;
+          if (typeof b.resetPassword === 'string') user.passwordHash = hashPassword(b.resetPassword);
+          // Revoke every existing session whenever credentials or privileges change.
+          if (typeof b.active === 'boolean' || typeof b.role === 'string' || typeof b.resetPassword === 'string') {
+            db.sessions = db.sessions.filter((session) => session.userId !== user.id);
           }
           user.updatedAt = new Date().toISOString();
           appendAuditLog(db, {
@@ -4335,6 +4623,49 @@ export function registerSuiteRoutes(app: Express): void {
         res.json({ user: updated });
       } catch (err: any) {
         res.status(err?.statusCode || 400).json({ error: err?.message || 'User update failed.' });
+      }
+    }
+  );
+
+  app.delete(
+    '/api/suite/users/:userId',
+    requireAuth,
+    requireRole(['Super Admin']),
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = String(req.params.userId || '').trim();
+      try {
+        await withDbMutation((db) => {
+          const user = db.users.find((candidate) => candidate.id === userId);
+          if (!user) {
+            const err = new Error('User not found.');
+            (err as any).statusCode = 404;
+            throw err;
+          }
+          if (user.id === req.suiteUser!.id) {
+            const err = new Error('You cannot delete your own account.');
+            (err as any).statusCode = 400;
+            throw err;
+          }
+          if (user.active && user.role === 'Super Admin' &&
+              db.users.filter((candidate) => candidate.active && candidate.role === 'Super Admin' && candidate.id !== user.id).length === 0) {
+            const err = new Error('The last active Super Admin cannot be deleted.');
+            (err as any).statusCode = 400;
+            throw err;
+          }
+          db.users = db.users.filter((candidate) => candidate.id !== user.id);
+          db.sessions = db.sessions.filter((session) => session.userId !== user.id);
+          appendAuditLog(db, {
+            actorId: req.suiteUser!.id,
+            actorName: req.suiteUser!.name,
+            actorRole: req.suiteUser!.role,
+            action: 'DELETE_USER',
+            targetId: user.id,
+            summary: `Deleted internal account ${user.email} (${user.role}). All sessions revoked.`,
+          });
+        });
+        res.json({ ok: true, deletedUserId: userId });
+      } catch (err: any) {
+        res.status(err?.statusCode || 400).json({ error: err?.message || 'User deletion failed.' });
       }
     }
   );

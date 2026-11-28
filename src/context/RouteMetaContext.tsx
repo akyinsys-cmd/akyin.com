@@ -3,10 +3,12 @@ import {
   ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useState,
 } from 'react';
 import type { RouteMetadata } from '../App';
 import { AppRoute } from '../data/akyinData';
+import { getSuiteBearerToken, suiteApi } from '../services/suiteApi';
 
 const ROUTE_META_STORAGE_KEY = 'akyin_route_meta_overrides_v1';
 
@@ -76,6 +78,32 @@ export function RouteMetaProvider({
     Record<AppRoute, RouteMetadata>
   >(() => loadPersistedRouteMeta(defaultRouteMeta));
 
+  useEffect(() => {
+    let active = true;
+    suiteApi.getPublicRouteMeta().then(({ routeMetaOverrides }) => {
+      if (!active || !routeMetaOverrides || typeof routeMetaOverrides !== 'object') return;
+      setRouteMetaMap((prev) => {
+        const merged = { ...prev };
+        (Object.keys(defaultRouteMeta) as AppRoute[]).forEach((route) => {
+          const patch = routeMetaOverrides[route];
+          const base = defaultRouteMeta[route];
+          if (!patch || !base) return;
+          merged[route] = {
+            ...merged[route],
+            title: typeof patch.title === 'string' && patch.title.trim() ? patch.title : merged[route].title,
+            description: typeof patch.description === 'string' && patch.description.trim() ? patch.description : merged[route].description,
+            ogTitle: typeof patch.ogTitle === 'string' ? patch.ogTitle : merged[route].ogTitle,
+            ogDescription: typeof patch.ogDescription === 'string' ? patch.ogDescription : merged[route].ogDescription,
+            structuredData: patch.structuredData && typeof patch.structuredData === 'object'
+              ? patch.structuredData : merged[route].structuredData,
+          };
+        });
+        return merged;
+      });
+    }).catch(() => undefined);
+    return () => { active = false; };
+  }, [defaultRouteMeta]);
+
   const persistOverrides = useCallback(
     (nextMap: Record<AppRoute, RouteMetadata>) => {
       if (typeof window === 'undefined') return;
@@ -99,10 +127,13 @@ export function RouteMetaProvider({
         if (Object.keys(overrides).length === 0) {
           window.localStorage.removeItem(ROUTE_META_STORAGE_KEY);
         } else {
-          window.localStorage.setItem(
-            ROUTE_META_STORAGE_KEY,
-            JSON.stringify(overrides)
-          );
+          window.localStorage.setItem(ROUTE_META_STORAGE_KEY, JSON.stringify(overrides));
+        }
+        // Publish metadata to the authenticated server database so SSR, crawlers and other devices see it.
+        if (getSuiteBearerToken()) {
+          void suiteApi.updateSettings({ routeMetaOverrides: JSON.stringify(overrides) }).catch((err) => {
+            console.error('[route-meta] Server publish failed:', err);
+          });
         }
       } catch {
         // Ignore storage errors in restricted browsing contexts

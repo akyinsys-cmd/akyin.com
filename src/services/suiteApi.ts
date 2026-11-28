@@ -546,6 +546,12 @@ async function apiJson<T>(
 
 export const suiteApi = {
   // Public
+  getPublicRouteMeta() {
+    return apiJson<{ routeMetaOverrides: Record<string, Partial<{
+      title: string; description: string; ogTitle: string; ogDescription: string;
+      structuredData: Record<string, unknown>;
+    }>> }>('/api/public/route-meta');
+  },
   fetchPublicTicker(): Promise<PublicTickerResponse> {
     return apiJson<PublicTickerResponse>('/api/public/ticker');
   },
@@ -688,6 +694,20 @@ export const suiteApi = {
       { method: 'POST' },
       true
     );
+  },
+
+  // Unified customer directory (read-only aggregation of existing records)
+  getCustomers() {
+    return apiJson<{
+      customers: Array<{
+        customerKey: string; name: string; companyName: string; email: string; phone: string;
+        city: string; country: string; clientId: string; clientStatus: string;
+        leadIds: string[]; invoiceCount: number; appointmentCount: number;
+        sources: string[]; lastActivityAt: string;
+      }>;
+      total: number;
+      note: string;
+    }>('/api/suite/customers', {}, true);
   },
 
   // Clients
@@ -878,6 +898,21 @@ export const suiteApi = {
       uaeGatewayEnabled: boolean;
     }>('/api/suite/payments', {}, true);
   },
+  reconcileRazorpay(days = 30) {
+    return apiJson<{
+      mode: 'test' | 'live';
+      days: number;
+      scanned: number;
+      truncated: boolean;
+      matchedCount: number;
+      gatewayOnly: Array<{ paymentId: string; orderId: string; amount: number; currency: string; status: string; captured: boolean; createdAt: string }>;
+      localOnly: Array<{ paymentId: string; orderId: string; amount: number; currency: string; status: string; verified: boolean; createdAt: string }>;
+      note: string;
+    }>('/api/suite/payments/razorpay-reconcile', {
+      method: 'POST',
+      body: JSON.stringify({ days }),
+    }, true);
+  },
   createInvoice(payload: Record<string, unknown>) {
     return apiJson<{ invoice: SuiteInvoice }>('/api/suite/invoices', {
       method: 'POST',
@@ -1013,6 +1048,13 @@ export const suiteApi = {
       method: 'PATCH',
       body: JSON.stringify(patch),
     }, true);
+  },
+  deleteUser(userId: string) {
+    return apiJson<{ ok: boolean; deletedUserId: string }>(
+      `/api/suite/users/${encodeURIComponent(userId)}`,
+      { method: 'DELETE' },
+      true
+    );
   },
   getAuditLogs() {
     return apiJson<{

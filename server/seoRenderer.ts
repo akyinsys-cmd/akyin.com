@@ -4,6 +4,8 @@ export interface ServerRouteSeoMeta {
   title: string;
   description: string;
   ogType?: 'website' | 'article';
+  ogTitle?: string;
+  ogDescription?: string;
   robots?: string;
   h1: string;
   summary: string;
@@ -883,8 +885,35 @@ export function renderSeoHtml(baseHtml: string, rawPath: string, db?: SuiteDatab
     }
   }
 
-  // 2. Check static routes
-  const meta = ROUTE_SEO_META[cleaned] || ROUTE_SEO_META['/'];
+  // 2. Check static routes and apply Super Admin-published route metadata from the server database.
+  const baseMeta = ROUTE_SEO_META[cleaned] || ROUTE_SEO_META['/'];
+  let routeOverride: Record<string, unknown> = {};
+  const rawOverrides = db?.websiteSettings?.routeMetaOverrides;
+  if (typeof rawOverrides === 'string' && rawOverrides.length <= 500_000) {
+    try {
+      const allOverrides = JSON.parse(rawOverrides) as Record<string, unknown>;
+      const candidate = allOverrides && typeof allOverrides === 'object' ? allOverrides[cleaned] : undefined;
+      if (candidate && typeof candidate === 'object' && !Array.isArray(candidate)) {
+        routeOverride = candidate as Record<string, unknown>;
+      }
+    } catch {
+      routeOverride = {};
+    }
+  }
+  const meta: ServerRouteSeoMeta = {
+    ...baseMeta,
+    title: typeof routeOverride.title === 'string' && routeOverride.title.trim()
+      ? routeOverride.title.slice(0, 180) : baseMeta.title,
+    description: typeof routeOverride.description === 'string' && routeOverride.description.trim()
+      ? routeOverride.description.slice(0, 320) : baseMeta.description,
+    ogType: baseMeta.ogType,
+    ogTitle: typeof routeOverride.ogTitle === 'string' ? routeOverride.ogTitle.slice(0, 180) : baseMeta.ogTitle,
+    ogDescription: typeof routeOverride.ogDescription === 'string' ? routeOverride.ogDescription.slice(0, 320) : baseMeta.ogDescription,
+    robots: baseMeta.robots,
+    structuredData: routeOverride.structuredData && typeof routeOverride.structuredData === 'object' &&
+      !Array.isArray(routeOverride.structuredData)
+      ? routeOverride.structuredData as Record<string, unknown> : baseMeta.structuredData,
+  };
   const canonicalUrl = `${DOMAIN}${cleaned === '/' ? '/' : cleaned}`;
   const robotsValue = meta.robots || DEFAULT_ROBOTS;
   const ogType = meta.ogType || 'website';
@@ -941,6 +970,8 @@ export function renderSeoHtml(baseHtml: string, rawPath: string, db?: SuiteDatab
     canonicalUrl,
     robotsValue,
     ogType,
+    ogTitle: meta.ogTitle,
+    ogDescription: meta.ogDescription,
     structuredData,
     rootHtml,
   });
@@ -954,6 +985,8 @@ function injectSeoIntoTemplate(
     canonicalUrl: string;
     robotsValue: string;
     ogType: string;
+    ogTitle?: string;
+    ogDescription?: string;
     structuredData: Record<string, unknown>;
     rootHtml: string;
   }
@@ -982,11 +1015,11 @@ function injectSeoIntoTemplate(
     )
     .replace(
       /<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i,
-      `<meta property="og:title" content="${escapeHtml(exactTitle)}" />`
+      `<meta property="og:title" content="${escapeHtml(opts.ogTitle || exactTitle)}" />`
     )
     .replace(
       /<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i,
-      `<meta property="og:description" content="${escapeHtml(exactDesc)}" />`
+      `<meta property="og:description" content="${escapeHtml(opts.ogDescription || exactDesc)}" />`
     )
     .replace(
       /<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>/i,

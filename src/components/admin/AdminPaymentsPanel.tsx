@@ -5,6 +5,7 @@ import {
   Plus,
   RotateCcw,
   ShieldCheck,
+  RefreshCw,
   Wallet,
 } from 'lucide-react';
 import { SuiteInvoice, SuitePayment, suiteApi } from '../../services/suiteApi';
@@ -26,6 +27,9 @@ export function AdminPaymentsPanel({ onChanged }: AdminPaymentsPanelProps) {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [saving, setSaving] = useState(false);
+  const [reconciliation, setReconciliation] = useState<Awaited<ReturnType<typeof suiteApi.reconcileRazorpay>> | null>(null);
+  const [reconciling, setReconciling] = useState(false);
+  const [reconciliationError, setReconciliationError] = useState('');
   const [serviceCategories, setServiceCategories] = useState<string[]>([
     'Digital marketing',
     'Bulk SMS Marketing',
@@ -91,6 +95,21 @@ export function AdminPaymentsPanel({ onChanged }: AdminPaymentsPanelProps) {
   useEffect(() => {
     void loadPayments();
   }, [loadPayments]);
+
+  const handleReconcileRazorpay = async () => {
+    setReconciling(true);
+    setReconciliationError('');
+    setNotice('');
+    try {
+      const result = await suiteApi.reconcileRazorpay(30);
+      setReconciliation(result);
+      setNotice(`Read-only reconciliation completed: ${result.scanned} gateway records scanned.`);
+    } catch (err) {
+      setReconciliationError(err instanceof Error ? err.message : 'Razorpay reconciliation failed.');
+    } finally {
+      setReconciling(false);
+    }
+  };
 
   const handleCreateInvoice = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,10 +189,16 @@ export function AdminPaymentsPanel({ onChanged }: AdminPaymentsPanelProps) {
           </p>
         </div>
 
-        <GlassButton variant="primary" size="sm" onClick={() => setInvoiceModal(true)}>
-          <Plus className="w-3.5 h-3.5" aria-hidden="true" />
-          <span>Create Direct Invoice</span>
-        </GlassButton>
+        <div className="flex flex-wrap gap-2">
+          <GlassButton variant="subtle" size="sm" disabled={reconciling || !razorpayConfigured} onClick={() => void handleReconcileRazorpay()}>
+            <RefreshCw className={`w-3.5 h-3.5 ${reconciling ? 'animate-spin' : ''}`} aria-hidden="true" />
+            <span>{reconciling ? 'Checking Razorpay...' : 'Reconcile Last 30 Days'}</span>
+          </GlassButton>
+          <GlassButton variant="primary" size="sm" onClick={() => setInvoiceModal(true)}>
+            <Plus className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>Create Direct Invoice</span>
+          </GlassButton>
+        </div>
       </div>
 
       {/* Gateway Status Bar */}
@@ -224,6 +249,30 @@ export function AdminPaymentsPanel({ onChanged }: AdminPaymentsPanelProps) {
       {error && (
         <div className="rounded-2xl bg-[#FEF3F2] border border-[#FECDCA] px-4 py-3 text-xs font-semibold text-[#B42318]">
           {error}
+        </div>
+      )}
+      {reconciliationError && (
+        <div className="rounded-2xl bg-[#FEF3F2] border border-[#FECDCA] px-4 py-3 text-xs font-semibold text-[#B42318]">{reconciliationError}</div>
+      )}
+      {reconciliation && (
+        <div className="liquid-glass-card rounded-3xl p-5 space-y-3 text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-display text-base font-bold text-[#1D1D1F]">Razorpay Reconciliation · {reconciliation.mode.toUpperCase()}</h3>
+            <span className="text-[#6E6E73]">{reconciliation.days} days · {reconciliation.scanned} records scanned</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="rounded-xl border border-[#E8E8ED] p-3"><p className="text-[#6E6E73]">Matched IDs</p><p className="text-xl font-bold">{reconciliation.matchedCount}</p></div>
+            <div className="rounded-xl border border-[#E8E8ED] p-3"><p className="text-[#6E6E73]">Gateway only</p><p className="text-xl font-bold">{reconciliation.gatewayOnly.length}</p></div>
+            <div className="rounded-xl border border-[#E8E8ED] p-3"><p className="text-[#6E6E73]">Local only</p><p className="text-xl font-bold">{reconciliation.localOnly.length}</p></div>
+          </div>
+          {reconciliation.truncated && <p className="font-semibold text-[#B54708]">The scan reached the 500-record safety cap. Use a shorter period for a complete comparison.</p>}
+          {reconciliation.gatewayOnly.length > 0 && (
+            <div><h4 className="font-bold mb-2">Razorpay records not matched locally</h4>{reconciliation.gatewayOnly.slice(0,20).map(item=><p key={item.paymentId} className="py-1 border-b border-[#E8E8ED]">{item.paymentId} · {item.currency} {item.amount.toLocaleString()} · {item.status}</p>)}</div>
+          )}
+          {reconciliation.localOnly.length > 0 && (
+            <div><h4 className="font-bold mb-2">Local records not found in this Razorpay window</h4>{reconciliation.localOnly.slice(0,20).map(item=><p key={item.paymentId} className="py-1 border-b border-[#E8E8ED]">{item.paymentId} · {item.currency} {item.amount.toLocaleString()} · {item.status}</p>)}</div>
+          )}
+          <p className="text-[#6E6E73]">{reconciliation.note}</p>
         </div>
       )}
 

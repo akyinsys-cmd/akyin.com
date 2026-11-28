@@ -46,6 +46,7 @@ import { AdminConfigDashboard } from '../components/AdminConfigDashboard';
 import { AdminAppointmentsPanel } from '../components/admin/AdminAppointmentsPanel';
 import { AdminCalendarPanel } from '../components/admin/AdminCalendarPanel';
 import { AdminClientsPanel } from '../components/admin/AdminClientsPanel';
+import { AdminCustomerDirectory } from '../components/admin/AdminCustomerDirectory';
 import { AdminCrmLeadsPanel } from '../components/admin/AdminCrmLeadsPanel';
 import { AdminLoginPage } from '../components/admin/AdminLoginPage';
 import { AdminPaymentsPanel } from '../components/admin/AdminPaymentsPanel';
@@ -65,6 +66,7 @@ export { AdminLoginPage } from '../components/admin/AdminLoginPage';
 type AdminSidebarTab =
   | 'Overview'
   | 'Leads and Enquiries'
+  | 'Customers'
   | 'Clients'
   | 'Service Catalogue'
   | 'Quotations'
@@ -142,6 +144,7 @@ const SIDEBAR_ITEMS: Array<{
 }> = [
   { id: 'Overview', resource: 'overview', icon: LayoutDashboard },
   { id: 'Leads and Enquiries', resource: 'leads', icon: Inbox },
+  { id: 'Customers', resource: 'clients', icon: Users },
   { id: 'Clients', resource: 'clients', icon: Users },
   { id: 'Service Catalogue', resource: 'services', icon: Briefcase },
   { id: 'Quotations', resource: 'quotations', icon: FileText },
@@ -507,6 +510,8 @@ export function AdminPage({ onNavigate }: AdminPageProps) {
           )}
 
           {/* 3. Clients */}
+          {activeTab === 'Customers' && <AdminCustomerDirectory />}
+
           {activeTab === 'Clients' && (
             <AdminClientsPanel onChanged={() => void loadOverview()} />
           )}

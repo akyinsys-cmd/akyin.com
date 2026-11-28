@@ -32,6 +32,28 @@ after(() => {
 });
 
 describe('AKYIN Business Management Suite — Core Financial, Security & Booking Tests', () => {
+  it('preserves a corrupt database instead of silently replacing live data with an empty database', () => {
+    const isolatedDir = fs.mkdtempSync(path.join(os.tmpdir(), 'akyin-corrupt-db-test-'));
+    const previousDataDir = process.env.AKYIN_DATA_DIR;
+    const dbPath = path.join(isolatedDir, 'suite-db.json');
+    const originalContents = '{"schemaVersion":4,"payments":[broken-json';
+    fs.writeFileSync(dbPath, originalContents, 'utf8');
+
+    try {
+      process.env.AKYIN_DATA_DIR = isolatedDir;
+      assert.throws(() => readDb(), /database could not be read/i);
+      assert.equal(fs.readFileSync(dbPath, 'utf8'), originalContents);
+      const backupsDir = path.join(isolatedDir, 'backups');
+      const backups = fs.readdirSync(backupsDir).filter((name) => name.startsWith('suite-db-corrupt-'));
+      assert.equal(backups.length, 1);
+      assert.equal(fs.readFileSync(path.join(backupsDir, backups[0]), 'utf8'), originalContents);
+    } finally {
+      if (previousDataDir === undefined) delete process.env.AKYIN_DATA_DIR;
+      else process.env.AKYIN_DATA_DIR = previousDataDir;
+      fs.rmSync(isolatedDir, { recursive: true, force: true });
+    }
+  });
+
   it('calculates quotation line items, clamped discounts, and GST totals accurately', () => {
     const withGst = calculateQuotationTotals(
       [
@@ -393,6 +415,72 @@ describe('AKYIN Business Management Suite — Core Financial, Security & Booking
     const settledInv = afterDb.invoices.find((i) => i.id === 'inv-wh-1');
     assert.equal(settledInv?.paidAmount, 10000);
     assert.equal(settledInv?.status, 'PAID');
+
+    // A refund webhook must be idempotent even when Razorpay's event-id header is absent.
+    // Refund amounts are capped at the captured payment amount and cannot over-credit invoice refunds.
+    const refundBody = Buffer.from(JSON.stringify({
+      event: 'refund.processed',
+      payload: { refund: { entity: { id: 'rfnd_unique_001', payment_id: paymentId, amount: 1200000 } } },
+    }), 'utf8');
+    const refundSig = crypto.createHmac('sha256', webhookSecret).update(refundBody).digest('hex');
+    const refundReq: any = { headers: { 'x-razorpay-signature': refundSig }, body: refundBody };
+    const refund1 = makeMockRes();
+    await handleRazorpayWebhook(refundReq, refund1.res);
+    assert.equal(refund1.state.statusCode, 200);
+    assert.equal(refund1.state.body.duplicate, false);
+    const refund2 = makeMockRes();
+    await handleRazorpayWebhook(refundReq, refund2.res);
+    assert.equal(refund2.state.statusCode, 200);
+    assert.equal(refund2.state.body.duplicate, true);
+
+    const afterRefund = readDb();
+    const refundedPayment = afterRefund.payments.find((p) => p.id === 'pay-wh-1');
+    const refundedInvoice = afterRefund.invoices.find((i) => i.id === 'inv-wh-1');
+    assert.equal(refundedPayment?.refundedAmount, 10000);
+    assert.equal(refundedInvoice?.refundedAmount, 10000);
+    assert.equal(refundedInvoice?.paidAmount, 0);
+    assert.equal(refundedInvoice?.status, 'REFUNDED');
+
+    // A signed event with the wrong amount/currency must never settle a stored payment.
+    await withDbMutation((db) => {
+      db.invoices.unshift({
+        id: 'inv-wh-mismatch', invoiceNumber: 'AKY-INV-WH-MISMATCH', quotationId: '',
+        quotationNumber: '', leadId: '', clientId: '', serviceCategory: 'Digital marketing',
+        leadSource: 'Website', customerName: 'Mismatch Client', companyName: 'Mismatch Co',
+        customerEmail: 'mismatch@example.com', customerPhone: '', currency: 'INR',
+        paymentType: 'full', subtotal: 5000, discountAmount: 0, taxableAmount: 5000,
+        gstEnabled: false, gstRate: 0, gstAmount: 0, totalAmount: 5000, paidAmount: 0,
+        refundedAmount: 0, status: 'UNPAID', dueDate: '2026-12-31', notes: '',
+        createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+      });
+      db.payments.unshift({
+        id: 'pay-wh-mismatch', invoiceId: 'inv-wh-mismatch', invoiceNumber: 'AKY-INV-WH-MISMATCH',
+        quotationId: '', clientId: '', customerName: 'Mismatch Client', customerEmail: '',
+        serviceCategory: 'Digital marketing', leadSource: 'Website', mode: 'live',
+        gateway: 'razorpay', method: 'razorpay', currency: 'INR', amount: 5000,
+        gstPortion: 0, gatewayFeeAmount: 0, refundedAmount: 0, status: 'created',
+        verified: false, razorpayOrderId: 'order_MISMATCH', razorpayPaymentId: '',
+        razorpaySignatureVerified: false, webhookEventIds: [], idempotencyKey: 'mismatch',
+        notes: '', createdAt: new Date().toISOString(), capturedAt: '', updatedAt: new Date().toISOString(),
+      });
+    });
+    const mismatchBody = Buffer.from(JSON.stringify({
+      event: 'payment.captured',
+      payload: { payment: { entity: {
+        id: 'pay_MISMATCH', order_id: 'order_MISMATCH', amount: 499900,
+        currency: 'INR', method: 'card',
+      } } },
+    }), 'utf8');
+    const mismatchSig = crypto.createHmac('sha256', webhookSecret).update(mismatchBody).digest('hex');
+    const mismatchReq: any = { headers: { 'x-razorpay-signature': mismatchSig }, body: mismatchBody };
+    const mismatchRes = makeMockRes();
+    await handleRazorpayWebhook(mismatchReq, mismatchRes.res);
+    assert.equal(mismatchRes.state.statusCode, 200);
+    assert.equal(mismatchRes.state.body.ignored, true);
+    const afterMismatch = readDb();
+    assert.equal(afterMismatch.invoices.find((i) => i.id === 'inv-wh-mismatch')?.paidAmount, 0);
+    assert.equal(afterMismatch.payments.find((p) => p.id === 'pay-wh-mismatch')?.verified, false);
+
     delete process.env.RAZORPAY_WEBHOOK_SECRET;
   });
 
