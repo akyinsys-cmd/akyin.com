@@ -218,14 +218,14 @@ export function AdminUsersPanel({ currentUserId }: AdminUsersPanelProps) {
                             )}
                           </button>
                           <button
-                          type="button"
-                          disabled={saving}
-                          onClick={() => void handleDeleteUser(u)}
-                          className="ml-2 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#FECDCA] bg-white hover:bg-[#FEF3F2] text-[11px] font-semibold text-[#B42318] cursor-pointer"
-                          aria-label={`Delete account for ${u.email}`}
-                        >
-                          <Trash2 className="w-3 h-3" /> Delete
-                        </button>
+                            type="button"
+                            disabled={saving}
+                            onClick={() => void handleDeleteUser(u)}
+                            className="ml-2 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#FECDCA] bg-white hover:bg-[#FEF3F2] text-[11px] font-semibold text-[#B42318] cursor-pointer"
+                            aria-label={`Delete account for ${u.email}`}
+                          >
+                            <Trash2 className="w-3 h-3" /> Delete
+                          </button>
                         </>
                       )}
                     </td>
