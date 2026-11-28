@@ -39,14 +39,14 @@ export function AdminCustomerDirectory() {
     const headers = ['Name','Company','Email','Phone','City','Country','Client Status','Lead Count','Invoice Count','Appointment Count','Sources','Last Activity'];
     const quote = (value: unknown) => {
       const raw = String(value ?? '');
-      const safe = /^[=+\\-@\\t\\r]/.test(raw) ? "'" + raw : raw;
+      const safe = /^[-=+@\t\r]/.test(raw) ? "'" + raw : raw;
       return '"' + safe.replace(/"/g, '""') + '"';
     };
     const rows = filtered.map((c) => [
       c.name,c.companyName,c.email,c.phone,c.city,c.country,c.clientStatus,c.leadIds.length,
       c.invoiceCount,c.appointmentCount,c.sources.join('; '),c.lastActivityAt
     ].map(quote).join(','));
-    const blob = new Blob([[headers.map(quote).join(','), ...rows].join('\\n')], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([[headers.map(quote).join(','), ...rows].join('\r\n')], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
