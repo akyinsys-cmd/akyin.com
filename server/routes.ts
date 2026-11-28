@@ -304,7 +304,10 @@ export async function handleRazorpayWebhook(req: Request, res: Response): Promis
   const refundEntity = (payload.payload as Record<string, any> | undefined)?.refund?.entity;
   const orderId = String(paymentEntity?.order_id || '');
   const paymentId = String(paymentEntity?.id || refundEntity?.payment_id || '');
-  const dedupeKey = eventIdHeader || `${eventName}:${paymentId || orderId}:${rawBody.length}`;
+  const refundId = String(refundEntity?.id || '');
+  const dedupeKey =
+    eventIdHeader ||
+    (refundId ? `${eventName}:${refundId}` : `${eventName}:${paymentId || orderId}:${crypto.createHash('sha256').update(rawBody).digest('hex')}`);
 
   const outcome = await withDbMutation(async (db) => {
     if (db.processedWebhookEvents.includes(dedupeKey)) {
@@ -321,8 +324,31 @@ export async function handleRazorpayWebhook(req: Request, res: Response): Promis
     );
 
     if (eventName === 'payment.captured' || eventName === 'order.paid') {
-      const amountInMajor = paymentEntity?.amount ? round2(Number(paymentEntity.amount) / 100) : 0;
-      const feeInMajor = paymentEntity?.fee ? round2(Number(paymentEntity.fee) / 100) : 0;
+      const amountMinor = Number(paymentEntity?.amount);
+      const amountInMajor = Number.isSafeInteger(amountMinor) && amountMinor > 0 ? round2(amountMinor / 100) : 0;
+      const feeMinor = Number(paymentEntity?.fee);
+      const feeInMajor = Number.isSafeInteger(feeMinor) && feeMinor >= 0 ? round2(feeMinor / 100) : 0;
+      const eventCurrency = String(paymentEntity?.currency || '').toUpperCase();
+      if (
+        targetPayment &&
+        (!amountInMajor ||
+          eventCurrency !== String(targetPayment.currency || '').toUpperCase() ||
+          Math.round(amountInMajor * 100) !== Math.round(targetPayment.amount * 100) ||
+          (targetPayment.status === 'captured' &&
+            targetPayment.verified &&
+            targetPayment.razorpayPaymentId &&
+            targetPayment.razorpayPaymentId !== paymentId))
+      ) {
+        appendAuditLog(db, {
+          actorId: 'razorpay_webhook',
+          actorName: 'Razorpay Webhook',
+          actorRole: 'Webhook',
+          action: 'WEBHOOK_PAYMENT_MISMATCH',
+          targetId: paymentId || orderId || dedupeKey,
+          summary: 'Ignored a captured-payment webhook because its order, amount, currency, or payment ID did not match the stored payment.',
+        });
+        return { duplicate: false, ignored: true };
+      }
       if (targetPayment) {
         if (!targetPayment.webhookEventIds.includes(dedupeKey)) {
           targetPayment.webhookEventIds.push(dedupeKey);
@@ -377,11 +403,14 @@ export async function handleRazorpayWebhook(req: Request, res: Response): Promis
         body: `Razorpay reported payment.failed for order ${orderId}, payment ${paymentId}.`,
       });
     } else if (eventName === 'refund.processed' && targetPayment) {
-      const refundAmt = refundEntity?.amount ? round2(Number(refundEntity.amount) / 100) : 0;
-      if (refundAmt > 0) {
-        targetPayment.refundedAmount = round2(
-          Math.min(targetPayment.amount, targetPayment.refundedAmount + refundAmt)
-        );
+      const refundMinor = Number(refundEntity?.amount);
+      const refundAmt = Number.isSafeInteger(refundMinor) && refundMinor > 0 ? round2(refundMinor / 100) : 0;
+      const appliedRefund = round2(Math.min(
+        refundAmt,
+        Math.max(0, targetPayment.amount - targetPayment.refundedAmount)
+      ));
+      if (appliedRefund > 0) {
+        targetPayment.refundedAmount = round2(targetPayment.refundedAmount + appliedRefund);
         if (targetPayment.refundedAmount >= targetPayment.amount) {
           targetPayment.status = 'refunded';
         }
@@ -389,8 +418,9 @@ export async function handleRazorpayWebhook(req: Request, res: Response): Promis
         if (targetPayment.invoiceId) {
           const inv = db.invoices.find((i) => i.id === targetPayment.invoiceId);
           if (inv) {
-            inv.refundedAmount = round2(inv.refundedAmount + refundAmt);
-            inv.paidAmount = round2(Math.max(0, inv.paidAmount - refundAmt));
+            const invoiceRefund = round2(Math.min(appliedRefund, Math.max(0, inv.paidAmount)));
+            inv.refundedAmount = round2(inv.refundedAmount + invoiceRefund);
+            inv.paidAmount = round2(Math.max(0, inv.paidAmount - invoiceRefund));
             recalculateInvoiceStatus(inv);
           }
         }
@@ -399,8 +429,8 @@ export async function handleRazorpayWebhook(req: Request, res: Response): Promis
           actorName: 'Razorpay Webhook',
           actorRole: 'Webhook',
           action: 'WEBHOOK_REFUND_PROCESSED',
-          targetId: paymentId,
-          summary: `Refund of ${refundAmt} processed via Razorpay webhook.`,
+          targetId: refundId || paymentId,
+          summary: `Refund of ${appliedRefund} processed via Razorpay webhook.`,
         });
       }
     }
@@ -408,7 +438,7 @@ export async function handleRazorpayWebhook(req: Request, res: Response): Promis
     return { duplicate: false };
   });
 
-  res.json({ ok: true, duplicate: outcome.duplicate });
+  res.json({ ok: true, duplicate: outcome.duplicate, ignored: Boolean(outcome.ignored) });
 }
 
 export function createSimpleRateLimiter(windowMs: number, max: number, code: string, message: string) {
@@ -1308,14 +1338,35 @@ export function registerSuiteRoutes(app: Express): void {
       return;
     }
 
+    const knownPayment = readDb().payments.find((p) => p.razorpayOrderId === razorpay_order_id);
+    if (!knownPayment || knownPayment.gateway !== 'razorpay' || knownPayment.mode !== creds.mode) {
+      res.status(404).json({
+        verified: false,
+        error: 'This Razorpay order was not created by the current AKYIN payment configuration.',
+        code: 'ORDER_NOT_FOUND',
+      });
+      return;
+    }
+
     const settled = await withDbMutation(async (db) => {
       const nowIso = new Date().toISOString();
-      const paymentRec = db.payments.find(
-        (p) =>
-          p.razorpayOrderId === razorpay_order_id ||
-          (razorpay_payment_id && p.razorpayPaymentId === razorpay_payment_id)
-      );
-      if (paymentRec) {
+      const paymentRec = db.payments.find((p) => p.razorpayOrderId === razorpay_order_id);
+      if (!paymentRec || paymentRec.gateway !== 'razorpay' || paymentRec.mode !== creds.mode) {
+        const err = new Error('Razorpay order is no longer available for verification.');
+        (err as any).statusCode = 404;
+        throw err;
+      }
+      if (
+        paymentRec.status === 'captured' &&
+        paymentRec.verified &&
+        paymentRec.razorpayPaymentId &&
+        paymentRec.razorpayPaymentId !== razorpay_payment_id
+      ) {
+        const err = new Error('A different payment has already settled this Razorpay order.');
+        (err as any).statusCode = 409;
+        throw err;
+      }
+      {
         const wasSettled = paymentRec.status === 'captured' && paymentRec.verified;
         paymentRec.razorpayPaymentId = razorpay_payment_id;
         paymentRec.razorpaySignatureVerified = true;
@@ -1346,8 +1397,16 @@ export function registerSuiteRoutes(app: Express): void {
         body: `Order ID: ${razorpay_order_id}\nPayment ID: ${razorpay_payment_id}\nMode: ${creds.mode}`,
       });
       return paymentRec;
+    }).catch((err: any) => {
+      res.status(err?.statusCode || 500).json({
+        verified: false,
+        error: err?.message || 'Unable to verify payment.',
+        code: err?.statusCode === 404 ? 'ORDER_NOT_FOUND' : err?.statusCode === 409 ? 'ORDER_ALREADY_SETTLED' : 'PAYMENT_VERIFICATION_FAILED',
+      });
+      return null;
     });
 
+    if (!settled) return;
     const item = sku ? PAYMENT_CATALOG_BY_SKU[sku] : undefined;
     res.json({
       verified: true,
