@@ -200,23 +200,24 @@ export function AdminUsersPanel({ currentUserId }: AdminUsersPanelProps) {
                           <Shield className="w-3.5 h-3.5" /> Current Session
                         </span>
                       ) : (
-                        <button
-                          type="button"
-                          disabled={saving}
-                          onClick={() => void handleToggleActive(u)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#E8E8ED] bg-white hover:border-[#1D1D1F] text-[11px] font-semibold cursor-pointer"
-                        >
-                          {u.active ? (
-                            <>
-                              <UserX className="w-3 h-3 text-[#B42318]" /> Disable
-                            </>
-                          ) : (
-                            <>
-                              <UserCheck className="w-3 h-3 text-[#067647]" /> Activate
-                            </>
-                          )}
-                        </button>
-                        <button
+                        <>
+                          <button
+                            type="button"
+                            disabled={saving}
+                            onClick={() => void handleToggleActive(u)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#E8E8ED] bg-white hover:border-[#1D1D1F] text-[11px] font-semibold cursor-pointer"
+                          >
+                            {u.active ? (
+                              <>
+                                <UserX className="w-3 h-3 text-[#B42318]" /> Disable
+                              </>
+                            ) : (
+                              <>
+                                <UserCheck className="w-3 h-3 text-[#067647]" /> Activate
+                              </>
+                            )}
+                          </button>
+                          <button
                           type="button"
                           disabled={saving}
                           onClick={() => void handleDeleteUser(u)}
@@ -225,6 +226,7 @@ export function AdminUsersPanel({ currentUserId }: AdminUsersPanelProps) {
                         >
                           <Trash2 className="w-3 h-3" /> Delete
                         </button>
+                        </>
                       )}
                     </td>
                   </tr>
